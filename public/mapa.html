@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AlertaPersonas — Mapa en Tiempo Real</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #0f1117; color: #e2e8f0; height: 100dvh; display: flex; flex-direction: column; }
+
+    header {
+      background: #111827;
+      border-bottom: 1px solid #1e293b;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 1000;
+    }
+    header h1 { font-size: 1.1rem; font-weight: 700; color: #f1f5f9; }
+    .badge { background: #dc2626; color: white; font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+
+    .stats-bar {
+      background: #111827;
+      border-bottom: 1px solid #1e293b;
+      padding: 8px 20px;
+      display: flex;
+      gap: 24px;
+      font-size: 0.85rem;
+    }
+    .stat { display: flex; align-items: center; gap: 6px; }
+    .stat-num { font-weight: 700; font-size: 1rem; }
+    .green { color: #22c55e; }
+    .red { color: #ef4444; }
+    .blue { color: #3b82f6; }
+
+    #map { flex: 1; }
+
+    .wa-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #25D366;
+      color: white;
+      border: none;
+      border-radius: 999px;
+      padding: 14px 22px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(37,211,102,.4);
+      text-decoration: none;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .wa-btn:hover { background: #1ebe57; }
+
+    .legend {
+      position: absolute;
+      bottom: 100px;
+      left: 16px;
+      background: #111827dd;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 0.8rem;
+      z-index: 1000;
+      backdrop-filter: blur(8px);
+    }
+    .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🚨 AlertaPersonas</h1>
+    <span class="badge" id="event-name">Cargando...</span>
+  </header>
+  <div class="stats-bar">
+    <div class="stat"><span class="stat-num green" id="stat-safe">—</span> <span>personas SANAS</span></div>
+    <div class="stat"><span class="stat-num red" id="stat-searches">—</span> <span>búsquedas activas</span></div>
+    <div class="stat"><span class="stat-num blue" id="stat-centers">—</span> <span>centros activos</span></div>
+  </div>
+  <div id="map"></div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="dot" style="background:#3b82f6"></div> Centro asistencial</div>
+    <div class="legend-item"><div class="dot" style="background:#22c55e"></div> Personas SANAS (zona)</div>
+    <div class="legend-item"><div class="dot" style="background:#ef4444"></div> Búsqueda activa</div>
+  </div>
+
+  <a class="wa-btn" href="https://wa.me/+58XXXXXXXXXX?text=SANO" target="_blank">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.088.537 4.053 1.476 5.765L.063 23.094a.75.75 0 00.921.897l5.507-1.452A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.898 0-3.686-.49-5.24-1.352l-.374-.214-3.883 1.024 1.004-3.774-.232-.381A9.944 9.944 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+    Estoy SANO / Busco a alguien
+  </a>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map', { zoomControl: true }).setView([10.48, -66.87], 9);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '© OpenStreetMap © CARTO',
+      maxZoom: 19
+    }).addTo(map);
+
+    function centerIcon(color) {
+      return L.divIcon({
+        className: '',
+        html: `<div style="width:16px;height:16px;border-radius:50%;background:${color};border:2px solid white;box-shadow:0 0 8px ${color}88"></div>`,
+        iconSize: [16, 16],
+        iconAnchor: [8, 8],
+      });
+    }
+
+    async function loadData() {
+      const res = await fetch('/api/map-data');
+      const data = await res.json();
+
+      if (!data.disaster) {
+        document.getElementById('event-name').textContent = 'Sin evento activo';
+        return;
+      }
+
+      document.getElementById('event-name').textContent = data.disaster.name;
+      document.getElementById('stat-safe').textContent = data.safeCount;
+      document.getElementById('stat-searches').textContent = data.searches.length;
+      document.getElementById('stat-centers').textContent = data.centers.length;
+
+      // Centros asistenciales
+      data.centers.forEach(c => {
+        L.marker([c.lat, c.lng], { icon: centerIcon('#3b82f6') })
+          .addTo(map)
+          .bindPopup(`<b>🏥 ${c.name}</b><br>${c.address || ''}<br>Personas: ${c.current_count}${c.capacity ? `/${c.capacity}` : ''}`);
+      });
+
+      // Búsquedas activas (posición aproximada del desastre)
+      data.searches.forEach(s => {
+        const jitter = (Math.random() - 0.5) * 0.04;
+        L.circleMarker([data.disaster.lat + jitter, data.disaster.lng + jitter], {
+          radius: 7, color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.8, weight: 2
+        }).addTo(map).bindPopup(`<b>🔍 ${s.missing_name}</b><br>${s.description || ''}<br>ID: #${s.id}`);
+      });
+
+      // Punto epicentro
+      L.circle([data.disaster.lat, data.disaster.lng], {
+        radius: data.disaster.radius_km * 1000,
+        color: '#f59e0b', fillColor: '#f59e0b', fillOpacity: 0.05, dashArray: '8,8'
+      }).addTo(map);
+
+      map.setView([data.disaster.lat, data.disaster.lng], 10);
+    }
+
+    loadData();
+    setInterval(loadData, 30000); // actualizar cada 30s
+  </script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AlertaPersonas — Búsqueda</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+
+    .card {
+      background: #111827;
+      border: 1px solid #1e293b;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 480px;
+      width: 100%;
+    }
+    .logo { font-size: 2rem; margin-bottom: 8px; }
+    h1 { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
+    .subtitle { font-size: 0.85rem; color: #64748b; margin-bottom: 24px; }
+
+    .status-box {
+      background: #0f1117;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .status-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: .08em; color: #64748b; margin-bottom: 6px; }
+    .missing-name { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; }
+    .description { font-size: 0.9rem; color: #94a3b8; margin-bottom: 12px; }
+
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; }
+    .badge.active { background: #450a0a; color: #fca5a5; }
+    .badge.found { background: #14532d; color: #86efac; }
+
+    .stats-row { display: flex; gap: 16px; margin-top: 16px; }
+    .mini-stat { text-align: center; }
+    .mini-stat .n { font-size: 1.5rem; font-weight: 800; }
+    .mini-stat .l { font-size: 0.7rem; color: #64748b; }
+    .yellow { color: #f59e0b; }
+    .green { color: #22c55e; }
+
+    .divider { border: none; border-top: 1px solid #1e293b; margin: 20px 0; }
+
+    .wa-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: #25D366;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: none;
+      width: 100%;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .wa-btn:hover { background: #1ebe57; }
+    .secondary-btn {
+      display: block;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      text-decoration: none;
+      padding: 10px;
+    }
+    .secondary-btn:hover { color: #e2e8f0; }
+
+    .loading { text-align: center; color: #64748b; padding: 40px 0; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">🔍</div>
+    <h1>AlertaPersonas</h1>
+    <p class="subtitle">Estado de búsqueda en tiempo real</p>
+
+    <div id="content"><div class="loading">Cargando...</div></div>
+
+    <hr class="divider">
+    <a class="wa-btn" id="wa-link" href="#" target="_blank">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.088.537 4.053 1.476 5.765L.063 23.094a.75.75 0 00.921.897l5.507-1.452A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.898 0-3.686-.49-5.24-1.352l-.374-.214-3.883 1.024 1.004-3.774-.232-.381A9.944 9.944 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+      Yo estoy SANO / Busco a alguien
+    </a>
+    <a class="secondary-btn" href="/mapa">Ver mapa completo del evento →</a>
+  </div>
+
+  <script>
+    const searchId = window.location.pathname.split('/').pop();
+    const WA_NUMBER = '+58XXXXXXXXXX';
+
+    document.getElementById('wa-link').href =
+      `https://wa.me/${WA_NUMBER.replace('+','')}?text=SANO`;
+
+    async function load() {
+      // En producción esto llama a /api/search/:id
+      // Para el MVP usamos map-data y filtramos por ID
+      try {
+        const res = await fetch('/api/map-data');
+        const data = await res.json();
+        const search = data.searches?.find(s => s.id == searchId);
+
+        if (!search) {
+          document.getElementById('content').innerHTML = `
+            <div class="status-box">
+              <div class="status-label">Estado</div>
+              <div class="missing-name">Búsqueda #${searchId}</div>
+              <span class="badge found">✓ Resuelta o no encontrada</span>
+            </div>
+          `;
+          return;
+        }
+
+        document.getElementById('content').innerHTML = `
+          <div class="status-box">
+            <div class="status-label">Buscando a</div>
+            <div class="missing-name">${search.missing_name}</div>
+            <div class="description">${search.description || ''}</div>
+            <span class="badge active">🔴 Búsqueda activa</span>
+            <div class="stats-row">
+              <div class="mini-stat">
+                <div class="n yellow">—</div>
+                <div class="l">Alertas enviadas</div>
+              </div>
+              <div class="mini-stat">
+                <div class="n green">—</div>
+                <div class="l">Avistamientos</div>
+              </div>
+            </div>
+          </div>
+          <p style="font-size:.85rem;color:#64748b;text-align:center">
+            Si conoces a esta persona, escríbenos por WhatsApp
+          </p>
+        `;
+
+        // Update WA link with context
+        document.getElementById('wa-link').href =
+          `https://wa.me/${WA_NUMBER.replace('+','')}?text=SÍ ID:${searchId}`;
+      } catch(e) {
+        document.getElementById('content').innerHTML =
+          `<div class="loading">Error cargando datos. Intenta de nuevo.</div>`;
+      }
+    }
+
+    load();
+    setInterval(load, 20000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AlertaPersonas — Admin</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; }
+
+    header {
+      background: #111827;
+      border-bottom: 1px solid #1e293b;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 { font-size: 1.1rem; font-weight: 700; }
+    .secret-input { background: #1e293b; border: 1px solid #334155; color: #e2e8f0; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; width: 220px; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 32px 24px; display: grid; gap: 24px; }
+
+    .card {
+      background: #111827;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .card h2 { font-size: 1rem; font-weight: 600; margin-bottom: 16px; color: #94a3b8; text-transform: uppercase; letter-spacing: .05em; font-size: .8rem; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; }
+    .stat-card { background: #0f1117; border: 1px solid #1e293b; border-radius: 8px; padding: 16px; text-align: center; }
+    .stat-card .num { font-size: 2rem; font-weight: 800; }
+    .stat-card .label { font-size: 0.75rem; color: #64748b; margin-top: 4px; }
+    .green { color: #22c55e; }
+    .red { color: #ef4444; }
+    .blue { color: #3b82f6; }
+    .yellow { color: #f59e0b; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 4px; }
+    input, select {
+      width: 100%;
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #e2e8f0;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    .full { grid-column: 1 / -1; }
+    button {
+      background: #dc2626;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background .2s;
+    }
+    button:hover { background: #b91c1c; }
+    button.secondary { background: #1e293b; }
+    button.secondary:hover { background: #334155; }
+    .btn-row { display: flex; gap: 10px; margin-top: 16px; }
+
+    .alert { padding: 12px 16px; border-radius: 8px; font-size: 0.85rem; margin-top: 12px; }
+    .alert.success { background: #14532d; border: 1px solid #166534; color: #86efac; }
+    .alert.error { background: #450a0a; border: 1px solid #7f1d1d; color: #fca5a5; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th { text-align: left; padding: 8px 12px; color: #64748b; font-weight: 600; border-bottom: 1px solid #1e293b; font-size: 0.75rem; text-transform: uppercase; }
+    td { padding: 10px 12px; border-bottom: 1px solid #1e293b; }
+    tr:last-child td { border-bottom: none; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.7rem; font-weight: 700; }
+    .badge.active { background: #14532d; color: #86efac; }
+    .badge.found { background: #1e3a5f; color: #93c5fd; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🚨 AlertaPersonas — Admin</h1>
+    <input class="secret-input" type="password" id="secret" placeholder="Admin secret" oninput="loadAll()">
+  </header>
+  <main>
+    <!-- Stats -->
+    <div class="card">
+      <h2>Estado actual</h2>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="num green" id="s-safe">—</div><div class="label">Personas SANAS</div></div>
+        <div class="stat-card"><div class="num red" id="s-searches">—</div><div class="label">Búsquedas activas</div></div>
+        <div class="stat-card"><div class="num blue" id="s-resolved">—</div><div class="label">Resueltas</div></div>
+        <div class="stat-card"><div class="num yellow" id="s-alerts">—</div><div class="label">Alertas (última hora)</div></div>
+      </div>
+      <div id="disaster-info" style="margin-top:16px;font-size:.85rem;color:#64748b;"></div>
+    </div>
+
+    <!-- Activar evento -->
+    <div class="card">
+      <h2>Activar evento de emergencia</h2>
+      <div class="form-grid">
+        <div class="full">
+          <label>Nombre del evento</label>
+          <input id="d-name" placeholder="Ej: Sismo 7.1 — Carabobo, 24 Jun 2026">
+        </div>
+        <div>
+          <label>Latitud (epicentro)</label>
+          <input id="d-lat" type="number" step="0.0001" placeholder="10.4806">
+        </div>
+        <div>
+          <label>Longitud (epicentro)</label>
+          <input id="d-lng" type="number" step="0.0001" placeholder="-66.9036">
+        </div>
+        <div>
+          <label>Radio de alerta (km)</label>
+          <input id="d-radius" type="number" value="50">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button onclick="activateDisaster()">🚨 Activar evento</button>
+        <button class="secondary" onclick="useVenezuela()">Usar coords Venezuela (24-Jun-2026)</button>
+      </div>
+      <div id="disaster-msg"></div>
+    </div>
+
+    <!-- Añadir centro asistencial -->
+    <div class="card">
+      <h2>Añadir centro asistencial</h2>
+      <div class="form-grid">
+        <div class="full"><label>Nombre del centro</label><input id="c-name" placeholder="Ej: Refugio Altamira"></div>
+        <div><label>Latitud</label><input id="c-lat" type="number" step="0.0001"></div>
+        <div><label>Longitud</label><input id="c-lng" type="number" step="0.0001"></div>
+        <div class="full"><label>Dirección</label><input id="c-address" placeholder="Ej: Av. Luis Roche, Altamira, Caracas"></div>
+        <div><label>Capacidad</label><input id="c-capacity" type="number" placeholder="200"></div>
+      </div>
+      <div class="btn-row"><button onclick="addCenter()">+ Añadir centro</button></div>
+      <div id="center-msg"></div>
+    </div>
+
+    <!-- Búsquedas activas -->
+    <div class="card">
+      <h2>Búsquedas activas</h2>
+      <table>
+        <thead><tr><th>ID</th><th>Buscando a</th><th>Descripción</th><th>Estado</th><th>Creada</th></tr></thead>
+        <tbody id="searches-table"><tr><td colspan="5" style="color:#64748b;text-align:center">Ingresa el admin secret para ver datos</td></tr></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    function secret() { return document.getElementById('secret').value; }
+    function headers() { return { 'Content-Type': 'application/json', 'x-admin-secret': secret() }; }
+
+    function showMsg(id, text, ok) {
+      const el = document.getElementById(id);
+      el.innerHTML = `<div class="alert ${ok ? 'success' : 'error'}">${text}</div>`;
+      setTimeout(() => el.innerHTML = '', 4000);
+    }
+
+    async function loadAll() {
+      if (!secret()) return;
+      try {
+        const res = await fetch('/api/stats', { headers: headers() });
+        if (!res.ok) return;
+        const d = await res.json();
+        if (!d.active && d.disaster === undefined) return;
+        document.getElementById('s-safe').textContent = d.safe ?? '—';
+        document.getElementById('s-searches').textContent = d.activeSearches ?? '—';
+        document.getElementById('s-resolved').textContent = d.resolved ?? '—';
+        document.getElementById('s-alerts').textContent = d.alertsLastHour ?? '—';
+        if (d.disaster) {
+          document.getElementById('disaster-info').textContent =
+            `Evento activo: ${d.disaster.name} | Activado: ${d.disaster.triggered_at}`;
+        }
+        loadSearches();
+      } catch(e) { console.error(e); }
+    }
+
+    async function loadSearches() {
+      const res = await fetch('/api/map-data');
+      const d = await res.json();
+      const tbody = document.getElementById('searches-table');
+      if (!d.searches?.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="color:#64748b;text-align:center">Sin búsquedas activas</td></tr>';
+        return;
+      }
+      tbody.innerHTML = d.searches.map(s => `
+        <tr>
+          <td>#${s.id}</td>
+          <td><b>${s.missing_name}</b></td>
+          <td style="color:#94a3b8">${s.description || '—'}</td>
+          <td><span class="badge active">Activa</span></td>
+          <td style="color:#64748b">${new Date(s.created_at).toLocaleTimeString('es-VE')}</td>
+        </tr>
+      `).join('');
+    }
+
+    async function activateDisaster() {
+      const body = {
+        name: document.getElementById('d-name').value,
+        lat: parseFloat(document.getElementById('d-lat').value),
+        lng: parseFloat(document.getElementById('d-lng').value),
+        radius_km: parseFloat(document.getElementById('d-radius').value) || 50,
+      };
+      if (!body.name || !body.lat || !body.lng) return showMsg('disaster-msg', 'Completa todos los campos.', false);
+      const res = await fetch('/api/disasters', { method: 'POST', headers: headers(), body: JSON.stringify(body) });
+      const d = await res.json();
+      showMsg('disaster-msg', res.ok ? `✓ Evento activado (ID: ${d.id})` : d.error, res.ok);
+      if (res.ok) loadAll();
+    }
+
+    async function addCenter() {
+      const body = {
+        name: document.getElementById('c-name').value,
+        lat: parseFloat(document.getElementById('c-lat').value),
+        lng: parseFloat(document.getElementById('c-lng').value),
+        address: document.getElementById('c-address').value,
+        capacity: parseInt(document.getElementById('c-capacity').value) || null,
+      };
+      const res = await fetch('/api/centers', { method: 'POST', headers: headers(), body: JSON.stringify(body) });
+      const d = await res.json();
+      showMsg('center-msg', res.ok ? `✓ Centro añadido (ID: ${d.id})` : d.error, res.ok);
+    }
+
+    function useVenezuela() {
+      document.getElementById('d-name').value = 'Sismos 7.1 y 7.5 — Carabobo / Caracas, 24 Jun 2026';
+      document.getElementById('d-lat').value = '10.4806';
+      document.getElementById('d-lng').value = '-68.0000';
+      document.getElementById('d-radius').value = '80';
+    }
+
+    loadAll();
+    setInterval(loadAll, 15000);
+  </script>
+</body>
+</html>
