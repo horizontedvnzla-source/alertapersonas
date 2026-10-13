@@ -14,7 +14,9 @@
   .brand .logo{font-weight:800;font-size:28px;letter-spacing:-.6px;line-height:1}
   .brand .logo .h{color:var(--gray)} .brand .logo .t{color:var(--red)}
   .brand .sub{font-size:11.5px;color:var(--gray);margin-top:4px;letter-spacing:.02em}
-  .panel{position:fixed;background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);z-index:30;font-size:13px;user-select:none;width:250px}
+  body.dark .brand .logo .h{color:#9ca3af} body.dark .brand .sub{color:#9ca3af}
+  .panel{position:fixed;background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);z-index:30;font-size:13px;user-select:none;width:250px;transition:outline-color .15s}
+  .panel.drop{outline:2px dashed var(--red);outline-offset:3px}
   .panel .hd{display:flex;align-items:center;gap:6px;padding:7px 6px 7px 10px;cursor:move;font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#4b5563;touch-action:none}
   .panel .hd .dot{width:8px;height:8px;border-radius:50%;background:var(--red);flex:none}
   .panel .hd .tt{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -27,11 +29,12 @@
   .tech button{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 6px;font-size:11.5px;cursor:pointer;text-align:left;color:var(--ink);line-height:1.15}
   .tech button i{font-style:normal;flex:none;width:18px;height:18px;border-radius:50%;color:#fff;font-size:10.5px;font-weight:800;display:grid;place-items:center}
   .tech button.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);font-weight:700}
-  .tag{display:inline-block;background:#fef2f2;color:#b91c1c;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:700;margin:2px 0 6px}
+  .tag{display:inline-block;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:700;margin:2px 0 6px}
   .desc{font-size:12.5px;line-height:1.45;color:#374151}
   .ej{font-size:11.5px;color:var(--muted);margin-top:4px}
   details{margin-top:8px;border-top:1px solid var(--line);padding-top:6px}
   summary{cursor:pointer;font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#4b5563;list-style:none}
+  summary::-webkit-details-marker{display:none}
   summary::before{content:'▸ ';color:#9ca3af} details[open] summary::before{content:'▾ '}
   ol{padding-left:18px;margin-top:5px;font-size:12px;line-height:1.45;color:#374151} ol li{margin:2px 0}
   .row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap} .row>*{flex:1}
@@ -47,19 +50,37 @@
   .ms.ok .ck{background:#16a34a;border-color:#16a34a} .ms.ok{color:#15803d}
   .ms small{display:block;color:var(--muted)}
   .chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
-  .chips button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:3px 8px;font-size:11.5px;cursor:pointer}
+  .chips button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:3px 9px;font-size:11.5px;cursor:pointer}
   .chips button.on{background:#111827;color:#fff;border-color:#111827}
-  .chips button b{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
   #i-rf{border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:12px;min-width:0}
   canvas.mini{width:100%;height:auto;margin-top:8px;border:1px solid var(--line);border-radius:8px;background:#fff}
-  .mat h4{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#9ca3af;margin:8px 0 4px}
-  .mat .g{display:flex;flex-wrap:wrap;gap:4px}
-  .mat button{border:1px solid var(--line);background:#fff;border-radius:7px;padding:4px 7px;font-size:11.5px;cursor:pointer}
-  .mat button:hover{border-color:#9ca3af}
+  .sec{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#9ca3af;margin:8px 0 5px;font-weight:700}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+  .card{border:1px solid var(--line);background:#fff;border-radius:9px;padding:4px 3px 5px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:grab;touch-action:none;transition:border-color .12s, transform .12s}
+  .card:hover{border-color:#9ca3af;transform:translateY(-1px)}
+  .card canvas{width:56px;height:56px;pointer-events:none}
+  .card span{font-size:10.5px;line-height:1.15;text-align:center;color:#374151;pointer-events:none}
+  .rlist{display:flex;flex-direction:column;gap:4px}
+  .rg{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:9px;padding:5px 7px;cursor:grab;touch-action:none}
+  .rg:hover{border-color:#9ca3af}
+  .rg .sw{flex:none;width:22px;height:22px;border-radius:50%;border:1px solid rgba(0,0,0,.12)}
+  .rg .sw.s{border-radius:5px}
+  .rg div{flex:1;min-width:0;pointer-events:none} .rg b{display:block;font-size:12px} .rg small{color:var(--muted);font-size:10.5px}
+  .rg em{font-style:normal;font-size:10.5px;color:#6b7280;background:#f3f4f6;border-radius:999px;padding:1px 6px;pointer-events:none}
+  .hint{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.35}
+  #ghost{position:fixed;z-index:80;pointer-events:none;display:none;transform:translate(-50%,-50%);background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:4px;opacity:.92}
+  #ghost canvas{width:56px;height:56px;display:block}
+  #ghost .sw{width:26px;height:26px;border-radius:50%}
   #bar{position:fixed;right:14px;bottom:14px;z-index:35;display:flex;gap:2px;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:3px;backdrop-filter:blur(10px)}
   #bar button{border:0;background:transparent;min-width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:13px;color:#374151;padding:0 6px}
   #bar button:hover{background:#f3f4f6} #bar button.on{background:#111827;color:#fff}
   #bar .z{font-size:11.5px;font-variant-numeric:tabular-nums;min-width:46px}
+  #bar .sep{width:1px;background:var(--line);margin:4px 2px}
+  #bgpop{position:fixed;right:14px;bottom:56px;z-index:36;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:8px;display:none;gap:6px;align-items:center;backdrop-filter:blur(10px)}
+  #bgpop.on{display:flex}
+  #bgpop button{width:24px;height:24px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #d1d5db;cursor:pointer}
+  #bgpop button.on{box-shadow:0 0 0 2px #111827}
+  #bgpop input{width:28px;height:26px;border:0;background:none;cursor:pointer;padding:0}
   #trash{position:fixed;left:14px;bottom:14px;z-index:35;width:42px;height:42px;border-radius:50%;background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);display:grid;place-items:center;font-size:18px;opacity:.55;transition:all .15s;pointer-events:none}
   #trash.show{opacity:1} #trash.hot{background:var(--red);transform:scale(1.25)}
   #tip{position:fixed;z-index:50;pointer-events:none;background:rgba(17,24,39,.93);color:#f9fafb;border-radius:9px;padding:7px 9px;font-size:12px;line-height:1.45;max-width:260px;display:none;box-shadow:var(--shadow)}
@@ -70,9 +91,12 @@
   @keyframes tin{from{opacity:0;transform:translateY(-8px)}}
   #help{position:fixed;inset:0;z-index:70;background:rgba(15,23,42,.35);display:none;place-items:center}
   #help.on{display:grid}
-  #help .card{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:18px 20px;max-width:420px;font-size:13px;line-height:1.6}
+  #help .card2{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:18px 20px;max-width:440px;font-size:13px;line-height:1.6}
   #help h3{font-size:15px;margin-bottom:6px} #help kbd{background:#f3f4f6;border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:11.5px}
   body.nopanels .panel{display:none}
+  #dock{position:fixed;left:14px;top:232px;z-index:30;display:flex;flex-direction:column;gap:8px;max-height:calc(100vh - 300px);overflow:auto;padding:2px 4px 6px 2px;scrollbar-width:thin}
+  #dock .panel{position:relative;left:auto!important;top:auto!important;flex:none}
+  #dock .panel .bd{max-height:none}
   @media (max-width:700px){.panel{width:220px}.brand .logo{font-size:22px}.brand .sub{font-size:10px}}
 </style>
 </head>
@@ -82,40 +106,53 @@
 <div class="brand"><div class="logo"><span class="h">Horizon</span><span class="t">TED</span></div><div class="sub">Exploración sin límites, aprendizaje sin riesgos</div></div>
 
 <div class="panel" id="p-tech" style="left:14px;top:14px">
-  <div class="hd"><span class="dot"></span><span class="tt">Técnicas de separación</span><button class="mn" title="Encoger">–</button></div>
+  <div class="hd"><span class="dot"></span><span class="tt">Técnicas de separación</span><button class="mn">–</button></div>
   <div class="bd"><div class="tech" id="techs"></div></div>
 </div>
 
 <div class="panel" id="p-lab" style="right:14px;top:74px;width:280px">
-  <div class="hd"><span class="dot" id="lab-dot"></span><span class="tt" id="lab-title">Laboratorio</span><button class="mn" title="Encoger">–</button></div>
+  <div class="hd"><span class="dot" id="lab-dot"></span><span class="tt" id="lab-title">Laboratorio</span><button class="mn">–</button></div>
   <div class="bd" id="lab"></div>
 </div>
 
-<div class="panel min" id="p-mat" style="left:14px;bottom:66px;width:250px">
-  <div class="hd"><span class="dot" style="background:#9ca3af"></span><span class="tt">Materiales</span><button class="mn" title="Expandir">+</button></div>
-  <div class="bd mat" id="mat"></div>
+<div id="dock">
+<div class="panel min" id="p-mat" style="width:250px">
+  <div class="hd"><span class="dot" style="background:#0ea5e9"></span><span class="tt">Materiales</span><button class="mn">+</button></div>
+  <div class="bd" id="mat" style="max-height:calc(100vh - 330px)"></div>
+</div>
+
+<div class="panel min" id="p-rea" style="width:250px">
+  <div class="hd"><span class="dot" style="background:#f59e0b"></span><span class="tt">Reactivos</span><button class="mn">+</button></div>
+  <div class="bd" id="rea" style="max-height:calc(100vh - 360px)"></div>
+</div>
 </div>
 
 <div id="bar">
   <button id="z-out" title="Alejar (−)">−</button><button class="z" id="z-lvl" title="Restablecer 100 %">100%</button><button id="z-in" title="Acercar (+)">+</button>
   <button id="z-fit" title="Ajustar vista (0)">⤢</button>
+  <span class="sep"></span>
+  <button id="b-reset" title="Reiniciar el experimento">↺</button>
+  <button id="b-bg" title="Color de fondo">◐</button>
   <button id="b-lab" title="Etiquetas de los materiales" class="on">Aa</button>
   <button id="b-spd" title="Velocidad del tiempo">×1</button>
   <button id="b-pan" title="Mostrar/ocultar paneles (H)">◧</button>
   <button id="b-help" title="Ayuda">?</button>
 </div>
+<div id="bgpop"></div>
 <div id="trash">🗑</div>
 <div id="tip"></div>
+<div id="ghost"></div>
 <div id="toasts"></div>
-<div id="help"><div class="card">
+<div id="help"><div class="card2">
   <h3>Cómo usar el laboratorio</h3>
   • <b>Arrastra</b> cualquier equipo o recipiente con el ratón.<br>
-  • Lleva un recipiente <b>sobre</b> otro (o sobre un embudo) y se inclina para <b>verter</b>.<br>
-  • Suelta un embudo cerca del aro, un papel cerca de la pinza o un tubo en la centrífuga: se <b>acoplan</b> solos.<br>
+  • Lleva un recipiente <b>sobre</b> otro (o sobre un embudo) y se inclina para <b>verter</b>. Con <kbd>Espacio</kbd> vierte aunque no haya nada debajo.<br>
+  • Suelta un embudo cerca del aro, un papel o una bureta cerca de la pinza o un tubo en la centrífuga o la gradilla: se <b>acoplan</b> solos.<br>
+  • <b>Materiales</b> y <b>Reactivos</b>: haz clic o arrástralos a la mesa. Un reactivo soltado sobre un recipiente se añade dentro.<br>
   • <b>Rueda del ratón</b>: zoom · <b>arrastra el fondo</b>: mover la vista.<br>
-  • <b>Doble clic</b> en un recipiente: agitar · <b>clic</b> en la llave o el mechero: abrir/encender.<br>
-  • Pasa el ratón sobre un recipiente para ver <b>qué contiene</b>.<br>
-  • Arrastra a la papelera (abajo a la izquierda) o pulsa <kbd>Supr</kbd> para eliminar.<br>
+  • <b>Doble clic</b> en un recipiente: agitar · <b>clic</b> en llaves, mechero o tara de la balanza.<br>
+  • La <b>pipeta</b> absorbe si su punta está dentro de un líquido y gotea si está sobre un recipiente.<br>
+  • Para quitar un objeto, arrástralo a cualquier <b>panel</b> o a la papelera (o pulsa <kbd>Supr</kbd>).<br>
   • Paneles: arrástralos por su título y encógelos con <kbd>–</kbd>. <kbd>H</kbd> los oculta todos.
   <div class="row"><button class="btn pri" onclick="document.getElementById('help').classList.remove('on')">¡A experimentar!</button></div>
 </div></div>
@@ -123,7 +160,8 @@
 <script>
 "use strict";
 /* ============================== utilidades ============================== */
-const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+const cv = document.getElementById('cv');
+let ctx = cv.getContext('2d');
 const $ = id => document.getElementById(id);
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -136,18 +174,21 @@ const W2S = (wx, wy) => ({ x: (wx - cam.x) * cam.z + W / 2, y: (wy - cam.y) * ca
 const f1 = x => (Math.abs(x) < 10 ? x.toFixed(1) : x.toFixed(0));
 function toast(msg, kind = '') {
   const d = document.createElement('div'); d.className = 'toast ' + kind; d.textContent = msg; $('toasts').appendChild(d);
+  while ($('toasts').children.length > 4) $('toasts').firstChild.remove();
   setTimeout(() => { d.style.transition = 'opacity .4s'; d.style.opacity = 0; }, 3200); setTimeout(() => d.remove(), 3700);
 }
 const toastOnce = (() => { const last = {}; return (k, msg, kind) => { const t = performance.now(); if (!last[k] || t - last[k] > 6000) { last[k] = t; toast(msg, kind); } }; })();
+const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) { } } };
 
 /* ============================== sustancias ============================== */
+const AQ = [128, 218, 228]; // agua: azul turquesa claro
 const CU_T = [0, 20, 40, 60, 80, 100], CU_S = [14.3, 20.7, 28.5, 40, 55, 75.4];
 const interp = (xs, ys, x) => { if (x <= xs[0]) return ys[0]; for (let i = 1; i < xs.length; i++) if (x <= xs[i]) return lerp(ys[i - 1], ys[i], (x - xs[i - 1]) / (xs[i] - xs[i - 1])); return ys[ys.length - 1]; };
-const SOL = {   // sólidos solubles en agua (g por 100 mL)
+const SOL = {
   salt: { n: 'Sal (NaCl)', S: T => 35.7 + 0.035 * T, cry: '#f8fafc', edge: '#94a3b8', dT: 0.175 },
   cuso4: { n: 'Sulfato de cobre', S: T => interp(CU_T, CU_S, T), cry: '#2563eb', edge: '#1e3a8a', tint: [29, 95, 220], dT: 0.05 },
 };
-const SOLIDS = { // sólidos insolubles: k = rapidez de sedimentación (1/s), filt = fracción retenida por el papel
+const SOLIDS = {
   sand: { n: 'Arena', k: 0.9, filt: 1, col: [185, 141, 85] },
   clay: { n: 'Arcilla fina', k: 0.0035, filt: 0.7, col: [156, 116, 87] },
 };
@@ -165,10 +206,23 @@ const INKS = {
   roja: { n: 'Tinta roja', d: { dyeR: 1 } },
   permanente: { n: 'Marcador permanente', d: { dyeK: 1 } },
 };
+const REAG = [
+  { k: 'water', n: 'Agua destilada', f: 'H₂O', a: 50, u: 'mL', sw: `rgb(${AQ})` },
+  { k: 'ethanol', n: 'Alcohol etílico', f: 'C₂H₅OH', a: 50, u: 'mL', sw: '#eef2f7' },
+  { k: 'oil', n: 'Aceite vegetal', f: 'lípidos', a: 40, u: 'mL', sw: '#f5be28' },
+  { k: 'sand', n: 'Arena', f: 'SiO₂', a: 10, u: 'g', sw: 'rgb(185,141,85)', s: 1 },
+  { k: 'clay', n: 'Arcilla fina', f: 'Al₂Si₂O₅(OH)₄', a: 3, u: 'g', sw: 'rgb(156,116,87)', s: 1 },
+  { k: 'salt', n: 'Cloruro de sodio', f: 'NaCl', a: 5, u: 'g', sw: '#f8fafc', s: 1 },
+  { k: 'cuso4', n: 'Sulfato de cobre (II)', f: 'CuSO₄', a: 5, u: 'g', sw: '#2563eb', s: 1 },
+  { k: 'dyeB', n: 'Colorante azul', f: 'azul de metileno', a: 0.5, u: 'g', sw: '#2563eb' },
+  { k: 'dyeR', n: 'Colorante rojo', f: 'rojo alimentario', a: 0.5, u: 'g', sw: '#e11d48' },
+  { k: 'dyeY', n: 'Colorante amarillo', f: 'tartrazina', a: 0.5, u: 'g', sw: '#eab308' },
+];
+const SUBNAME = { water: 'Agua', ethanol: 'Alcohol', oil: 'Aceite' };
 
 /* ============================== modelo de contenido ============================== */
 const newC = () => ({ m: {}, sus: {}, em: 0, T: 20, Tp: 20, cry: [], up: {}, boil: false });
-const g0 = (c, k) => c.m[k] || 0;
+const g0 = (c, k) => (c.m && c.m[k]) || 0;
 const aqV = c => g0(c, 'water') + g0(c, 'ethanol');
 const liqV = c => aqV(c) + g0(c, 'oil');
 const dissolved = (c, s) => Math.min(g0(c, s), SOL[s].S(c.T) * g0(c, 'water') / 100);
@@ -176,9 +230,9 @@ const undis = (c, s) => Math.max(0, g0(c, s) - dissolved(c, s));
 function settledVol(c) { let v = 0; for (const s in SOLIDS) v += (g0(c, s) - (c.sus[s] || 0)) * 0.4; for (const s in SOL) v += undis(c, s) * 0.4; return v; }
 function susVol(c) { let v = 0; for (const s in SOLIDS) v += (c.sus[s] || 0) * 0.4; return v; }
 const totV = c => liqV(c) + settledVol(c) + susVol(c);
+function massOf(c) { let m = g0(c, 'water') + g0(c, 'ethanol') * 0.79 + g0(c, 'oil') * 0.92; for (const s in SOLIDS) m += g0(c, s); for (const s in SOL) m += g0(c, s); for (const d in DYES) m += g0(c, d); return m; }
 function mv(src, dst, k, a) { if (!(a > 0)) return; src.m[k] = g0(src, k) - a; if (src.m[k] < 1e-9) delete src.m[k]; dst.m[k] = (dst.m[k] || 0) + a; }
 function sub(c, k, a) { c.m[k] = g0(c, k) - a; if (c.m[k] < 1e-9) delete c.m[k]; }
-// extrae un volumen dV: 'top' = verter por el pico, 'bottom' = por la llave, 'liquid' = solo la fase líquida (filtro)
 function take(c, dV, mode) {
   const out = newC(); out.T = c.T; let rem = dV;
   const phOil = () => { const v = Math.min(rem, Math.max(0, g0(c, 'oil') - c.em)); if (v > 0) { mv(c, out, 'oil', v); rem -= v; } };
@@ -224,59 +278,79 @@ function boilT(c) {
 function vaporY(x, plates) { let y = x; for (let i = 0; i < plates; i++) y = 2.4 * y / (1 + 1.4 * y); return y; }
 function aqColor(c, aMul = 1) {
   const aq = aqV(c) + c.em + susVol(c);
-  let col = [196, 224, 255], a = 0.32;
+  let col = AQ.slice(), a = 0.5;
   if (aq <= 1e-6) return `rgba(${col},${a})`;
+  if (g0(c, 'ethanol') > g0(c, 'water')) { col = [226, 238, 246]; a = 0.55; }
   const mix = (tc, t, ta) => { t = clamp(t, 0, 1); col = col.map((v, i) => lerp(v, tc[i], t)); a = lerp(a, ta, t); };
-  const cu = dissolved(c, 'cuso4') / aq; if (cu > 0) mix(SOL.cuso4.tint, cu * 5, 0.78);
-  for (const d in DYES) { const k = g0(c, d) / aq; if (k > 0) mix(DYES[d].c, k * 40, 0.75); }
+  const cu = dissolved(c, 'cuso4') / aq; if (cu > 0) mix(SOL.cuso4.tint, cu * 5, 0.8);
+  for (const d in DYES) { const k = g0(c, d) / aq; if (k > 0) mix(DYES[d].c, k * 40, 0.78); }
   for (const s in SOLIDS) { const k = (c.sus[s] || 0) / aq; if (k > 0) mix(SOLIDS[s].col, k * 7, 0.92); }
   if (c.em > 0) mix([248, 222, 140], c.em / aq * 1.6, 0.85);
-  return `rgba(${col.map(Math.round)},${a * aMul})`;
+  return `rgba(${col.map(Math.round)},${clamp(a * aMul, 0, 1)})`;
 }
-const oilCol = 'rgba(245,190,40,0.82)';
-function liquidColor(p) { return liqV(p) > 0 && g0(p, 'oil') > aqV(p) ? oilCol : aqColor(p, 1.6); }
+const oilCol = 'rgba(245,190,40,0.86)';
+function liquidColor(p) { if (liqV(p) <= 0.01) { let sw = 0, cc = [0, 0, 0]; for (const s in SOLIDS) { const a = g0(p, s); sw += a; cc = cc.map((v, i) => v + SOLIDS[s].col[i] * a); } return sw > 0 ? `rgba(${cc.map(v => Math.round(v / sw))},.9)` : 'rgba(240,240,240,.9)'; } return g0(p, 'oil') > aqV(p) ? oilCol : aqColor(p, 1.5); }
 
 /* ============================== geometría de recipientes ============================== */
+// line(): contorno del vidrio (sirve también de recorte para el líquido: el líquido toca las paredes)
 const GEO = {
-  beaker: { cap: 250, ib: -5, ih: 102, half: 44, mouth: [-44, 44, -115], botW: 36, grad: [-5, -107, 5],
+  beaker: { cap: 250, ib: -2, ih: 105, half: 44, mouth: [-44, 44, -115], botW: 36, grad: [-5, -107],
     line(c) { c.moveTo(-46, -117); c.lineTo(-42, -112); c.lineTo(-42, -7); c.quadraticCurveTo(-42, 0, -35, 0); c.lineTo(35, 0); c.quadraticCurveTo(42, 0, 42, -7); c.lineTo(42, -112); c.lineTo(47, -118); },
-    inner(c) { c.rect(-40, -112, 80, 108); } },
-  erlen: { cap: 250, ib: -4, ih: 100, half: 14, mouth: [-14, 14, -137], botW: 38, grad: [-4, -96, 0],
+    hl(c) { c.moveTo(-35, -104); c.lineTo(-35, -14); } },
+  erlen: { cap: 250, ib: -1, ih: 100, half: 14, mouth: [-14, 14, -137], botW: 38, grad: [-4, -96],
     line(c) { c.moveTo(-17, -138); c.lineTo(-13, -134); c.lineTo(-13, -98); c.lineTo(-47, -8); c.quadraticCurveTo(-50, 0, -41, 0); c.lineTo(41, 0); c.quadraticCurveTo(50, 0, 47, -8); c.lineTo(13, -98); c.lineTo(13, -134); c.lineTo(17, -138); },
-    inner(c) { c.moveTo(-11, -134); c.lineTo(-11, -98); c.lineTo(-44, -4); c.lineTo(44, -4); c.lineTo(11, -98); c.lineTo(11, -134); c.closePath(); } },
-  tube: { cap: 15, ib: -2, ih: 108, half: 10, mouth: [-10, 10, -121], botW: 6,
+    hl(c) { c.moveTo(-8, -92); c.lineTo(-36, -16); } },
+  tube: { cap: 15, ib: -1, ih: 110, half: 10, mouth: [-10, 10, -121], botW: 6,
     line(c) { c.moveTo(-12, -122); c.lineTo(-10, -119); c.lineTo(-10, -10); c.arc(0, -10, 10, Math.PI, 0, true); c.lineTo(10, -119); c.lineTo(12, -122); },
-    inner(c) { c.moveTo(-8, -119); c.lineTo(-8, -10); c.arc(0, -10, 8, Math.PI, 0, true); c.lineTo(8, -119); c.closePath(); } },
-  dish: { cap: 80, ib: -3, ih: 30, shape: 'bowl', half: 60, mouth: [-60, 60, -34], botW: 34, porcelain: true,
-    line(c) { c.moveTo(-63, -35); c.quadraticCurveTo(-60, 4, 0, 3); c.quadraticCurveTo(60, 4, 63, -35); },
-    inner(c) { c.moveTo(-58, -33); c.quadraticCurveTo(-55, -1, 0, -2); c.quadraticCurveTo(55, -1, 58, -33); c.closePath(); } },
-  funnel: { cap: 60, ib: -44, ih: 54, shape: 'cone', half: 50, mouth: [-50, 50, -100], botW: 4, noPour: true,
-    line(c) { c.moveTo(-53, -101); c.lineTo(-6, -43); c.lineTo(-4, 0); c.lineTo(4, 0); c.lineTo(6, -43); c.lineTo(53, -101); },
-    inner(c) { c.moveTo(-47, -98); c.lineTo(-4, -45); c.lineTo(4, -45); c.lineTo(47, -98); c.closePath(); } },
-  sep: { cap: 250, ib: -66, ih: 134, half: 10, mouth: [-10, 10, -226], botW: 6, noPour: true,
-    line(c) { c.moveTo(-6, -64); c.bezierCurveTo(-20, -90, -44, -128, -40, -163); c.bezierCurveTo(-36, -194, -14, -200, -10, -206); c.lineTo(-10, -226); c.moveTo(10, -226); c.lineTo(10, -206); c.bezierCurveTo(14, -200, 36, -194, 40, -163); c.bezierCurveTo(44, -128, 20, -90, 6, -64); c.closePath(); },
-    inner(c) { c.moveTo(-5, -66); c.bezierCurveTo(-18, -90, -41, -128, -37, -163); c.bezierCurveTo(-33, -192, -12, -198, -8, -204); c.lineTo(-8, -224); c.lineTo(8, -224); c.lineTo(8, -204); c.bezierCurveTo(12, -198, 33, -192, 37, -163); c.bezierCurveTo(41, -128, 18, -90, 5, -66); c.closePath(); } },
-  balon: { cap: 250, ib: -46, ih: 98, half: 30, mouth: [-30, 30, -372], botW: 26, noPour: true,
+    hl(c) { c.moveTo(-5, -112); c.lineTo(-5, -16); } },
+  probeta: { cap: 100, ib: -13, ih: 180, half: 13, mouth: [-13, 13, -200], botW: 9, grad: [-13, -190],
+    line(c) { c.moveTo(-15, -202); c.lineTo(-12, -198); c.lineTo(-12, -12); c.lineTo(12, -12); c.lineTo(12, -198); c.lineTo(15, -202); },
+    hl(c) { c.moveTo(-7, -190); c.lineTo(-7, -20); } },
+  aforado: { cap: 100, ib: -3, ih: 140, half: 6, mouth: [-6, 6, -176], botW: 22,
+    line(c) { c.moveTo(-8, -178); c.lineTo(-6, -175); c.lineTo(-6, -73.5); c.arc(0, -38, 36, Math.atan2(-35.5, -6), Math.atan2(-35.5, 6), true); c.lineTo(6, -175); c.lineTo(8, -178); },
+    hl(c) { c.arc(0, -38, 28, 3.5, 4.3); } },
+  dish: { cap: 80, ib: -3, ih: 30, half: 60, mouth: [-60, 60, -34], botW: 34, porcelain: true, shape: 'bowl',
+    line(c) { c.moveTo(-63, -35); c.quadraticCurveTo(-60, 4, 0, 3); c.quadraticCurveTo(60, 4, 63, -35); } },
+  vidrio: { cap: 15, ib: -1, ih: 11, half: 38, mouth: [-38, 38, -13], botW: 18, shape: 'bowl',
+    line(c) { c.moveTo(-40, -13); c.quadraticCurveTo(0, 9, 40, -13); } },
+  mortero: { cap: 60, ib: -5, ih: 36, half: 46, mouth: [-46, 46, -45], botW: 20, porcelain: true, shape: 'bowl',
+    line(c) { c.moveTo(-50, -46); c.quadraticCurveTo(-50, -2, -18, -4); c.lineTo(18, -4); c.quadraticCurveTo(50, -2, 50, -46); } },
+  funnel: { cap: 60, ib: -44, ih: 56, half: 50, mouth: [-50, 50, -100], botW: 4, noPour: true, shape: 'cone',
+    line(c) { c.moveTo(-53, -101); c.lineTo(-6, -43); c.lineTo(-4, 0); c.lineTo(4, 0); c.lineTo(6, -43); c.lineTo(53, -101); } },
+  sep: { cap: 250, ib: -66, ih: 138, half: 10, mouth: [-10, 10, -226], botW: 6, noPour: true,
+    line(c) { c.moveTo(-10, -226); c.lineTo(-10, -206); c.bezierCurveTo(-14, -200, -36, -194, -40, -163); c.bezierCurveTo(-44, -128, -20, -90, -6, -64); c.lineTo(6, -64); c.bezierCurveTo(20, -90, 44, -128, 40, -163); c.bezierCurveTo(36, -194, 14, -200, 10, -206); c.lineTo(10, -226); } },
+  bureta: { cap: 50, ib: -34, ih: 256, half: 6, mouth: [-6, 6, -300], botW: 3, noPour: true, grad: [-40, -290],
+    line(c) { c.moveTo(-8, -302); c.lineTo(-6, -298); c.lineTo(-6, -34); c.lineTo(6, -34); c.lineTo(6, -298); c.lineTo(8, -302); } },
+  pipeta: { cap: 5, ib: -3, ih: 110, half: 4, mouth: [-4, 4, -125], botW: 2, noPour: true, noTarget: true,
+    line(c) { c.moveTo(-4, -125); c.lineTo(-4, -22); c.lineTo(-1.5, 0); c.lineTo(1.5, 0); c.lineTo(4, -22); c.lineTo(4, -125); } },
+  balon: { cap: 250, ib: -45, ih: 100, half: 30, mouth: [-30, 30, -372], botW: 26, noPour: true,
     line(c) { c.moveTo(-11, -166); c.lineTo(-11, -138.7); c.arc(0, -92, 48, Math.atan2(-46.7, -11), Math.atan2(-46.7, 11), true); c.lineTo(11, -166); },
-    inner(c) { c.arc(0, -92, 45, 0, Math.PI * 2); c.rect(-9, -166, 18, 40); } },
-  bottleW: { cap: 500, ib: -5, ih: 128, half: 32, mouth: [-10, 10, -152], botW: 28, nozzle: [44, -176],
+    hl(c) { c.arc(0, -92, 38, 3.5, 4.3); } },
+  bottleW: { cap: 500, ib: -2, ih: 132, half: 32, mouth: [-10, 10, -152], botW: 28, nozzle: [44, -176], noTarget: true,
     line(c) { c.moveTo(-10, -150); c.lineTo(-10, -142); c.lineTo(-24, -142); c.quadraticCurveTo(-32, -142, -32, -132); c.lineTo(-32, -8); c.quadraticCurveTo(-32, 0, -24, 0); c.lineTo(24, 0); c.quadraticCurveTo(32, 0, 32, -8); c.lineTo(32, -132); c.quadraticCurveTo(32, -142, 24, -142); c.lineTo(10, -142); c.lineTo(10, -150); },
-    inner(c) { c.rect(-29, -138, 58, 134); } },
+    hl(c) { c.moveTo(-24, -128); c.lineTo(-24, -14); } },
+  jar: { cap: 150, ib: -2, ih: 100, half: 26, mouth: [-26, 26, -118], botW: 28,
+    line(c) { c.moveTo(-26, -118); c.lineTo(-26, -108); c.quadraticCurveTo(-34, -106, -34, -98); c.lineTo(-34, -6); c.quadraticCurveTo(-34, 0, -28, 0); c.lineTo(28, 0); c.quadraticCurveTo(34, 0, 34, -6); c.lineTo(34, -98); c.quadraticCurveTo(34, -106, 26, -108); c.lineTo(26, -118); },
+    hl(c) { c.moveTo(-27, -95); c.lineTo(-27, -12); } },
+  botella: { cap: 400, ib: -2, ih: 128, half: 11, mouth: [-11, 11, -170], botW: 28,
+    line(c) { c.moveTo(-11, -170); c.lineTo(-11, -150); c.quadraticCurveTo(-34, -142, -34, -118); c.lineTo(-34, -6); c.quadraticCurveTo(-34, 0, -28, 0); c.lineTo(28, 0); c.quadraticCurveTo(34, 0, 34, -6); c.lineTo(34, -118); c.quadraticCurveTo(34, -142, 11, -150); c.lineTo(11, -170); },
+    hl(c) { c.moveTo(-27, -112); c.lineTo(-27, -12); } },
 };
 GEO.bottleA = GEO.bottleW;
+const GLASS_MASS = { beaker: 55, erlen: 60, tube: 12, probeta: 80, aforado: 50, dish: 70, vidrio: 15, mortero: 180, funnel: 40, sep: 110, bureta: 70, pipeta: 5, balon: 90, bottleW: 40, bottleA: 40, jar: 90, botella: 120 };
 const isC = o => !!GEO[o.type];
 const hOf = (g, v) => { const f = Math.min(Math.max(v, 0) / g.cap, 1.05); return g.ih * (g.shape === 'cone' ? Math.cbrt(f) : g.shape === 'bowl' ? Math.sqrt(f) : f); };
 const surfaceY = o => o.y + GEO[o.type].ib - hOf(GEO[o.type], totV(o));
 function mouthOf(o) { const g = GEO[o.type]; return { x0: o.x + g.mouth[0], x1: o.x + g.mouth[1], y: o.y + g.mouth[2] }; }
 
 /* ============================== escena ============================== */
-let objs = [], uid = 0, held = null, sel = null, tech = 1, puddles = [], steam = [], streams = [], drops = [], flags = {}, SPEED = 1, showLabels = true, drawn = [], missionDone = [];
+let objs = [], uid = 0, held = null, sel = null, tech = 1, puddles = [], steam = [], streams = [], drops = [], flags = {}, SPEED = 1, showLabels = true, drawn = [], missionDone = [], spaceDown = false;
 const TYPES = {};
 function mk(type, x = 0, y = 0, props = {}) {
   const o = { id: ++uid, type, x, y, parent: null, sock: null, tilt: 0, tdir: 1, vy: 0 };
   if (isC(o)) Object.assign(o, newC());
   Object.assign(o, props);
-  objs.push(o);
+  if (type === 'campana') objs.unshift(o); else objs.push(o);
   if (TYPES[type].init) TYPES[type].init(o);
   return o;
 }
@@ -298,19 +372,37 @@ function removeObj(o) { const del = objs.filter(c => isAnc(o, c)); objs = objs.f
 function receiverAt(x, y, excl) {
   let best = null, bd = 1e9;
   for (const o of objs) {
-    if (!isC(o) || o === excl || o === held || isAnc(o, excl) || (excl && isAnc(excl, o))) continue;
+    if (!isC(o) || GEO[o.type].noTarget || o === excl || o === held || isAnc(o, excl) || (excl && isAnc(excl, o))) continue;
     if (o.parent && o.parent.type === 'centrifuge' && o.parent.run) continue;
     const m = mouthOf(o);
     if (x >= m.x0 - 3 && x <= m.x1 + 3 && y >= m.y - 45 && y <= o.y - 4) { const d = Math.abs(m.y - y); if (d < bd) { bd = d; best = o; } }
   }
   return best;
 }
-function spill(x, part) {
-  const v = liqV(part) + settledVol(part) + susVol(part); if (v <= 0) return;
-  let p = puddles.find(p => Math.abs(p.x - x) < 50);
-  if (!p) { p = { x, v: 0, col: liquidColor(part) }; puddles.push(p); }
-  p.v = Math.min(p.v + v, 400);
-  toastOnce('spill', '¡Derrame en la mesa! Coloca un recipiente debajo.', 'bad');
+// superficie sobre la que cae un derrame (base del soporte, balanza, gradilla... o la mesa)
+function groundY(x, fromY = -1e9) {
+  let y = 0;
+  for (const o of objs) {
+    if (o.parent || o === held) continue;
+    let top = null, x0 = 0, x1 = 0;
+    if (o.type.startsWith('stand')) { x0 = o.x - 74; x1 = o.x + 74; top = o.y - 13; }
+    else if (o.type === 'destilador') { x0 = o.x - 136; x1 = o.x - 54; top = o.y - 10; }
+    else if (o.type === 'balanza') { x0 = o.x - 66; x1 = o.x + 66; top = o.y - 36; }
+    else if (o.type === 'gradilla') { x0 = o.x - 70; x1 = o.x + 70; top = o.y - 8; }
+    else if (o.type === 'tripod') { x0 = o.x - 60; x1 = o.x + 60; top = o.y - 116; }
+    if (top !== null && x >= x0 && x <= x1 && top > fromY && top < y) y = top;
+  }
+  return y;
+}
+function spill(x, part, fromY = -1e9) {
+  const v = liqV(part) + settledVol(part) + susVol(part); if (v <= 0) return 0;
+  const y = groundY(x, fromY);
+  let p = puddles.find(p => Math.abs(p.x - x) < 40 && Math.abs(p.y - y) < 2);
+  if (!p) { p = { x, y, v: 0, col: liquidColor(part), seed: Math.random() * 100, oil: 0 }; puddles.push(p); }
+  else p.x = lerp(p.x, x, v / (p.v + v));
+  p.v = Math.min(p.v + v, 600); p.col = liquidColor(part); p.oil = g0(part, 'oil') > aqV(part);
+  toastOnce('spill', '¡Derrame! Coloca un recipiente debajo.', 'bad');
+  return y;
 }
 
 /* ============================== dibujo: helpers ============================== */
@@ -324,6 +416,21 @@ function text(s, x, y, size = 11, col = '#334155', align = 'center', weight = 60
 }
 function hash(i) { const s = Math.sin(i * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); }
 const TIME = () => performance.now() / 1000;
+function bunsen(P, on, scale = 1) { // mechero con base en (0,0)
+  ctx.save(); ctx.scale(scale, scale);
+  ctx.fillStyle = '#1f2937'; ctx.beginPath(); ctx.ellipse(0, -4, 24, 6, 0, 0, 7); ctx.fill();
+  const gr = ctx.createLinearGradient(-7, 0, 7, 0); gr.addColorStop(0, '#6b7280'); gr.addColorStop(0.5, '#e5e7eb'); gr.addColorStop(1, '#6b7280');
+  ctx.fillStyle = gr; ctx.fillRect(-6, -76, 12, 70); ctx.fillStyle = '#111827'; ctx.fillRect(-6, -30, 12, 5);
+  ctx.strokeStyle = '#9ca3af'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(6, -14); ctx.quadraticCurveTo(30, -12, 48, -4); ctx.stroke();
+  if (on && P > 0.01) {
+    const t = TIME(), fh = 14 + 32 * P + Math.sin(t * 30) * 1.5;
+    const fg = ctx.createLinearGradient(0, -76, 0, -76 - fh);
+    fg.addColorStop(0, 'rgba(59,130,246,.9)'); fg.addColorStop(0.6, 'rgba(129,140,248,.55)'); fg.addColorStop(1, 'rgba(251,146,60,0)');
+    ctx.fillStyle = fg; ctx.beginPath(); ctx.moveTo(-6, -76); ctx.quadraticCurveTo(-9, -76 - fh * 0.6, 0, -76 - fh); ctx.quadraticCurveTo(9, -76 - fh * 0.6, 6, -76); ctx.fill();
+    ctx.fillStyle = 'rgba(191,219,254,.9)'; ctx.beginPath(); ctx.moveTo(-3, -76); ctx.quadraticCurveTo(0, -76 - fh * 0.5, 3, -76); ctx.fill();
+  }
+  ctx.restore();
+}
 
 function drawContents(o, g) {
   const ib = g.ib, t = TIME();
@@ -332,42 +439,35 @@ function drawContents(o, g) {
   let sedV = 0, sc = [0, 0, 0], sw = 0;
   for (const s in SOLIDS) { const a = g0(o, s) - (o.sus[s] || 0); if (a > 1e-4) { sedV += a * 0.4; sc = sc.map((v, i) => v + SOLIDS[s].col[i] * a); sw += a; } }
   if (sedV > 0.01) {
-    const h = Math.max(1.5, H(sedV)); const col = sc.map(v => Math.round(v / sw));
-    ctx.fillStyle = `rgb(${col})`; ctx.fillRect(-200, y - h, 400, h);
+    const h = Math.max(1.5, H(sedV)), col = sc.map(v => Math.round(v / sw));
+    ctx.fillStyle = `rgb(${col})`; ctx.fillRect(-200, y - h, 400, h + 30);
     ctx.fillStyle = `rgba(${col.map(v => v * 0.6)},0.8)`;
     for (let i = 0; i < Math.min(90, h * 6); i++) ctx.fillRect(lerp(-g.half - 10, g.half + 10, hash(i + o.id)), y - h * hash(i * 3.1 + 7), 1.6, 1.6);
     y -= h;
   }
-  let crV = 0; for (const s in SOL) crV += undis(o, s) * 0.4;
-  const aqT = aqV(o) + o.em + susVol(o) + crV * 0; // los cristales se dibujan aparte
+  const aqT = aqV(o) + o.em + susVol(o);
   if (aqT > 0.01) {
     const h = H(aqT);
-    ctx.fillStyle = aqColor(o); ctx.fillRect(-200, y - h, 400, h);
-    // partículas en suspensión
+    ctx.fillStyle = aqColor(o); ctx.fillRect(-200, y - h, 400, h + (sedV > 0.01 ? 0 : 30));
     let sus = 0; for (const s in SOLIDS) sus += o.sus[s] || 0;
     if (sus > 0.005) {
       const n = Math.min(80, Math.round(sus / aqT * 900) + 2);
-      for (let i = 0; i < n; i++) {
-        const px = lerp(-g.half, g.half, hash(i + o.id * 13)) + Math.sin(t * 1.3 + i) * 3, py = y - h * hash(i * 7.3 + o.id) + Math.cos(t + i) * 2;
-        ctx.fillStyle = 'rgba(120,85,55,.75)'; ctx.fillRect(px, py, 2, 2);
-      }
+      for (let i = 0; i < n; i++) { ctx.fillStyle = 'rgba(120,85,55,.75)'; ctx.fillRect(lerp(-g.half, g.half, hash(i + o.id * 13)) + Math.sin(t * 1.3 + i) * 3, y - h * hash(i * 7.3 + o.id) + Math.cos(t + i) * 2, 2, 2); }
     }
     if (o.em > 0.5) {
       const n = Math.min(40, Math.round(o.em / aqT * 80));
       for (let i = 0; i < n; i++) { ctx.fillStyle = 'rgba(245,190,40,.85)'; ctx.beginPath(); ctx.arc(lerp(-g.half, g.half, hash(i * 3 + o.id)), y - h * hash(i * 5.7 + o.id * 2) - Math.sin(t + i) * 2, 1.5 + 2 * hash(i), 0, 7); ctx.fill(); }
     }
-    ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.fillRect(-200, y - h, 400, 1.2);
-    if (o.boil) for (let i = 0; i < 8; i++) { const bx = lerp(-g.botW, g.botW, hash(i + Math.floor(t * 3))), by = y - ((t * 60 + i * 23) % h); ctx.strokeStyle = 'rgba(255,255,255,.8)'; ctx.beginPath(); ctx.arc(bx, by, 2.2, 0, 7); ctx.stroke(); }
+    ctx.fillStyle = 'rgba(255,255,255,.6)'; ctx.fillRect(-200, y - h, 400, 1.2);
+    if (o.boil) for (let i = 0; i < 8; i++) { const bx = lerp(-g.botW, g.botW, hash(i + Math.floor(t * 3))), by = y - ((t * 60 + i * 23) % Math.max(h, 1)); ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.beginPath(); ctx.arc(bx, by, 2.2, 0, 7); ctx.stroke(); }
     y -= h;
   }
   const oilF = Math.max(0, g0(o, 'oil') - o.em);
-  if (oilF > 0.01) { const h = H(oilF); ctx.fillStyle = oilCol; ctx.fillRect(-200, y - h, 400, h); ctx.fillStyle = 'rgba(255,255,255,.5)'; ctx.fillRect(-200, y - h, 400, 1.2); y -= h; }
-  // cristales
+  if (oilF > 0.01) { const h = H(oilF); ctx.fillStyle = oilCol; ctx.fillRect(-200, y - h, 400, h + (aqT > 0.01 || sedV > 0.01 ? 0 : 30)); ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.fillRect(-200, y - h, 400, 1.2); y -= h; }
   for (const k of o.cry) {
     const S = SOL[k.s], sz = 4 + 20 * Math.cbrt(k.mass), cx = k.x * g.botW * 0.9, cy = ib - sz * 0.35 - (k.r * 4);
     ctx.save(); ctx.translate(cx, cy); ctx.rotate(k.a);
-    ctx.fillStyle = S.cry; ctx.strokeStyle = S.edge; ctx.lineWidth = 1;
-    ctx.beginPath();
+    ctx.fillStyle = S.cry; ctx.strokeStyle = S.edge; ctx.lineWidth = 1; ctx.beginPath();
     if (k.s === 'salt') ctx.rect(-sz / 2, -sz / 2, sz, sz);
     else { ctx.moveTo(-sz * 0.6, 0); ctx.lineTo(-sz * 0.2, -sz * 0.45); ctx.lineTo(sz * 0.6, -sz * 0.2); ctx.lineTo(sz * 0.2, sz * 0.45); ctx.closePath(); }
     ctx.globalAlpha = 0.9; ctx.fill(); ctx.globalAlpha = 1; ctx.stroke();
@@ -379,47 +479,70 @@ function drawCont(o) {
   const g = GEO[o.type];
   ctx.save(); ctx.translate(o.x, o.y);
   if (o.tilt > 0.001) { const px = o.tdir * g.half, py = g.mouth[2]; ctx.translate(px, py); ctx.rotate(o.tdir * o.tilt); ctx.translate(-px, -py); }
-  if (g.porcelain) { ctx.beginPath(); g.line(ctx); ctx.closePath(); const gr = ctx.createLinearGradient(0, -35, 0, 4); gr.addColorStop(0, '#ffffff'); gr.addColorStop(1, '#d1d5db'); ctx.fillStyle = gr; ctx.fill(); }
-  else { ctx.beginPath(); g.line(ctx); ctx.closePath(); ctx.fillStyle = 'rgba(226,238,252,0.28)'; ctx.fill(); }
+  // piezas bajo el cuerpo
+  if (o.type === 'probeta') { ctx.beginPath(); ctx.moveTo(-26, 0); ctx.lineTo(26, 0); ctx.lineTo(18, -12); ctx.lineTo(-18, -12); ctx.closePath(); ctx.fillStyle = 'rgba(203,213,225,.7)'; ctx.fill(); ctx.strokeStyle = 'rgba(71,85,105,.9)'; ctx.lineWidth = 2; ctx.stroke(); }
+  if (o.type === 'mortero') { ctx.beginPath(); rr(ctx, -22, -6, 44, 6, 2); ctx.fillStyle = '#e5e7eb'; ctx.fill(); }
+  // cuerpo
+  ctx.beginPath(); g.line(ctx); ctx.closePath();
+  if (g.porcelain) { const gr = ctx.createLinearGradient(0, -45, 0, 4); gr.addColorStop(0, '#ffffff'); gr.addColorStop(1, '#d1d5db'); ctx.fillStyle = gr; }
+  else ctx.fillStyle = o.type === 'jar' ? 'rgba(217,180,120,.18)' : 'rgba(226,238,252,0.3)';
+  ctx.fill();
   if (o.type === 'funnel') { // papel de filtro
-    ctx.beginPath(); ctx.moveTo(-47, -99); ctx.lineTo(-3, -46); ctx.lineTo(3, -46); ctx.lineTo(47, -99); ctx.closePath(); ctx.fillStyle = 'rgba(255,255,255,.92)'; ctx.fill(); ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-48, -99); ctx.lineTo(-4, -45); ctx.lineTo(4, -45); ctx.lineTo(48, -99); ctx.closePath(); ctx.fillStyle = 'rgba(255,255,255,.95)'; ctx.fill(); ctx.strokeStyle = '#e5e7eb'; ctx.lineWidth = 1; ctx.stroke();
     ctx.strokeStyle = 'rgba(203,213,225,.9)'; ctx.beginPath(); ctx.moveTo(-20, -99); ctx.lineTo(-2, -48); ctx.moveTo(20, -99); ctx.lineTo(2, -48); ctx.stroke();
   }
-  ctx.save(); ctx.beginPath(); g.inner(ctx); ctx.clip(); drawContents(o, g); ctx.restore();
+  // contenido recortado por el mismo contorno: sin huecos entre líquido y pared
+  ctx.save(); ctx.beginPath(); g.line(ctx); ctx.closePath(); ctx.clip(); drawContents(o, g); ctx.restore();
+  // contorno
+  ctx.beginPath(); g.line(ctx);
+  ctx.strokeStyle = g.porcelain ? '#94a3b8' : 'rgba(71,85,105,.9)'; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.stroke();
+  if (g.hl) { ctx.beginPath(); g.hl(ctx); ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = 2.2; ctx.stroke(); }
+  if (g.grad) { const [a, b] = g.grad, x0 = o.type === 'probeta' || o.type === 'bureta' ? -4 : 12, x1 = x0 + (o.type === 'bureta' ? 6 : 10); ctx.strokeStyle = 'rgba(71,85,105,.55)'; ctx.lineWidth = 1; const n = o.type === 'bureta' ? 10 : o.type === 'probeta' ? 10 : 5; for (let i = 1; i < n; i++) { const yy = lerp(a, b, i / n); ctx.beginPath(); ctx.moveTo(x0, yy); ctx.lineTo(i % 2 ? x0 + (x1 - x0) * 0.6 : x1, yy); ctx.stroke(); } }
+  // detalles por tipo
   if (o.type === 'bottleW' || o.type === 'bottleA') {
     ctx.fillStyle = o.type === 'bottleW' ? '#e0f2fe' : '#fef3c7'; ctx.fillRect(-26, -95, 52, 34);
     text(o.type === 'bottleW' ? 'AGUA' : 'ALCOHOL', 0, -84, 9.5, '#0f172a', 'center', 800); text(o.type === 'bottleW' ? 'destilada' : 'etanol', 0, -71, 8.5, '#475569');
     ctx.fillStyle = '#e11d48'; ctx.fillRect(-12, -158, 24, 10);
     ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -158); ctx.quadraticCurveTo(2, -182, 44, -176); ctx.stroke();
   }
-  ctx.beginPath(); g.line(ctx);
-  ctx.strokeStyle = g.porcelain ? '#94a3b8' : 'rgba(71,85,105,.9)'; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.stroke();
-  if (!g.porcelain) { ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(-g.half * 0.55 - 6, g.mouth[2] + 14); ctx.lineTo(-g.half * 0.55 - 6, g.ib - 14); ctx.stroke(); }
-  if (g.grad) { const [a, b, n] = g.grad; ctx.strokeStyle = 'rgba(71,85,105,.55)'; ctx.lineWidth = 1; for (let i = 1; i <= 4; i++) { const yy = lerp(a, b, i / 5) + 0; ctx.beginPath(); ctx.moveTo(12, yy); ctx.lineTo(24, yy); ctx.stroke(); } }
-  if (o.type === 'sep') { // llave
-    ctx.fillStyle = 'rgba(226,238,252,.6)'; ctx.fillRect(-3, -64, 6, 64); ctx.strokeStyle = 'rgba(71,85,105,.9)'; ctx.lineWidth = 1.5; ctx.strokeRect(-3, -64, 6, 64);
-    ctx.fillStyle = '#1e293b'; ctx.beginPath(); ctx.arc(0, -57, 6, 0, 7); ctx.fill();
+  if (o.type === 'jar' || o.type === 'botella') {
+    const y0 = o.type === 'jar' ? -78 : -96; ctx.fillStyle = '#fff'; ctx.fillRect(-28, y0, 56, 34); ctx.strokeStyle = '#d1d5db'; ctx.lineWidth = 1; ctx.strokeRect(-28, y0, 56, 34);
+    text(o.label || '', 0, y0 + 12, 8.5, '#0f172a', 'center', 800); text(o.formula || '', 0, y0 + 24, 8, '#64748b', 'center', 600);
+    ctx.fillStyle = '#334155'; if (o.type === 'jar') { ctx.beginPath(); rr(ctx, -28, -126, 56, 9, 3); ctx.fill(); } else { ctx.beginPath(); rr(ctx, -13, -180, 26, 11, 3); ctx.fill(); }
+  }
+  if (o.type === 'aforado') { ctx.strokeStyle = 'rgba(30,41,59,.85)'; ctx.lineWidth = 1.3; ctx.beginPath(); ctx.moveTo(-6, -140); ctx.lineTo(6, -140); ctx.stroke(); ctx.fillStyle = '#334155'; ctx.beginPath(); rr(ctx, -8, -188, 16, 10, 3); ctx.fill(); }
+  if (o.type === 'pipeta') { ctx.fillStyle = '#ef4444'; ctx.beginPath(); rr(ctx, -8, -168, 16, 46, 8); ctx.fill(); ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.fillRect(-5, -162, 3, 30); }
+  if (o.type === 'mortero') { ctx.save(); ctx.translate(14, -26); ctx.rotate(-0.55); ctx.beginPath(); rr(ctx, -6, -86, 12, 92, 6); const pg = ctx.createLinearGradient(-6, 0, 6, 0); pg.addColorStop(0, '#d1d5db'); pg.addColorStop(0.5, '#fff'); pg.addColorStop(1, '#cbd5e1'); ctx.fillStyle = pg; ctx.fill(); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore(); }
+  if (o.type === 'sep' || o.type === 'bureta') { // llave y punta
+    const ty = o.type === 'sep' ? -57 : -26, top = o.type === 'sep' ? -64 : -34;
+    ctx.fillStyle = 'rgba(226,238,252,.6)'; ctx.fillRect(-2.5, top, 5, -top); ctx.strokeStyle = 'rgba(71,85,105,.9)'; ctx.lineWidth = 1.4; ctx.strokeRect(-2.5, top, 5, -top);
+    if (o.open && totV(o) > 0.01) { ctx.fillStyle = aqColor(o, 1.4); ctx.fillRect(-1.5, top, 3, -top); }
+    ctx.fillStyle = '#1e293b'; ctx.beginPath(); ctx.arc(0, ty, 6, 0, 7); ctx.fill();
     ctx.fillStyle = o.open ? '#16a34a' : '#dc2626';
-    ctx.save(); ctx.translate(0, -57); if (o.open) ctx.rotate(Math.PI / 2); ctx.beginPath(); rr(ctx, -16, -3, 32, 6, 3); ctx.fill(); ctx.restore();
-    ctx.fillStyle = '#334155'; ctx.beginPath(); rr(ctx, -9, -236, 18, 12, 3); ctx.fill();
+    ctx.save(); ctx.translate(0, ty); if (o.open) ctx.rotate(Math.PI / 2); ctx.beginPath(); rr(ctx, -16, -3, 32, 6, 3); ctx.fill(); ctx.restore();
+    if (o.type === 'sep') { ctx.fillStyle = '#334155'; ctx.beginPath(); rr(ctx, -9, -236, 18, 12, 3); ctx.fill(); }
   }
   ctx.restore();
 }
 
 /* ============================== tipos de objetos ============================== */
-const CONT_HITS = { beaker: [-48, -120, 48, 0], erlen: [-50, -139, 50, 0], tube: [-13, -123, 13, 0], dish: [-64, -37, 64, 4], funnel: [-54, -102, 54, 0], balon: [-50, -168, 50, -40], bottleW: [-34, -182, 48, 0] };
+const CONT_HITS = { beaker: [-48, -120, 48, 0], erlen: [-50, -139, 50, 0], tube: [-13, -123, 13, 0], dish: [-64, -37, 64, 4], vidrio: [-42, -16, 42, 2], mortero: [-52, -112, 64, 0], funnel: [-54, -102, 54, 0], balon: [-50, -168, 50, -40], bottleW: [-34, -182, 48, 0], probeta: [-26, -204, 26, 0], aforado: [-38, -190, 38, 0], jar: [-36, -128, 36, 0], botella: [-36, -182, 36, 0], pipeta: [-9, -170, 9, 0] };
 CONT_HITS.bottleA = CONT_HITS.bottleW;
-for (const t of ['beaker', 'erlen', 'tube', 'dish', 'funnel', 'balon', 'bottleW', 'bottleA']) TYPES[t] = { draw: drawCont, hits: () => [{ r: CONT_HITS[t] }] };
-TYPES.beaker.lab = 'Vaso de precipitados'; TYPES.erlen.lab = 'Matraz Erlenmeyer'; TYPES.tube.lab = 'Tubo de ensayo';
-TYPES.dish.lab = 'Cápsula de porcelana'; TYPES.funnel.lab = 'Embudo con papel de filtro'; TYPES.funnel.mountDy = 85;
-TYPES.balon.lab = 'Balón de destilación'; TYPES.bottleW.lab = 'Frasco lavador (agua)'; TYPES.bottleA.lab = 'Frasco de alcohol';
+const CLAB = { beaker: 'Vaso de precipitados', erlen: 'Matraz Erlenmeyer', tube: 'Tubo de ensayo', dish: 'Cápsula de porcelana', vidrio: 'Vidrio de reloj', mortero: 'Mortero y pistilo', funnel: 'Embudo con papel de filtro', balon: 'Balón de destilación', bottleW: 'Frasco lavador (agua)', bottleA: 'Frasco de alcohol', probeta: 'Probeta', aforado: 'Matraz aforado', jar: 'Frasco de reactivo', botella: 'Botella de reactivo', pipeta: 'Pipeta' };
+const ROD_SOCK = ['beaker', 'erlen', 'dish', 'probeta', 'mortero', 'jar', 'vidrio'];
+for (const t in CONT_HITS) TYPES[t] = {
+  lab: CLAB[t], draw: drawCont, hits: () => [{ r: CONT_HITS[t] }],
+  sockets: ROD_SOCK.includes(t) ? o => { const g = GEO[o.type]; return [{ name: 'rod', x: o.x + (g.half > 20 ? g.half * 0.42 : 0), y: o.y + g.ib - 3, acc: ['termometro', 'varilla'], dy: 0 }]; } : undefined
+};
+TYPES.funnel.mountDy = 85;
 TYPES.sep = { lab: 'Embudo de decantación', mountDy: 150, draw: drawCont, hits: () => [{ r: [-18, -66, 18, -48], part: 'tap' }, { r: [-44, -238, 44, 0] }] };
+TYPES.bureta = { lab: 'Bureta', mountDy: 200, draw: drawCont, hits: () => [{ r: [-18, -34, 18, -18], part: 'tap' }, { r: [-10, -304, 10, 0] }] };
 
 function standType(ring) {
   return {
     lab: ring ? 'Soporte universal con aro' : 'Soporte universal con pinza',
     init(o) { if (o.armY === undefined) o.armY = -235; },
-    sockets: o => [{ name: 'arm', x: o.x + 25, y: o.y + o.armY, acc: ring ? ['funnel', 'sep'] : ['paper'] }],
+    sockets: o => [{ name: 'arm', x: o.x + 25, y: o.y + o.armY, acc: ring ? ['funnel', 'sep'] : ['paper', 'bureta'] }],
     hits: o => [{ c: [-55, o.armY, 12], part: 'arm' }, { r: [-74, -14, 74, 0] }, { r: [-61, -392, -49, 0] }, { r: [-55, o.armY - 7, ring ? 64 : 48, o.armY + 7] }],
     draw(o) {
       ctx.save(); ctx.translate(o.x, o.y);
@@ -441,28 +564,16 @@ function standType(ring) {
 }
 TYPES.standRing = standType(true);
 TYPES.standClamp = standType(false);
-
 TYPES.tripod = {
   lab: 'Trípode, rejilla y mechero Bunsen',
   init(o) { if (o.P === undefined) o.P = 0.6; if (o.on === undefined) o.on = false; },
-  sockets: o => [{ name: 'top', x: o.x, y: o.y - 113, acc: ['dish', 'beaker', 'erlen'], dy: 0 }],
+  sockets: o => [{ name: 'top', x: o.x, y: o.y - 113, acc: ['dish', 'beaker', 'erlen', 'vidrio'], dy: 0 }],
   hits: () => [{ r: [-22, -80, 22, 0], part: 'burner' }, { r: [-66, -118, 66, 0] }],
   draw(o) {
     ctx.save(); ctx.translate(o.x, o.y);
     ctx.strokeStyle = '#374151'; ctx.lineWidth = 3; ctx.lineCap = 'round';
     ctx.beginPath(); ctx.moveTo(-48, -110); ctx.lineTo(-62, 0); ctx.moveTo(48, -110); ctx.lineTo(62, 0); ctx.moveTo(0, -110); ctx.lineTo(4, -10); ctx.stroke();
-    // mechero
-    ctx.fillStyle = '#1f2937'; ctx.beginPath(); ctx.ellipse(0, -4, 24, 6, 0, 0, 7); ctx.fill();
-    const gr = ctx.createLinearGradient(-7, 0, 7, 0); gr.addColorStop(0, '#6b7280'); gr.addColorStop(0.5, '#e5e7eb'); gr.addColorStop(1, '#6b7280');
-    ctx.fillStyle = gr; ctx.fillRect(-6, -76, 12, 70); ctx.fillStyle = '#111827'; ctx.fillRect(-6, -30, 12, 5);
-    if (o.on && o.P > 0.01) {
-      const t = TIME(), fh = 14 + 32 * o.P + Math.sin(t * 30) * 1.5;
-      const fg = ctx.createLinearGradient(0, -76, 0, -76 - fh);
-      fg.addColorStop(0, 'rgba(59,130,246,.9)'); fg.addColorStop(0.6, 'rgba(129,140,248,.55)'); fg.addColorStop(1, 'rgba(251,146,60,0)');
-      ctx.fillStyle = fg; ctx.beginPath(); ctx.moveTo(-6, -76); ctx.quadraticCurveTo(-9, -76 - fh * 0.6, 0, -76 - fh); ctx.quadraticCurveTo(9, -76 - fh * 0.6, 6, -76); ctx.fill();
-      ctx.fillStyle = 'rgba(191,219,254,.9)'; ctx.beginPath(); ctx.moveTo(-3, -76); ctx.quadraticCurveTo(0, -76 - fh * 0.5, 3, -76); ctx.fill();
-    }
-    // rejilla
+    bunsen(o.P, o.on);
     ctx.fillStyle = '#9ca3af'; ctx.fillRect(-60, -115, 120, 5); ctx.fillStyle = '#e5e7eb'; ctx.fillRect(-22, -115, 44, 5);
     if (o.on && o.P > 0.01) { ctx.fillStyle = `rgba(249,115,22,${0.25 + 0.5 * o.P})`; ctx.fillRect(-22, -115, 44, 5); }
     ctx.restore();
@@ -470,13 +581,13 @@ TYPES.tripod = {
 };
 TYPES.iceBath = {
   lab: 'Baño de hielo',
-  sockets: o => [{ name: 'top', x: o.x, y: o.y - 14, acc: ['dish', 'beaker', 'erlen', 'tube'], dy: 0 }],
+  sockets: o => [{ name: 'top', x: o.x, y: o.y - 14, acc: ['dish', 'beaker', 'erlen', 'tube', 'vidrio'], dy: 0 }],
   hits: () => [{ r: [-82, -44, 82, 0] }],
   draw(o) { ctx.save(); ctx.translate(o.x, o.y); ctx.beginPath(); rr(ctx, -80, -42, 160, 42, 7); ctx.fillStyle = 'rgba(219,234,254,.85)'; ctx.fill(); ctx.strokeStyle = '#93c5fd'; ctx.lineWidth = 2; ctx.stroke(); ctx.restore(); },
   front(o) {
     ctx.save(); ctx.translate(o.x, o.y);
-    ctx.fillStyle = 'rgba(191,219,254,.55)'; ctx.fillRect(-78, -30, 156, 28);
-    for (let i = 0; i < 9; i++) { ctx.save(); ctx.translate(-68 + i * 17, -22 + (i % 2) * 6); ctx.rotate(hash(i) - 0.5); ctx.beginPath(); rr(ctx, -7, -7, 14, 14, 3); ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.fill(); ctx.strokeStyle = '#bfdbfe'; ctx.lineWidth = 1; ctx.stroke(); ctx.restore(); }
+    ctx.fillStyle = `rgba(${AQ},.45)`; ctx.fillRect(-78, -30, 156, 28);
+    for (let i = 0; i < 9; i++) { ctx.save(); ctx.translate(-68 + i * 17, -22 + (i % 2) * 6); ctx.rotate(hash(i) - 0.5); ctx.beginPath(); rr(ctx, -7, -7, 14, 14, 3); ctx.fillStyle = 'rgba(255,255,255,.88)'; ctx.fill(); ctx.strokeStyle = '#bfdbfe'; ctx.lineWidth = 1; ctx.stroke(); ctx.restore(); }
     ctx.beginPath(); rr(ctx, -80, -42, 160, 42, 7); ctx.strokeStyle = '#60a5fa'; ctx.lineWidth = 2; ctx.stroke();
     ctx.restore();
   }
@@ -493,53 +604,79 @@ TYPES.column = {
     ctx.restore();
   }
 };
+// geometría del refrigerante (tubo interior A→B, camisa de agua con dos conexiones)
+const CA = [16, -296], CB = [262, -168], CL = Math.hypot(CB[0] - CA[0], CB[1] - CA[1]);
+const CU = [(CB[0] - CA[0]) / CL, (CB[1] - CA[1]) / CL], CN = [CU[1], -CU[0]];
+const CP = (s, k = 0) => [CA[0] + CU[0] * CL * s + CN[0] * k, CA[1] + CU[1] * CL * s + CN[1] * k];
+const HOSE_OUT = () => { const p = CP(0.24, 30); return [p, [p[0] + 30, p[1] - 60], [p[0] + 110, p[1] - 84]]; };
+const HOSE_IN = () => { const p = CP(0.8, 30); return [p, [p[0] + 26, p[1] - 56], [p[0] + 112, p[1] - 72]]; };
+function hose(pts, flow, dir) {
+  const [a, b, c] = pts;
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = '#475569'; ctx.lineWidth = 9; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.quadraticCurveTo(b[0], b[1], c[0], c[1]); ctx.stroke();
+  ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 6; ctx.stroke();
+  if (flow) { ctx.strokeStyle = '#0ea5e9'; ctx.lineWidth = 2.5; ctx.setLineDash([3, 7]); ctx.lineDashOffset = dir * TIME() * 24; ctx.stroke(); ctx.setLineDash([]); }
+}
 TYPES.destilador = {
   lab: 'Equipo de destilación',
   init(o) {
     const b = mk('balon', o.x, o.y, { fixed: true }); b.parent = o; b.sock = 'balon'; o.balon = b;
-    Object.assign(o, { heat: 0, cool: true, headT: 20, front: 0, buf: { water: 0, ethanol: 0 }, boilT: 0, plat: 0, yv: 0, outRate: 0, dry: false });
+    Object.assign(o, { heat: 0, cool: true, headT: 20, front: 0, buf: { water: 0, ethanol: 0 }, boilT: 0, plat: 0, yv: 0, dry: false, src: o.src || 'manta' });
   },
   sockets: o => [{ name: 'balon', x: o.x, y: o.y, acc: [], dy: 0 }, { name: 'col', x: o.x, y: o.y - 166, acc: ['column'], dy: 0 }],
-  hits: () => [{ r: [-64, -50, 64, 0] }, { c: [0, -92, 50] }, { r: [-14, -306, 14, -140] }, { r: [-8, -376, 8, -296] }, { seg: [16, -296, 262, -168, 18] }, { r: [255, -176, 284, -144] }, { r: [-102, -392, -86, 0] }, { r: [-136, -10, -54, 0] }],
+  hits: () => [{ r: [-64, -50, 64, 0] }, { c: [0, -92, 50] }, { r: [-14, -306, 14, -140] }, { r: [-8, -376, 8, -296] }, { seg: [16, -296, 262, -168, 20] }, { r: [255, -176, 284, -144] }, { r: [-102, -392, -86, 0] }, { r: [-136, -10, -54, 0] }],
   draw(o) {
     const t = TIME();
     ctx.save(); ctx.translate(o.x, o.y);
     ctx.fillStyle = '#374151'; ctx.beginPath(); rr(ctx, -136, -10, 82, 10, 3); ctx.fill();
     metal(-94, -390, -94, -10, 7, '#cbd5e1');
     metal(-90, -152, -12, -152, 3, '#94a3b8'); metal(-90, -300, -12, -300, 3, '#94a3b8');
-    // manta calefactora (fondo)
-    ctx.fillStyle = '#374151'; ctx.beginPath(); rr(ctx, -62, -58, 124, 58, 10); ctx.fill();
-    ctx.fillStyle = o.heat > 0.01 ? `rgba(249,115,22,${0.35 + 0.6 * o.heat})` : '#1f2937'; ctx.beginPath(); ctx.ellipse(0, -55, 50, 8, 0, 0, 7); ctx.fill();
-    // cuello / cabeza
+    if (o.src === 'manta') {
+      ctx.fillStyle = '#374151'; ctx.beginPath(); rr(ctx, -62, -58, 124, 58, 10); ctx.fill();
+      ctx.fillStyle = o.heat > 0.01 ? `rgba(249,115,22,${0.35 + 0.6 * o.heat})` : '#1f2937'; ctx.beginPath(); ctx.ellipse(0, -55, 50, 8, 0, 0, 7); ctx.fill();
+    } else {
+      // aro con rejilla y mechero Bunsen
+      metal(-90, -40, -44, -40, 3, '#94a3b8');
+      ctx.fillStyle = '#9ca3af'; ctx.fillRect(-42, -43, 84, 4); ctx.fillStyle = '#e5e7eb'; ctx.fillRect(-16, -43, 32, 4);
+      if (o.heat > 0.01) { ctx.fillStyle = `rgba(249,115,22,${0.25 + 0.5 * o.heat})`; ctx.fillRect(-16, -43, 32, 4); }
+      ctx.save(); ctx.translate(0, 0); bunsen(o.heat, o.heat > 0.01, 0.5); ctx.restore();
+    }
     const hasCol = !!childAt(o, 'col');
     if (!hasCol) { ctx.fillStyle = 'rgba(226,238,252,.35)'; ctx.fillRect(-10, -286, 20, 120); ctx.strokeStyle = 'rgba(71,85,105,.9)'; ctx.lineWidth = 2; ctx.strokeRect(-10, -286, 20, 120); }
     ctx.fillStyle = 'rgba(226,238,252,.35)'; ctx.fillRect(-10, -306, 20, 20); ctx.strokeStyle = 'rgba(71,85,105,.9)'; ctx.lineWidth = 2; ctx.strokeRect(-10, -306, 20, 20);
-    // vapor ascendente
-    if (o.boilNow) for (let i = 0; i < 7; i++) { const yy = -140 - ((t * 70 + i * 24) % (Math.max(10, 160 * o.front))); ctx.fillStyle = 'rgba(255,255,255,.75)'; ctx.beginPath(); ctx.arc(Math.sin(t * 3 + i) * 4, yy, 3, 0, 7); ctx.fill(); }
-    // refrigerante
-    const A = [16, -296], B = [262, -168];
+    ctx.fillStyle = '#334155'; ctx.beginPath(); rr(ctx, -12, -314, 24, 9, 3); ctx.fill();
+    if (o.boilNow) for (let i = 0; i < 7; i++) { const yy = -140 - ((t * 70 + i * 24) % (Math.max(10, 160 * o.front))); ctx.fillStyle = 'rgba(255,255,255,.8)'; ctx.beginPath(); ctx.arc(Math.sin(t * 3 + i) * 4, yy, 3, 0, 7); ctx.fill(); }
+    // —— refrigerante (Liebig) ——
+    hose(HOSE_OUT(), o.cool, 1); hose(HOSE_IN(), o.cool, 1);
+    const j0 = CP(0.15), j1 = CP(0.87);
     ctx.lineCap = 'round';
-    ctx.strokeStyle = 'rgba(71,85,105,.9)'; ctx.lineWidth = 30; ctx.beginPath(); ctx.moveTo(A[0] + 26, A[1] + 13); ctx.lineTo(B[0] - 16, B[1] - 8); ctx.stroke();
-    ctx.strokeStyle = o.cool ? 'rgba(186,230,253,.95)' : 'rgba(241,245,249,.95)'; ctx.lineWidth = 26; ctx.stroke();
-    if (o.cool) { ctx.strokeStyle = 'rgba(59,130,246,.45)'; ctx.lineWidth = 3; ctx.setLineDash([6, 10]); ctx.lineDashOffset = t * 30; ctx.stroke(); ctx.setLineDash([]); }
-    ctx.strokeStyle = 'rgba(71,85,105,.9)'; ctx.lineWidth = 9; ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]); ctx.lineTo(272, -150); ctx.stroke();
-    ctx.strokeStyle = 'rgba(236,244,252,.95)'; ctx.lineWidth = 6; ctx.stroke();
-    if (o.front >= 1 && o.boilNow) { const k = (t * 0.6) % 1; ctx.fillStyle = 'rgba(147,197,253,.9)'; ctx.beginPath(); ctx.arc(lerp(A[0], B[0], k), lerp(A[1], B[1], k), 2.5, 0, 7); ctx.fill(); }
-    // mangueras
-    ctx.strokeStyle = '#1d4ed8'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(232, -170); ctx.quadraticCurveTo(200, -110, 196, -6); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(55, -286); ctx.quadraticCurveTo(60, -340, 120, -350); ctx.lineTo(160, -350); ctx.stroke();
-    text('agua entra', 190, -16, 9, '#1d4ed8', 'right'); text('agua sale', 165, -350, 9, '#1d4ed8', 'left');
+    ctx.strokeStyle = 'rgba(71,85,105,.95)'; ctx.lineWidth = 36; ctx.beginPath(); ctx.moveTo(j0[0], j0[1]); ctx.lineTo(j1[0], j1[1]); ctx.stroke();
+    ctx.strokeStyle = o.cool ? `rgba(${AQ},.95)` : 'rgba(241,245,249,.95)'; ctx.lineWidth = 32; ctx.stroke();
+    // conexiones de entrada/salida
+    for (const s of [0.24, 0.8]) { const a = CP(s, 14), b = CP(s, 30); ctx.strokeStyle = 'rgba(71,85,105,.95)'; ctx.lineWidth = 12; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); ctx.strokeStyle = o.cool ? `rgba(${AQ},1)` : '#f1f5f9'; ctx.lineWidth = 8; ctx.stroke(); }
+    if (o.cool) for (let i = 0; i < 14; i++) { // el agua fría sube por la camisa (contracorriente)
+      const s = 0.85 - ((t * 0.08 + i / 14) % 1) * 0.68, k = (hash(i) - 0.5) * 22, p = CP(s, k);
+      ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.beginPath(); ctx.arc(p[0], p[1], 1.8, 0, 7); ctx.fill();
+    }
+    // tubo interior
+    ctx.strokeStyle = 'rgba(71,85,105,.95)'; ctx.lineWidth = 10; ctx.beginPath(); ctx.moveTo(CA[0], CA[1]); ctx.lineTo(CB[0], CB[1]); ctx.lineTo(272, -150); ctx.stroke();
+    ctx.strokeStyle = 'rgba(240,247,253,.98)'; ctx.lineWidth = 7; ctx.stroke();
+    if (o.dripping || (o.front >= 1 && o.boilNow)) for (let i = 0; i < 6; i++) { const s = 0.3 + ((t * 0.25 + i / 6) % 1) * 0.7, p = CP(s, -1); ctx.fillStyle = `rgba(${AQ},1)`; ctx.beginPath(); ctx.arc(p[0], p[1], 2.2, 0, 7); ctx.fill(); }
+    if (!o.cool && o.front >= 1 && o.boilNow) for (let i = 0; i < 4; i++) { ctx.fillStyle = 'rgba(255,255,255,.75)'; ctx.beginPath(); ctx.arc(276 + Math.sin(t * 2 + i) * 8, -150 - ((t * 30 + i * 12) % 50), 5 + i, 0, 7); ctx.fill(); }
+    // rótulos del agua
+    const ho = HOSE_OUT()[2], hi = HOSE_IN()[2];
+    text('Agua fría sale', ho[0] + 6, ho[1] - 2, 10, '#0369a1', 'left', 700); text('Agua fría entra', hi[0] + 6, hi[1] - 2, 10, '#0369a1', 'left', 700);
+    ctx.save(); const m = CP(0.55, -26); ctx.translate(m[0], m[1]); ctx.rotate(Math.atan2(CU[1], CU[0])); text('refrigerante', 0, 0, 9.5, '#475569', 'center', 700); ctx.restore();
     // termómetro
     ctx.fillStyle = 'rgba(255,255,255,.95)'; ctx.fillRect(-3, -374, 6, 76); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1; ctx.strokeRect(-3, -374, 6, 76);
-    const hT = clamp((o.headT - 0) / 110, 0, 1) * 66;
+    const hT = clamp(o.headT / 110, 0, 1) * 66;
     ctx.fillStyle = '#dc2626'; ctx.fillRect(-1.3, -298 - hT, 2.6, hT); ctx.beginPath(); ctx.arc(0, -296, 4, 0, 7); ctx.fill();
-    ctx.fillStyle = '#111827'; ctx.beginPath(); rr(ctx, 8, -372, 52, 18, 4); ctx.fill(); text(o.headT.toFixed(1) + ' °C', 34, -363, 10, '#fca5a5', 'center', 700);
-    // gotas en la salida
-    if (o.dripping) { const k = (t * 2.2) % 1; ctx.fillStyle = 'rgba(147,197,253,.95)'; ctx.beginPath(); ctx.arc(272, -148 + k * 40, 3, 0, 7); ctx.fill(); }
-    if (!o.cool && o.front >= 1 && o.boilNow) for (let i = 0; i < 4; i++) { ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.beginPath(); ctx.arc(276 + Math.sin(t * 2 + i) * 8, -150 - ((t * 30 + i * 12) % 50), 5 + i, 0, 7); ctx.fill(); }
+    ctx.fillStyle = '#111827'; ctx.beginPath(); rr(ctx, -64, -372, 54, 18, 4); ctx.fill(); text(o.headT.toFixed(1) + ' °C', -37, -363, 10, '#fca5a5', 'center', 700);
+    if (o.dripping) { const k = (t * 2.2) % 1; ctx.fillStyle = `rgba(${AQ},1)`; ctx.beginPath(); ctx.arc(272, -148 + k * 40, 3, 0, 7); ctx.fill(); }
     ctx.restore();
   },
   front(o) {
+    if (o.src !== 'manta') return;
     ctx.save(); ctx.translate(o.x, o.y);
     ctx.fillStyle = '#4b5563'; ctx.beginPath(); rr(ctx, -62, -46, 124, 46, 9); ctx.fill();
     ctx.fillStyle = '#111827'; ctx.beginPath(); rr(ctx, -46, -36, 54, 18, 4); ctx.fill();
@@ -558,14 +695,11 @@ TYPES.paper = {
     ctx.save(); ctx.translate(o.x, o.y);
     ctx.fillStyle = '#ffffff'; ctx.fillRect(-16, -200, 32, 200); ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1; ctx.strokeRect(-16, -200, 32, 200);
     for (let i = 1; i < 10; i++) { ctx.strokeStyle = '#cbd5e1'; ctx.beginPath(); ctx.moveTo(-16, -i * 20); ctx.lineTo(-11, -i * 20); ctx.stroke(); }
-    if (o.front > 0) { ctx.fillStyle = 'rgba(147,197,253,.28)'; ctx.fillRect(-16, -o.front, 32, o.front); ctx.strokeStyle = 'rgba(59,130,246,.6)'; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(-16, -o.front); ctx.lineTo(16, -o.front); ctx.stroke(); ctx.setLineDash([]); }
+    if (o.front > 0) { ctx.fillStyle = `rgba(${AQ},.3)`; ctx.fillRect(-16, -o.front, 32, o.front); ctx.strokeStyle = 'rgba(14,165,233,.6)'; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(-16, -o.front); ctx.lineTo(16, -o.front); ctx.stroke(); ctx.setLineDash([]); }
     ctx.strokeStyle = '#64748b'; ctx.lineWidth = 0.8; ctx.beginPath(); ctx.moveTo(-14, -30); ctx.lineTo(14, -30); ctx.stroke();
     const ink = INKS[o.ink].d, run = Math.max(0, o.front - 30);
     if (o.bled) { ctx.fillStyle = 'rgba(100,116,139,.15)'; ctx.beginPath(); ctx.ellipse(0, -30, 9, 6, 0, 0, 7); ctx.fill(); }
-    else for (const d in ink) {
-      const D = DYES[d], rf = lerp(D.rfW, D.rfA, o.e), dist = rf * run, y = -30 - dist, r = 4.5 + dist * 0.035;
-      ctx.fillStyle = `rgba(${D.c},${0.55 * ink[d] + 0.25})`; ctx.beginPath(); ctx.ellipse(0, y, r + 1.5, r + dist * 0.02, 0, 0, 7); ctx.fill();
-    }
+    else for (const d in ink) { const D = DYES[d], dist = lerp(D.rfW, D.rfA, o.e) * run, r = 4.5 + dist * 0.035; ctx.fillStyle = `rgba(${D.c},${0.55 * ink[d] + 0.25})`; ctx.beginPath(); ctx.ellipse(0, -30 - dist, r + 1.5, r + dist * 0.02, 0, 0, 7); ctx.fill(); }
     ctx.restore();
   }
 };
@@ -600,6 +734,97 @@ TYPES.centrifuge = {
     ctx.restore();
   }
 };
+TYPES.termometro = {
+  lab: 'Termómetro', mountDy: 0,
+  hits: () => [{ r: [-9, -214, 30, 2] }],
+  draw(o) {
+    let T = 20; const p = o.parent && isC(o.parent) ? o.parent : null;
+    if (p && totV(p) > 0.05 && surfaceY(p) < o.y - 1) T = p.T;
+    o.read = T;
+    ctx.save(); ctx.translate(o.x, o.y);
+    ctx.fillStyle = 'rgba(255,255,255,.92)'; ctx.beginPath(); rr(ctx, -4, -212, 8, 206, 4); ctx.fill(); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.2; ctx.stroke();
+    for (let i = 0; i <= 11; i++) { const y = -14 - i * 17; ctx.strokeStyle = '#64748b'; ctx.lineWidth = 0.8; ctx.beginPath(); ctx.moveTo(-4, y); ctx.lineTo(i % 5 ? -1 : 1, y); ctx.stroke(); }
+    const h = clamp(T / 110, 0, 1.05) * 187;
+    ctx.fillStyle = '#dc2626'; ctx.fillRect(-1.4, -12 - h, 2.8, h); ctx.beginPath(); ctx.arc(0, -6, 5, 0, 7); ctx.fill();
+    ctx.fillStyle = '#111827'; ctx.beginPath(); rr(ctx, 6, -214, 40, 16, 4); ctx.fill(); text(T.toFixed(0) + ' °C', 26, -206, 9.5, '#fca5a5', 'center', 700);
+    ctx.restore();
+  }
+};
+TYPES.varilla = {
+  lab: 'Varilla de vidrio (agitador)', mountDy: 0,
+  hits: () => [{ r: [-6, -204, 22, 3] }],
+  draw(o) { ctx.save(); ctx.translate(o.x, o.y); ctx.lineCap = 'round'; ctx.strokeStyle = 'rgba(71,85,105,.85)'; ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(0, -2); ctx.lineTo(16, -200); ctx.stroke(); ctx.strokeStyle = 'rgba(236,246,253,.95)'; ctx.lineWidth = 4.5; ctx.stroke(); ctx.restore(); }
+};
+TYPES.espatula = {
+  lab: 'Espátula', mountDy: 0,
+  hits: () => [{ r: [-9, -176, 18, 4] }],
+  draw(o) {
+    ctx.save(); ctx.translate(o.x, o.y); ctx.rotate(0.06);
+    const g = ctx.createLinearGradient(-6, 0, 6, 0); g.addColorStop(0, '#9ca3af'); g.addColorStop(0.5, '#f3f4f6'); g.addColorStop(1, '#9ca3af');
+    ctx.fillStyle = g; ctx.strokeStyle = '#6b7280'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.ellipse(0, -10, 7, 12, 0, 0, 7); ctx.fill(); ctx.stroke();
+    ctx.fillRect(-2, -150, 4, 130); ctx.strokeRect(-2, -150, 4, 130);
+    ctx.beginPath(); rr(ctx, -6, -172, 12, 24, 4); ctx.fill(); ctx.stroke();
+    ctx.restore();
+  }
+};
+TYPES.balanza = {
+  lab: 'Balanza',
+  init(o) { o.tare = o.tare || 0; },
+  sockets: o => [{ name: 'plate', x: o.x, y: o.y - 42, acc: Object.keys(GEO).filter(k => !['balon', 'sep', 'bureta', 'funnel', 'pipeta'].includes(k)), dy: 0 }],
+  hits: () => [{ r: [30, -30, 52, -12], part: 'tara' }, { r: [-66, -48, 66, 0] }],
+  draw(o) {
+    ctx.save(); ctx.translate(o.x, o.y);
+    ctx.fillStyle = '#e5e7eb'; ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2; ctx.beginPath(); rr(ctx, -66, -36, 132, 36, 8); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#9ca3af'; ctx.fillRect(-6, -42, 12, 8);
+    ctx.fillStyle = '#cbd5e1'; ctx.beginPath(); ctx.ellipse(0, -43, 54, 6, 0, 0, 7); ctx.fill(); ctx.stroke();
+    ctx.restore();
+  },
+  front(o) {
+    const c = childAt(o, 'plate'); const m = c ? (GLASS_MASS[c.type] || 50) + massOf(c) : 0;
+    o.read = m;
+    ctx.save(); ctx.translate(o.x, o.y);
+    ctx.fillStyle = '#0f172a'; ctx.beginPath(); rr(ctx, -56, -28, 80, 18, 4); ctx.fill();
+    text((m - o.tare).toFixed(2) + ' g', -16, -19, 10.5, '#86efac', 'center', 700);
+    ctx.fillStyle = '#334155'; ctx.beginPath(); ctx.arc(41, -20, 8, 0, 7); ctx.fill(); text('T', 41, -20, 9, '#fff', 'center', 800);
+    ctx.restore();
+  }
+};
+TYPES.gradilla = {
+  lab: 'Gradilla',
+  sockets: o => [-48, -16, 16, 48].map((dx, i) => ({ name: 'g' + i, x: o.x + dx, y: o.y - 6, acc: ['tube'], dy: 0 })),
+  hits: () => [{ r: [-72, -84, 72, 0] }],
+  draw(o) {
+    ctx.save(); ctx.translate(o.x, o.y);
+    ctx.fillStyle = '#94a3b8'; ctx.beginPath(); rr(ctx, -72, -8, 144, 8, 3); ctx.fill();
+    ctx.fillStyle = '#64748b'; ctx.fillRect(-68, -84, 6, 78); ctx.fillRect(62, -84, 6, 78);
+    ctx.fillStyle = '#cbd5e1'; ctx.fillRect(-66, -46, 132, 5); ctx.fillRect(-66, -82, 132, 5);
+    ctx.restore();
+  },
+  front(o) {
+    ctx.save(); ctx.translate(o.x, o.y);
+    ctx.fillStyle = 'rgba(148,163,184,.95)'; ctx.fillRect(-70, -78, 140, 8);
+    for (const dx of [-48, -16, 16, 48]) { ctx.strokeStyle = '#475569'; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(dx, -74, 12, 3, 0, 0, 7); ctx.stroke(); }
+    ctx.restore();
+  }
+};
+TYPES.campana = {
+  lab: 'Campana de extracción',
+  hits: () => [{ r: [-240, -440, 240, -372] }, { r: [-240, -372, -214, 0] }, { r: [214, -372, 240, 0] }],
+  draw(o) {
+    ctx.save(); ctx.translate(o.x, o.y);
+    ctx.fillStyle = '#e2e8f0'; ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2; ctx.beginPath(); rr(ctx, -240, -440, 480, 440, 8); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#f8fafc'; ctx.fillRect(-214, -372, 428, 372);
+    ctx.fillStyle = 'rgba(148,163,184,.12)'; for (let i = 0; i < 6; i++) ctx.fillRect(-214 + i * 72, -372, 1, 372);
+    ctx.fillStyle = '#cbd5e1'; ctx.fillRect(-230, -432, 460, 54);
+    ctx.fillStyle = '#fef9c3'; ctx.fillRect(-200, -386, 400, 6);
+    ctx.fillStyle = '#475569'; for (let i = 0; i < 12; i++) ctx.fillRect(-170 + i * 12, -422, 6, 30);
+    ctx.fillStyle = '#0f172a'; ctx.beginPath(); rr(ctx, 120, -424, 90, 26, 4); ctx.fill(); text('FLUJO  ON', 165, -411, 9.5, '#86efac', 'center', 800);
+    ctx.fillStyle = 'rgba(186,230,253,.18)'; ctx.fillRect(-214, -372, 428, 120); ctx.strokeStyle = '#94a3b8'; ctx.strokeRect(-214, -372, 428, 120);
+    ctx.fillStyle = '#64748b'; ctx.fillRect(-60, -258, 120, 6);
+    ctx.restore();
+  }
+};
 
 /* ============================== actualización ============================== */
 function envOf(o) {
@@ -624,7 +849,7 @@ function heatOpen(o, P, amb, dt) {
     }
   }
   if (aqV(o) <= 0.05) T = Math.min(T, 250);
-  o.T = T; o.boil = boiling; return boiling;
+  o.T = T; o.boil = boiling;
 }
 function crystUpdate(o, dt) {
   const cool = Math.max(0, (o.Tp - o.T) / Math.max(dt, 1e-3)); o.Tp = o.T;
@@ -648,27 +873,30 @@ function crystUpdate(o, dt) {
 function contUpdate(o, dt) {
   const e = envOf(o), g = e.g;
   for (const s in SOLIDS) if (o.sus[s]) { o.sus[s] *= Math.exp(-SOLIDS[s].k * g * dt * (o.type === 'funnel' ? 3 : 1)); if (liqV(o) < 0.3) o.sus[s] = 0; if (o.sus[s] < 1e-6) delete o.sus[s]; }
-  if (o.em > 0) { o.em = aqV(o) > 0.1 ? o.em * Math.exp(-0.12 * g * dt) : 0; if (o.em < 1e-3) o.em = 0; }
+  if (o.em > 0) { o.em = aqV(o) > 0.1 ? o.em * Math.exp(-0.15 * g * dt) : 0; if (o.em < 1e-3) o.em = 0; }
   if (o.type !== 'balon') heatOpen(o, e.P, e.amb, dt);
   crystUpdate(o, dt);
   const g2 = GEO[o.type];
-  if (totV(o) > g2.cap * 1.04 && !o.type.startsWith('bottle')) { const part = take(o, totV(o) - g2.cap, 'top'); spill(o.x, part); toastOnce('over', 'El recipiente se desbordó.', 'bad'); }
-  // embudo de filtración: drena a través del papel
+  if (totV(o) > g2.cap * 1.04 && !o.type.startsWith('bottle')) {
+    const part = take(o, totV(o) - g2.cap, 'top'), ex = o.x + (o.tdir || 1) * g2.half, y = spill(ex, part, o.y + g2.mouth[2]);
+    drops.push({ x: ex, y: o.y + g2.mouth[2], x2: ex, y2: y, col: liquidColor(part) });
+    toastOnce('over', 'El recipiente se desbordó.', 'bad');
+  }
   if (o.type === 'funnel' && liqV(o) > 0.01) {
     const clayR = g0(o, 'clay') - (o.sus.clay || 0), rate = 18 / (1 + clayR * 1.2);
     const part = take(o, Math.min(liqV(o) + susVol(o), rate * dt), 'liquid');
     for (const s in SOLIDS) { const sp = part.sus[s] || 0, back = sp * SOLIDS[s].filt; if (back > 0) { part.m[s] -= back; part.sus[s] -= back; o.m[s] = (o.m[s] || 0) + back; } }
     deliver(o.x, o.y, part, o, 'fromFilter');
   }
-  if (o.type === 'sep' && o.open && totV(o) > 0.01) {
-    const part = take(o, Math.min(totV(o), 7 * dt), 'bottom');
-    deliver(o.x, o.y, part, o, 'fromSep');
+  if ((o.type === 'sep' || o.type === 'bureta') && o.open && totV(o) > 0.01) {
+    const part = take(o, Math.min(totV(o), (o.type === 'sep' ? 7 : 2.5) * dt), 'bottom');
+    deliver(o.x, o.y, part, o, o.type === 'sep' ? 'fromSep' : 'fromPour');
   }
 }
 function deliver(x, y, part, src, flag) {
   const r = receiverAt(x, y, src);
   if (r) { add(r, part); r[flag] = true; drops.push({ x, y, x2: x, y2: surfaceY(r), col: liquidColor(part) }); }
-  else { spill(x, part); drops.push({ x, y, x2: x, y2: 0, col: liquidColor(part) }); }
+  else { const gy = spill(x, part, y); drops.push({ x, y, x2: x, y2: gy, col: liquidColor(part) }); }
 }
 function destUpdate(o, dt) {
   const b = o.balon, P = o.heat, v = liqV(b), hasCol = !!childAt(o, 'col');
@@ -684,7 +912,7 @@ function destUpdate(o, dt) {
     }
   }
   o.dry = aqV(b) <= 0.3 && P > 0.02;
-  if (o.dry) { T = Math.min(T, 240); toastOnce('dry', '¡El balón se quedó seco! Apaga la manta calefactora.', 'bad'); }
+  if (o.dry) { T = Math.min(T, 240); toastOnce('dry', '¡El balón se quedó seco! Apaga la fuente de calor.', 'bad'); }
   b.T = T; b.boil = boiling; o.boilNow = boiling;
   o.front = boiling ? Math.min(1, o.front + dt * (hasCol ? 0.22 : 0.55)) : Math.max(0, o.front - dt * 0.12);
   const col = childAt(o, 'col'); if (col) col.vap = clamp(o.front * 1.25, 0, 1);
@@ -696,14 +924,14 @@ function destUpdate(o, dt) {
     const k = Math.min(1, dt * 2), oW = o.buf.water * k, oE = o.buf.ethanol * k;
     o.buf.water -= oW; o.buf.ethanol -= oE;
     if (oW + oE > 1e-5) {
-      if (o.cool) { const part = newC(); part.T = 25; if (oW > 0) part.m.water = oW; if (oE > 0) part.m.ethanol = oE; const r = receiverAt(o.x + 272, o.y - 150, o); if (r) { add(r, part); r.fromCond = true; } else spill(o.x + 272, part); o.dripping = true; }
-      else { flags.lostVapor = true; toastOnce('vap', 'Sin agua en el refrigerante el vapor no se condensa y se pierde.', 'bad'); }
+      if (o.cool) { const part = newC(); part.T = 25; if (oW > 0) part.m.water = oW; if (oE > 0) part.m.ethanol = oE; const r = receiverAt(o.x + 272, o.y - 150, o); if (r) { add(r, part); r.fromCond = true; } else { const gy = spill(o.x + 272, part, o.y - 150); drops.push({ x: o.x + 272, y: o.y - 150, x2: o.x + 272, y2: gy, col: `rgba(${AQ},.9)` }); } o.dripping = true; }
+      else { flags.lostVapor = true; toastOnce('vap', 'Sin agua fría en el refrigerante el vapor no se condensa y se pierde.', 'bad'); }
     }
   }
 }
 function paperUpdate(p, dt) {
   const bx = p.x, by = p.y; let cont = null;
-  for (const o of objs) if (isC(o) && o !== held && !o.type.startsWith('bottle')) { const m = mouthOf(o); if (bx > m.x0 + 4 && bx < m.x1 - 4 && by > m.y && by <= o.y) { cont = o; break; } }
+  for (const o of objs) if (isC(o) && o !== held && !GEO[o.type].noTarget) { const m = mouthOf(o); if (bx > m.x0 + 4 && bx < m.x1 - 4 && by > m.y && by <= o.y) { cont = o; break; } }
   if (!cont) return;
   const sy = surfaceY(cont), aq = aqV(cont), dip = by - sy;
   if (aq > 0.5 && dip > 0) {
@@ -723,33 +951,56 @@ function centUpdate(o, dt) {
 function startCent(o) {
   if (o.run) { o.run = false; return; }
   const slots = [0, 1, 2, 3].map(i => childAt(o, 's' + i));
-  if (slots.filter(Boolean).length < 1) { toast('Coloca los tubos en los huecos del rotor (con la tapa abierta).'); return; }
-  const mass = t => t ? 12 + liqV(t) + Object.keys(SOLIDS).reduce((a, s) => a + g0(t, s), 0) + Object.keys(SOL).reduce((a, s) => a + g0(t, s), 0) : 0;
+  if (!slots.some(Boolean)) { toast('Coloca los tubos en los huecos del rotor (con la tapa abierta).'); return; }
+  const mass = t => t ? 12 + massOf(t) : 0;
   o.bad = [[0, 2], [1, 3]].some(([a, b]) => Math.abs(mass(slots[a]) - mass(slots[b])) > 1.5);
   o.badT = 0; o.tLeft = o.time; o.run = true;
 }
 function heldPour(dt) {
   const o = held;
-  if (!o || !isC(o) || GEO[o.type].noPour) { if (o) o.tilt = 0; return; }
-  const g = GEO[o.type], bottle = !!g.nozzle;
+  if (!o || !isC(o)) return;
+  const g = GEO[o.type];
+  if (o.type === 'pipeta') { // absorbe si la punta está sumergida, gotea si está sobre un recipiente
+    for (const t of objs) {
+      if (t === o || !isC(t) || GEO[t.type].noTarget || t.type.startsWith('bottle')) continue;
+      const m = mouthOf(t);
+      if (o.x > m.x0 && o.x < m.x1 && o.y > m.y && o.y < t.y && o.y > surfaceY(t) + 2 && liqV(t) > 0.05) {
+        if (totV(o) < g.cap) add(o, take(t, Math.min(3 * dt, g.cap - totV(o)), 'liquid'));
+        return;
+      }
+    }
+    if (totV(o) > 0.01) {
+      const r = receiverAt(o.x, o.y, o);
+      if (r && mouthOf(r).y - o.y < 160) { const part = take(o, 2.5 * dt, 'bottom'); add(r, part); r.fromPour = true; drops.push({ x: o.x, y: o.y, x2: o.x, y2: surfaceY(r), col: liquidColor(part) }); }
+    }
+    return;
+  }
+  if (g.noPour) { o.tilt = 0; return; }
+  const bottle = !!g.nozzle;
   const mx = o.x + (g.mouth[0] + g.mouth[1]) / 2, my = o.y + g.mouth[2];
   let tgt = null, bd = 1e9, L = null;
   for (const t of objs) {
-    if (t === o || !isC(t) || isAnc(o, t) || t.type.startsWith('bottle')) continue;
+    if (t === o || !isC(t) || isAnc(o, t) || GEO[t.type].noTarget) continue;
     if (t.parent && t.parent.type === 'centrifuge' && t.parent.run) continue;
     const m = mouthOf(t), cx = (m.x0 + m.x1) / 2, dir = cx >= mx ? 1 : -1;
     const lx = bottle ? o.x + g.nozzle[0] : o.x + dir * g.half, ly = bottle ? o.y + g.nozzle[1] : my;
     if (ly < m.y - 4 && m.y - ly < 320 && lx >= m.x0 - 16 && lx <= m.x1 + 16) { const d = m.y - ly + Math.abs(lx - cx); if (d < bd) { bd = d; tgt = t; L = { lx, ly, dir, m }; } }
   }
-  if (!bottle) { const want = tgt && totV(o) > 0.05 ? 0.9 : 0; if (tgt) o.tdir = L.dir; o.tilt += (want - o.tilt) * Math.min(1, dt * 8); }
+  const free = !tgt && spaceDown && totV(o) > 0.05;
+  if (!bottle) { const want = (tgt && totV(o) > 0.05) || free ? 0.95 : 0; if (tgt) o.tdir = L.dir; o.tilt += (want - o.tilt) * Math.min(1, dt * 8); }
   if (tgt && totV(o) > 0.01 && (bottle || o.tilt > 0.6)) {
     const rate = (tgt.type === 'tube' ? 5 : bottle ? 14 : 30) * dt;
     const part = take(o, rate, 'top');
     if (totV(part) > 0) {
       add(tgt, part); tgt.fromPour = true; if (o.type === 'tube') tgt.fromTube = true;
-      if (tgt.type === 'balon') { const d = tgt.parent; if (d) d.front = 0; }
+      if (tgt.type === 'balon' && tgt.parent) tgt.parent.front = 0;
       streams.push({ x1: L.lx, y1: L.ly, x2: clamp(L.lx, L.m.x0 + 4, L.m.x1 - 4), y2: tgt.type === 'balon' ? L.m.y : surfaceY(tgt), col: liquidColor(part) });
     }
+  } else if (free && (bottle || o.tilt > 0.6)) {
+    const lx = bottle ? o.x + g.nozzle[0] : o.x + o.tdir * g.half, ly = bottle ? o.y + g.nozzle[1] : my;
+    const part = take(o, 30 * dt, 'top');
+    const gy = spill(lx, part, ly);
+    streams.push({ x1: lx, y1: ly, x2: lx + o.tdir * 6, y2: gy, col: liquidColor(part) });
   }
 }
 function update(dt) {
@@ -763,7 +1014,8 @@ function update(dt) {
     if (o.type === 'centrifuge') centUpdate(o, dt);
     if (!o.parent && o !== held && o.y < 0) { o.vy += 2600 * dt; o.y = Math.min(0, o.y + o.vy * dt); if (o.y === 0) o.vy = 0; }
   }
-  for (const p of puddles) p.v -= dt * 0.4; puddles = puddles.filter(p => p.v > 0.5);
+  for (const p of puddles) if (!p.oil) p.v -= dt * 0.05;
+  puddles = puddles.filter(p => p.v > 0.3);
   for (const s of steam) { s.y -= 40 * dt; s.x += Math.sin(s.y / 10) * 0.4; s.life -= dt * 0.6; } steam = steam.filter(s => s.life > 0);
 }
 
@@ -779,6 +1031,7 @@ function drawObj(o) {
   ctx.restore();
   if (o === sel) { const b = hitsBox(o); ctx.save(); ctx.setLineDash([5, 4]); ctx.strokeStyle = 'rgba(220,38,38,.7)'; ctx.lineWidth = 1.5 / cam.z; ctx.strokeRect(b[0] - 5, b[1] - 5, b[2] - b[0] + 10, b[3] - b[1] + 10); ctx.restore(); }
 }
+let BG = '#eef2f7', BGdark = false;
 function drawLabels() {
   if (!showLabels || cam.z < 0.45) return;
   const placed = []; ctx.font = '600 11px system-ui,sans-serif';
@@ -790,32 +1043,42 @@ function drawLabels() {
       let y = 30; while (placed.some(p => p.y === y && x - w / 2 < p.x1 && x + w / 2 > p.x0)) y += 15;
       placed.push({ x0: x - w / 2, x1: x + w / 2, y });
       text(name, x, y, 11, '#cbd5e1', 'center', 600);
-    }
-    else if (o.parent.type !== 'centrifuge' && o.parent.type !== 'destilador') { const b = hitsBox(o); text(name, b[2] + 8, (b[1] + b[3]) / 2, 10.5, '#475569', 'left', 600); }
-    else if (o.type === 'column') text(name, o.x - 22, o.y - 60, 10.5, '#475569', 'right', 600);
+    } else if (!['centrifuge', 'destilador', 'gradilla'].includes(o.parent.type) && !['termometro', 'varilla'].includes(o.type)) { const b = hitsBox(o); text(name, b[2] + 8, (b[1] + b[3]) / 2, 10.5, BGdark ? '#cbd5e1' : '#475569', 'left', 600); }
+    else if (o.type === 'column') text(name, o.x - 22, o.y - 60, 10.5, BGdark ? '#cbd5e1' : '#475569', 'right', 600);
+  }
+}
+function drawPuddles() {
+  for (const p of puddles) {
+    const r = 10 + Math.sqrt(p.v) * 6.5, ry = 2.2 + Math.sqrt(p.v) * 0.55;
+    ctx.save(); ctx.translate(p.x, p.y);
+    ctx.fillStyle = p.col; ctx.beginPath();
+    for (let i = 0; i <= 24; i++) { const a = i / 24 * Math.PI * 2, k = 1 + 0.14 * Math.sin(a * 3 + p.seed) + 0.08 * Math.sin(a * 5 + p.seed * 2); ctx.lineTo(Math.cos(a) * r * k, Math.sin(a) * ry * k - ry * 0.4); }
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(15,23,42,.18)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.beginPath(); ctx.ellipse(-r * 0.25, -ry * 0.7, r * 0.35, ry * 0.3, 0, 0, 7); ctx.fill();
+    for (let i = 0; i < 4; i++) { ctx.fillStyle = p.col; ctx.beginPath(); ctx.ellipse(Math.cos(p.seed + i * 1.7) * (r + 6 + i * 3), Math.sin(p.seed + i) * ry * 0.4, 2 + i % 2, 1.2, 0, 0, 7); ctx.fill(); }
+    ctx.restore();
   }
 }
 function draw() {
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-  const gr = ctx.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#f8fafc'); gr.addColorStop(1, '#e2e8f0'); ctx.fillStyle = gr; ctx.fillRect(0, 0, W, H);
+  const gr = ctx.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, shadeHex(BG, BGdark ? 0.12 : 0.55)); gr.addColorStop(1, BG); ctx.fillStyle = gr; ctx.fillRect(0, 0, W, H);
   ctx.setTransform(DPR * cam.z, 0, 0, DPR * cam.z, DPR * (W / 2 - cam.x * cam.z), DPR * (H / 2 - cam.y * cam.z));
   const tl = S2W(0, 0), br = S2W(W, H);
-  // azulejos de pared
-  ctx.strokeStyle = 'rgba(148,163,184,.18)'; ctx.lineWidth = 1 / cam.z;
-  for (let x = Math.floor(tl.x / 80) * 80; x < br.x; x += 80) { ctx.beginPath(); ctx.moveTo(x, Math.max(tl.y, -2000)); ctx.lineTo(x, 0); ctx.stroke(); }
+  ctx.strokeStyle = BGdark ? 'rgba(255,255,255,.06)' : 'rgba(148,163,184,.18)'; ctx.lineWidth = 1 / cam.z;
+  for (let x = Math.floor(tl.x / 80) * 80; x < br.x; x += 80) { ctx.beginPath(); ctx.moveTo(x, Math.max(tl.y, -3000)); ctx.lineTo(x, 0); ctx.stroke(); }
   for (let y = Math.floor(tl.y / 80) * 80; y < 0; y += 80) { ctx.beginPath(); ctx.moveTo(tl.x, y); ctx.lineTo(br.x, y); ctx.stroke(); }
-  // mesa
   ctx.fillStyle = '#475569'; ctx.fillRect(tl.x - 10, 0, br.x - tl.x + 20, 12);
   const bg = ctx.createLinearGradient(0, 12, 0, 300); bg.addColorStop(0, '#334155'); bg.addColorStop(1, '#1e293b'); ctx.fillStyle = bg; ctx.fillRect(tl.x - 10, 12, br.x - tl.x + 20, Math.max(0, br.y - 12) + 10);
-  for (const p of puddles) { ctx.fillStyle = p.col; ctx.beginPath(); ctx.ellipse(p.x, 3, 8 + Math.sqrt(p.v) * 6, 3 + Math.sqrt(p.v), 0, 0, 7); ctx.fill(); }
   drawn = [];
-  const roots = objs.filter(o => !o.parent);
-  for (const o of roots) drawObj(o);
+  for (const o of objs.filter(o => !o.parent)) drawObj(o);
+  drawPuddles();
   drawLabels();
   for (const s of streams) { ctx.strokeStyle = s.col; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(s.x1, s.y1); ctx.quadraticCurveTo(s.x1 + (s.x2 - s.x1) * 0.3, s.y1 + 6, s.x2, s.y2); ctx.stroke(); }
   for (const d of drops) { const t = TIME(); for (let i = 0; i < 3; i++) { const k = ((t * 1.8) + i / 3) % 1; ctx.fillStyle = d.col; ctx.beginPath(); ctx.arc(d.x, lerp(d.y, d.y2, k), 2.6, 0, 7); ctx.fill(); } }
   for (const s of steam) { ctx.fillStyle = `rgba(255,255,255,${0.7 * s.life})`; ctx.beginPath(); ctx.arc(s.x, s.y, 4 + (1 - s.life) * 8, 0, 7); ctx.fill(); }
 }
+function shadeHex(hex, k) { const n = parseInt(hex.slice(1), 16), c = [n >> 16, (n >> 8) & 255, n & 255].map(v => Math.round(lerp(v, 255, k))); return `rgb(${c})`; }
 
 /* ============================== interacción ============================== */
 function hitTest(wx, wy) {
@@ -834,7 +1097,12 @@ function hitTest(wx, wy) {
   return null;
 }
 const pointers = new Map(); let drag = null, pinch = null, downPt = null;
-function bringFront(o) { const r = root(o); const fam = objs.filter(c => isAnc(r, c)); objs = objs.filter(c => !fam.includes(c)).concat(fam); }
+function bringFront(o) { const r = root(o); if (r.type === 'campana') return; const fam = objs.filter(c => isAnc(r, c)); objs = objs.filter(c => !fam.includes(c)).concat(fam); }
+function containerUnder(x, y, excl) { // recipiente cuya boca contiene el punto (para varilla, termómetro, reactivos)
+  let best = null;
+  for (const o of objs) { if (!isC(o) || o === excl || isAnc(excl, o) || GEO[o.type].noTarget) continue; const m = mouthOf(o); if (x >= m.x0 - 6 && x <= m.x1 + 6 && y >= m.y - 30 && y <= o.y) best = o; }
+  return best;
+}
 function dropObj(o) {
   o.tilt = 0;
   let best = null, bd = 50;
@@ -842,15 +1110,26 @@ function dropObj(o) {
     if (isAnc(o, p)) continue;
     for (const s of socketsOf(p)) {
       if (!s.acc.includes(o.type) || childAt(p, s.name)) continue;
-      const dy = s.dy ?? (TYPES[o.type].mountDy || 0), d = Math.hypot(o.x - s.x, (o.y - dy) - s.y);
-      if (d < bd) { bd = d; best = { p, s }; }
+      const dy = s.dy ?? (TYPES[o.type].mountDy || 0), lim = s.name === 'rod' ? 140 : 50, d = Math.hypot(o.x - s.x, (o.y - dy) - s.y);
+      if (s.name === 'rod') { const m = mouthOf(p); if (!(o.x > m.x0 - 8 && o.x < m.x1 + 8 && o.y > m.y - 20 && o.y < p.y)) continue; }
+      if (d < Math.min(bd, lim)) { bd = d; best = { p, s }; }
     }
   }
-  if (best) { attach(o, best.p, best.s.name); if (best.p.type === 'destilador') toast('Columna de fraccionamiento colocada: ahora es una destilación fraccionada.', 'ok'); }
+  if (best) {
+    attach(o, best.p, best.s.name);
+    if (best.p.type === 'destilador') toast('Columna de fraccionamiento colocada: ahora es una destilación fraccionada.', 'ok');
+    if (o.type === 'varilla') { stir(best.p); toast('Agitaste con la varilla de vidrio.'); }
+  }
 }
-function overTrash(x, y) { const r = $('trash').getBoundingClientRect(); return x > r.left - 14 && x < r.right + 14 && y > r.top - 14 && y < r.bottom + 14; }
+function removeZone(x, y) {
+  if ((() => { const r = $('trash').getBoundingClientRect(); return x > r.left - 14 && x < r.right + 14 && y > r.top - 14 && y < r.bottom + 14; })()) return $('trash');
+  for (const el of document.elementsFromPoint(x, y)) { const p = el.closest && el.closest('.panel'); if (p && getComputedStyle(p).display !== 'none') return p; }
+  return null;
+}
+function markZone(z) { document.querySelectorAll('.panel.drop').forEach(p => { if (p !== z) p.classList.remove('drop'); }); $('trash').classList.toggle('hot', z === $('trash')); if (z && z.classList.contains('panel')) z.classList.add('drop'); }
 cv.addEventListener('pointerdown', e => {
   cv.setPointerCapture(e.pointerId); pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  $('bgpop').classList.remove('on');
   if (pointers.size === 2) { const [a, b] = [...pointers.values()]; pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), z: cam.z }; drag = null; return; }
   const w = S2W(e.clientX, e.clientY), h = hitTest(w.x, w.y);
   downPt = { x: e.clientX, y: e.clientY, h };
@@ -870,7 +1149,11 @@ cv.addEventListener('pointermove', e => {
   if (drag) {
     if (downPt && Math.hypot(e.clientX - downPt.x, e.clientY - downPt.y) > 4) drag.moved = true;
     if (drag.mode === 'pan') { cam.x = drag.cx - (e.clientX - drag.sx) / cam.z; cam.y = drag.cy - (e.clientY - drag.sy) / cam.z; }
-    else if (drag.mode === 'obj') { drag.o.x = w.x - drag.dx; drag.o.y = Math.min(0, w.y - drag.dy); $('trash').classList.toggle('hot', overTrash(e.clientX, e.clientY)); }
+    else if (drag.mode === 'obj') {
+      drag.o.x = w.x - drag.dx; drag.o.y = Math.min(0, w.y - drag.dy);
+      markZone(removeZone(e.clientX, e.clientY));
+      if (drag.o.type === 'varilla') { const c = containerUnder(drag.o.x, drag.o.y, drag.o); if (c && surfaceY(c) < drag.o.y) stir(c); }
+    }
     else if (drag.mode === 'arm') { drag.o.armY = clamp(w.y - drag.o.y, -380, -40); }
     $('tip').style.display = 'none';
     return;
@@ -884,17 +1167,17 @@ function endDrag(e) {
   if (pinch) { if (pointers.size < 2) pinch = null; return; }
   if (!drag) return;
   const d = drag; drag = null; cv.className = '';
-  $('trash').classList.remove('show', 'hot');
+  markZone(null); $('trash').classList.remove('show');
   if (d.mode === 'obj') {
     held = null;
-    const click = !d.moved;
-    if (click && downPt && downPt.h) {
+    if (!d.moved && downPt && downPt.h) {
       const h = downPt.h;
-      if (h.part === 'tap') { h.o.open = !h.o.open; if (!h.o.parent) dropObj(d.o); labRender(); return; }
+      if (h.part === 'tap') { h.o.open = !h.o.open; dropObj(d.o); labRender(); return; }
       if (h.part === 'burner') { h.o.on = !h.o.on; labRender(); return; }
       if (h.part === 'btn') { startCent(h.o); labRender(); return; }
+      if (h.part === 'tara') { h.o.tare = h.o.read || 0; toast('Balanza tarada a 0.00 g.'); return; }
     }
-    if (overTrash(e.clientX, e.clientY)) { if (d.o.type === 'balon') return; removeObj(d.o); toast('Material retirado de la mesa.'); return; }
+    if (removeZone(e.clientX, e.clientY)) { removeObj(d.o); toast('Material retirado del escenario.'); return; }
     dropObj(d.o);
   }
 }
@@ -904,27 +1187,33 @@ cv.addEventListener('dblclick', e => {
   const w = S2W(e.clientX, e.clientY), h = hitTest(w.x, w.y);
   if (h && isC(h.o) && !h.o.fixed) { stir(h.o); if (h.o.type === 'sep') flags.sepShake = true; toast(`Agitaste: ${h.o.name || TYPES[h.o.type].lab}`); }
 });
-function zoomAt(sx, sy, f) { const w0 = S2W(sx, sy); cam.z = clamp(cam.z * f, 0.25, 4); const w1 = S2W(sx, sy); cam.x += w0.x - w1.x; cam.y += w0.y - w1.y; $('z-lvl').textContent = Math.round(cam.z * 100) + '%'; }
+function zoomAt(sx, sy, f) { const w0 = S2W(sx, sy); cam.z = clamp(cam.z * f, 0.2, 4); const w1 = S2W(sx, sy); cam.x += w0.x - w1.x; cam.y += w0.y - w1.y; $('z-lvl').textContent = Math.round(cam.z * 100) + '%'; }
 cv.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.0015)); }, { passive: false });
 addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
-  if ((e.key === 'Delete' || e.key === 'Backspace') && sel && !sel.fixed) { removeObj(sel); toast('Material retirado de la mesa.'); }
+  if (e.key === ' ') { spaceDown = true; e.preventDefault(); }
+  if ((e.key === 'Delete' || e.key === 'Backspace') && sel && !sel.fixed) { removeObj(sel); toast('Material retirado del escenario.'); }
   if (e.key === 'h' || e.key === 'H') document.body.classList.toggle('nopanels');
   if (e.key === '+' || e.key === '=') zoomAt(W / 2, H / 2, 1.2);
   if (e.key === '-') zoomAt(W / 2, H / 2, 1 / 1.2);
   if (e.key === '0') fit();
 });
+addEventListener('keyup', e => { if (e.key === ' ') spaceDown = false; });
 function showTip(h, x, y) {
   const tip = $('tip');
   if (!h) { tip.style.display = 'none'; return; }
   const o = h.o; let html = '';
   if (h.part === 'arm') html = '<b>Nuez del soporte</b><br><span class="s">Arrástrala para subir o bajar el aro/pinza</span>';
-  else if (h.part === 'tap') html = `<b>Llave del embudo</b><br><span class="s">Clic para ${o.open ? 'cerrar' : 'abrir'}</span>`;
+  else if (h.part === 'tap') html = `<b>Llave</b><br><span class="s">Clic para ${o.open ? 'cerrar' : 'abrir'}</span>`;
   else if (h.part === 'burner') html = `<b>Mechero Bunsen</b><br><span class="s">Clic para ${o.on ? 'apagar' : 'encender'}</span>`;
   else if (h.part === 'btn') html = `<b>Centrífuga</b><br><span class="s">Clic para ${o.run ? 'detener' : 'iniciar'}</span>`;
+  else if (h.part === 'tara') html = '<b>Tara</b><br><span class="s">Clic para poner la balanza a cero</span>';
   else if (isC(o)) html = `<b>${o.name || TYPES[o.type].lab}</b><br>` + describe(o);
   else if (o.type === 'paper') html = `<b>${INKS[o.ink].n}</b><br>${o.bled ? 'La mancha se disolvió en el disolvente.' : o.wet ? `Frente del disolvente: ${((o.front - 30) / 20).toFixed(1)} cm` : 'Seco: baja la pinza hasta tocar el disolvente.'}`;
-  else if (o.type === 'destilador') html = `<b>Equipo de destilación</b><br>${describe(o.balon)}<br><span class="s">Termómetro: ${o.headT.toFixed(1)} °C</span>`;
+  else if (o.type === 'destilador') html = `<b>Equipo de destilación</b><br>${describe(o.balon)}<br><span class="s">Termómetro: ${o.headT.toFixed(1)} °C · ${o.src === 'manta' ? 'manta calefactora' : 'mechero'}</span>`;
+  else if (o.type === 'termometro') html = `<b>Termómetro</b><br>${(o.read ?? 20).toFixed(1)} °C<br><span class="s">Suéltalo dentro de un recipiente para medir</span>`;
+  else if (o.type === 'varilla') html = '<b>Varilla de vidrio</b><br><span class="s">Muévela dentro de un líquido para agitarlo</span>';
+  else if (o.type === 'balanza') html = `<b>Balanza</b><br>${((o.read || 0) - o.tare).toFixed(2)} g<br><span class="s">Coloca un recipiente en el plato · T = tara</span>`;
   else html = `<b>${TYPES[o.type].lab}</b>`;
   tip.innerHTML = html; tip.style.display = 'block';
   const r = tip.getBoundingClientRect();
@@ -936,10 +1225,10 @@ function describe(c) {
   if (g0(c, 'ethanol') > 0.05) L.push(`Alcohol: ${f1(g0(c, 'ethanol'))} mL`);
   if (g0(c, 'oil') > 0.05) L.push(`Aceite: ${f1(g0(c, 'oil'))} mL${c.em > 0.5 ? ` (${Math.round(c.em / g0(c, 'oil') * 100)} % emulsionado)` : ''}`);
   for (const s in SOLIDS) if (g0(c, s) > 0.01) { const p = (c.sus[s] || 0) / g0(c, s); L.push(`${SOLIDS[s].n}: ${g0(c, s).toFixed(2)} g · ${p > 0.03 ? Math.round(p * 100) + ' % en suspensión' : 'sedimentada'}`); }
-  for (const s in SOL) if (g0(c, s) > 0.01) { const d = dissolved(c, s), u = undis(c, s); L.push(`${SOL[s].n}: ${d > 0.01 ? d.toFixed(2) + ' g disuelta' : ''}${d > 0.01 && u > 0.01 ? ' + ' : ''}${u > 0.01 ? u.toFixed(2) + ' g en cristales' : ''}`); }
+  for (const s in SOL) if (g0(c, s) > 0.01) { const d = dissolved(c, s), u = undis(c, s); L.push(`${SOL[s].n}: ${d > 0.01 ? d.toFixed(2) + ' g disuelta' : ''}${d > 0.01 && u > 0.01 ? ' + ' : ''}${u > 0.01 ? u.toFixed(2) + ' g sólida' : ''}`); }
   let dy = 0; for (const d in DYES) dy += g0(c, d); if (dy > 0.001) L.push('Colorantes disueltos');
   if (!L.length) return '<span class="s">Vacío</span>';
-  if (tot > 1 && aqV(c) > 0.1) L.push(`<span class="s">Pureza del líquido: ${Math.round(Math.max(g0(c, 'water'), g0(c, 'ethanol'), g0(c, 'oil')) / tot * 100)} % ${g0(c, 'water') >= g0(c, 'ethanol') && g0(c, 'water') >= g0(c, 'oil') ? 'agua' : g0(c, 'ethanol') >= g0(c, 'oil') ? 'alcohol' : 'aceite'}</span>`);
+  if (tot > 1) { const main = ['water', 'ethanol', 'oil'].sort((a, b) => g0(c, b) - g0(c, a))[0]; L.push(`<span class="s">Pureza del líquido: ${Math.round(g0(c, main) / tot * 100)} % ${SUBNAME[main].toLowerCase()}</span>`); }
   if (Math.abs(c.T - 20) > 2) L.push(`<span class="s">Temperatura: ${c.T.toFixed(0)} °C${c.boil ? ' · hirviendo' : ''}</span>`);
   return L.join('<br>');
 }
@@ -949,7 +1238,7 @@ function fit() {
   for (const o of objs) { const b = hitsBox(o); x0 = Math.min(x0, b[0]); y0 = Math.min(y0, b[1]); x1 = Math.max(x1, b[2]); y1 = Math.max(y1, b[3]); }
   y1 = Math.max(y1, 40);
   const wide = W > 1000, padL = wide ? 280 : 30, padR = wide ? 310 : 30, padT = 70, padB = 70;
-  const z = clamp(Math.min((W - padL - padR) / (x1 - x0 + 60), (H - padT - padB) / (y1 - y0 + 60)), 0.35, 1.6);
+  const z = clamp(Math.min((W - padL - padR) / (x1 - x0 + 60), (H - padT - padB) / (y1 - y0 + 60)), 0.3, 1.6);
   cam.z = z; cam.x = (x0 + x1) / 2 - ((padL - padR) / 2) / z; cam.y = (y0 + y1) / 2 - ((padT - padB) / 2) / z;
   $('z-lvl').textContent = Math.round(cam.z * 100) + '%';
 }
@@ -969,9 +1258,9 @@ const TECH = [null,
     ej: 'Ej.: extracción de aceites esenciales, petróleo y agua.',
     steps: ['Espera a que se formen dos capas (la mezcla está agitada).', 'Haz clic en la llave para abrirla: sale el agua.', 'Ciérrala justo cuando llegue la interfase.', 'Cambia de vaso y abre de nuevo para recoger el aceite.'] },
   { n: 'Destilación simple', col: '#16a34a', prop: 'Punto de ebullición',
-    desc: 'Separa un <b>líquido</b> de las sustancias disueltas en él. El líquido hierve, el vapor se enfría en el <b>refrigerante</b> y se recoge como <i>destilado</i>.',
+    desc: 'Separa un <b>líquido</b> de las sustancias disueltas en él. El líquido hierve, el vapor se enfría en el <b>refrigerante</b> (por su camisa circula agua fría) y se recoge como <i>destilado</i>.',
     ej: 'Ej.: obtener agua pura del agua de mar.',
-    steps: ['Sube el calefactor y espera a que hierva (≈ 100 °C).', 'El vapor sube, se condensa en el refrigerante y gotea al matraz.', 'El sólido y el colorante se quedan en el balón.', 'Prueba a cerrar el agua del refrigerante. ¿Qué pasa?'] },
+    steps: ['Elige la fuente de calor (manta o mechero) y súbela.', 'El vapor sube, se condensa en el refrigerante y gotea al matraz.', 'El agua fría entra por abajo y sale por arriba (contracorriente).', 'Prueba a cortar el agua del refrigerante. ¿Qué pasa?'] },
   { n: 'Destilación fraccionada', col: '#e11d48', prop: 'Puntos de ebullición cercanos',
     desc: 'Separa <b>líquidos miscibles</b> con puntos de ebullición distintos (alcohol 78 °C, agua 100 °C). La <b>columna de fraccionamiento</b> hace muchas mini-destilaciones.',
     ej: 'Ej.: refinerías de petróleo, bebidas destiladas, oxígeno del aire.',
@@ -987,7 +1276,7 @@ const TECH = [null,
   { n: 'Centrifugación', col: '#059669', prop: 'Densidad (fuerza centrífuga)',
     desc: 'Separa <b>sólidos muy finos</b> de un líquido girando a gran velocidad. La fuerza centrífuga los lleva al fondo del tubo. Los tubos deben ir <b>equilibrados</b>.',
     ej: 'Ej.: análisis de sangre, lavadoras (centrifugado), leche.',
-    steps: ['Arrastra los tubos a los huecos del rotor.', 'Equilibra: coloca tubos de igual masa enfrentados.', 'Pulsa ▶ en la centrífuga o en el panel.', 'Vierte el sobrenadante limpio a un vaso.'] },
+    steps: ['Arrastra los tubos a los huecos del rotor.', 'Equilibra: coloca tubos de igual masa enfrentados (usa la balanza).', 'Pulsa ▶ en la centrífuga o en el panel.', 'Vierte el sobrenadante limpio a un vaso.'] },
 ];
 const anyC = f => objs.some(o => isC(o) && f(o));
 const MIS = {
@@ -1002,7 +1291,7 @@ const MIS = {
     { t: 'Agita el embudo (doble clic) y mira cómo se separan las capas', f: () => flags.sepShake && objs.some(o => o.type === 'sep' && g0(o, 'oil') > 5 && o.em < 0.5) }],
   4: [{ t: 'Lleva la mezcla a ebullición', f: () => objs.some(o => o.type === 'destilador' && o.boilT > 2) },
     { t: 'Obtén ≥ 30 mL de agua destilada sin sal ni colorante', f: () => anyC(o => o.fromCond && g0(o, 'water') >= 30 && g0(o, 'salt') < 0.01 && g0(o, 'dyeB') < 1e-4) },
-    { t: 'Cierra el agua del refrigerante: ¿qué pasa con el vapor?', f: () => flags.lostVapor, ok: 'Sin refrigeración el vapor no se condensa: se escapa al aire.' }],
+    { t: 'Corta el agua del refrigerante: ¿qué pasa con el vapor?', f: () => flags.lostVapor, ok: 'Sin refrigeración el vapor no se condensa: se escapa al aire.' }],
   5: [{ t: 'Observa la meseta del termómetro cerca de 78 °C', f: () => flags.plateau },
     { t: 'Recoge ≥ 10 mL con ≥ 85 % de alcohol', f: () => anyC(o => o.fromCond && g0(o, 'ethanol') >= 10 && g0(o, 'ethanol') / aqV(o) >= 0.85) },
     { t: 'En otro matraz, recoge ≥ 10 mL con ≥ 90 % de agua', f: () => anyC(o => o.fromCond && g0(o, 'water') >= 10 && g0(o, 'water') / aqV(o) >= 0.9) }],
@@ -1040,12 +1329,12 @@ function build(t) {
       break;
     case 4:
       a = mk('destilador', 160, 0); fill(a.balon, { water: 150, salt: 10, dyeB: 1 });
-      mk('erlen', 432, 0, { name: 'Matraz colector' }); mk('erlen', 580, 0);
-      mk('column', 700, 0);
+      mk('erlen', 432, 0, { name: 'Matraz colector' }); mk('erlen', 590, 0);
+      mk('column', 720, 0);
       break;
     case 5:
       a = mk('destilador', 160, 0); fill(a.balon, { water: 80, ethanol: 80 }); attach(mk('column'), a, 'col');
-      mk('erlen', 432, 0, { name: 'Fracción 1' }); mk('erlen', 560, 0, { name: 'Fracción 2' }); mk('erlen', 680, 0, { name: 'Fracción 3' });
+      mk('erlen', 432, 0, { name: 'Fracción 1' }); mk('erlen', 570, 0, { name: 'Fracción 2' }); mk('erlen', 700, 0, { name: 'Fracción 3' });
       break;
     case 6:
       s = mk('tripod', 320, 0, { on: false, P: 0.6 }); attach(mk('dish'), s, 'top');
@@ -1057,23 +1346,23 @@ function build(t) {
     case 7:
       s = mk('standClamp', 300, 0, { armY: -232 }); attach(mk('paper', 0, 0, { ink: 'negra' }), s, 'arm');
       a = mk('beaker', 325, 0, { name: 'Disolvente' }); fill(a, { water: 40 });
-      mk('bottleW', 520, 0); mk('bottleA', 620, 0); mk('beaker', 760, 0);
+      a = mk('bottleW', 520, 0); fill(a, { water: 450 }); a = mk('bottleA', 620, 0); fill(a, { ethanol: 450 }); mk('beaker', 760, 0);
       break;
     case 8:
       s = mk('centrifuge', 360, 0, { rpm: 3000, time: 20 });
-      a = mk('tube', 100, 0, { name: 'Tubo con arcilla' }); fill(a, { water: 12, clay: 0.8 }, true);
-      a = mk('tube', 140, 0, { name: 'Tubo con arcilla' }); fill(a, { water: 12, clay: 0.8 }, true);
-      a = mk('tube', 180, 0, { name: 'Tubo con agua (contrapeso)' }); fill(a, { water: 12.8 });
+      s = mk('gradilla', 120, 0);
+      a = mk('tube', 0, 0, { name: 'Tubo con arcilla' }); fill(a, { water: 12, clay: 0.8 }, true); attach(a, s, 'g0');
+      a = mk('tube', 0, 0, { name: 'Tubo con arcilla' }); fill(a, { water: 12, clay: 0.8 }, true); attach(a, s, 'g1');
+      a = mk('tube', 0, 0, { name: 'Tubo con agua (contrapeso)' }); fill(a, { water: 12.8 }); attach(a, s, 'g2');
+      attach(mk('tube'), s, 'g3');
       a = mk('beaker', 580, 0, { name: 'Agua turbia (arcilla)' }); fill(a, { water: 150, clay: 6 }, true);
-      mk('beaker', 720, 0); mk('tube', 220, 0);
+      mk('beaker', 720, 0); mk('balanza', 860, 0);
       break;
   }
   layoutAll();
   missionDone = (MIS[t] || []).map(() => false);
 }
-function setTech(t) {
-  tech = t; build(t); fit(); techRender(); labRender();
-}
+function setTech(t) { tech = t; build(t); fit(); techRender(); labRender(); }
 
 /* ============================== paneles ============================== */
 function techRender() {
@@ -1084,7 +1373,7 @@ function ctrlHTML(t) {
   switch (t) {
     case 1: case 2: return `<div class="row"><button class="btn" data-act="stir">🥄 Agitar recipiente</button></div><dl class="ro" id="ro"></dl>`;
     case 3: return `<div class="row"><button class="btn pri" data-act="tap" id="b-tap">Abrir llave</button><button class="btn" data-act="shake">↻ Agitar</button></div><dl class="ro" id="ro"></dl>`;
-    case 4: case 5: return `<label class="sl"><span>Manta calefactora <b id="v-heat">0 %</b></span><input type="range" id="i-heat" min="0" max="100" value="0"></label><label class="tg"><input type="checkbox" id="i-cool" checked> Agua del refrigerante</label><dl class="ro" id="ro"></dl>`;
+    case 4: case 5: return `<div class="chips" id="src"><button data-src="manta">Manta calefactora</button><button data-src="mechero">Mechero Bunsen</button></div><label class="sl"><span>Fuente de calor <b id="v-heat">0 %</b></span><input type="range" id="i-heat" min="0" max="100" value="0"></label><label class="tg"><input type="checkbox" id="i-cool" checked> Agua fría en el refrigerante</label><dl class="ro" id="ro"></dl>`;
     case 6: return `<label class="sl"><span>Llama del mechero <b id="v-flame">60 %</b></span><input type="range" id="i-flame" min="5" max="100" value="60"></label><div class="row"><button class="btn pri" data-act="burner" id="b-burn">🔥 Encender</button></div><canvas class="mini" id="solc" width="520" height="230"></canvas><dl class="ro" id="ro"></dl>`;
     case 7: return `<div class="chips" id="inks">${Object.entries(INKS).map(([k, v]) => `<button data-ink="${k}">${v.n.replace('Tinta ', '')}</button>`).join('')}</div><div class="row"><button class="btn" data-act="newpaper">＋ Papel nuevo con esta tinta</button></div><dl class="ro" id="ro"></dl><div class="row"><input id="i-rf" placeholder="Rf del azul" inputmode="decimal"><button class="btn pri" data-act="rf">Comprobar</button></div>`;
     case 8: return `<label class="sl"><span>Velocidad <b id="v-rpm"></b></span><input type="range" id="i-rpm" min="500" max="6000" step="100"></label><label class="sl"><span>Tiempo <b id="v-time"></b></span><input type="range" id="i-time" min="5" max="60" step="5"></label><div class="row"><button class="btn pri" data-act="cent" id="b-cent">▶ Iniciar</button></div><dl class="ro" id="ro"></dl>`;
@@ -1100,11 +1389,15 @@ function labRender() {
     <details open><summary>Pasos</summary><ol>${T.steps.map(s => `<li>${s}</li>`).join('')}</ol></details>
     <details open><summary>Controles</summary>${ctrlHTML(tech)}</details>
     <details open><summary>Retos</summary><div id="mis"></div></details>
-    <div class="row"><button class="btn" id="b-reset">↺ Reiniciar experimento</button></div>`;
-  $('b-reset').onclick = () => setTech(tech);
+    <div class="row"><button class="btn" id="b-reset2">↺ Reiniciar experimento</button></div>`;
+  $('b-reset2').onclick = () => { setTech(tech); toast('Experimento reiniciado.'); };
   $('lab').querySelectorAll('[data-act]').forEach(b => b.onclick = () => act(b.dataset.act));
   const d = objs.find(o => o.type === 'destilador');
-  if ($('i-heat') && d) { $('i-heat').value = d.heat * 100; $('i-heat').oninput = e => { d.heat = e.target.value / 100; }; $('i-cool').checked = d.cool; $('i-cool').onchange = e => { d.cool = e.target.checked; }; }
+  if ($('i-heat') && d) {
+    $('i-heat').value = d.heat * 100; $('i-heat').oninput = e => { d.heat = e.target.value / 100; };
+    $('i-cool').checked = d.cool; $('i-cool').onchange = e => { d.cool = e.target.checked; };
+    $('src').querySelectorAll('button').forEach(b => { b.classList.toggle('on', b.dataset.src === d.src); b.onclick = () => { d.src = b.dataset.src; labRender(); }; });
+  }
   const tp = objs.find(o => o.type === 'tripod');
   if ($('i-flame') && tp) { $('i-flame').value = tp.P * 100; $('i-flame').oninput = e => { tp.P = e.target.value / 100; }; }
   const ce = objs.find(o => o.type === 'centrifuge');
@@ -1145,7 +1438,7 @@ function checkMissions() {
 }
 function ro(items) { const el = $('ro'); if (el) el.innerHTML = items.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join(''); }
 function labUpdate() {
-  if (document.body.classList.contains('nopanels') || $('p-lab').classList.contains('min')) return;
+  if (document.body.classList.contains('nopanels') || $('p-lab').classList.contains('min') || !$('ro')) return;
   if (tech === 1 || tech === 2) {
     const c = sel && objs.includes(sel) ? sel : objs.find(o => isC(o) && g0(o, 'sand') > 0);
     if (c) { const s = g0(c, 'sand') + g0(c, 'clay'), su = (c.sus.sand || 0) + (c.sus.clay || 0); ro([['Recipiente', c.name || TYPES[c.type].lab], ['Líquido', f1(liqV(c)) + ' mL'], ['Sólido', s.toFixed(1) + ' g'], ['Sedimentado', s > 0 ? Math.round((1 - su / s) * 100) + ' %' : '—']]); }
@@ -1155,16 +1448,15 @@ function labUpdate() {
   if (tech === 4 || tech === 5) {
     const d = objs.find(o => o.type === 'destilador');
     if (d) {
-      const b = d.balon, hasCol = !!childAt(d, 'col');
-      const rc = objs.filter(o => o.fromCond); const tot = rc.reduce((a, o) => a + aqV(o), 0);
+      const b = d.balon, hasCol = !!childAt(d, 'col'), tot = objs.filter(o => o.fromCond).reduce((a, o) => a + aqV(o), 0);
       $('v-heat').textContent = Math.round(d.heat * 100) + ' %';
-      const items = [['Temperatura del balón', b.T.toFixed(1) + ' °C' + (b.boil ? ' 🔥' : '')], ['Termómetro (vapor)', d.headT.toFixed(1) + ' °C'], ['Líquido en el balón', f1(liqV(b)) + ' mL'], ['Destilado recogido', f1(tot) + ' mL'], ['Columna', hasCol ? 'colocada' : 'sin columna']];
-      if (tech === 5 || g0(b, 'ethanol') > 0) { const last = receiverAt(d.x + 272, d.y - 150, d); if (last && aqV(last) > 0.1) items.push([`Alcohol en ${last.name || 'el matraz'}`, Math.round(g0(last, 'ethanol') / aqV(last) * 100) + ' %']); }
+      const items = [['Fuente de calor', d.src === 'manta' ? 'manta calefactora' : 'mechero Bunsen'], ['Temperatura del balón', b.T.toFixed(1) + ' °C' + (b.boil ? ' 🔥' : '')], ['Termómetro (vapor)', d.headT.toFixed(1) + ' °C'], ['Líquido en el balón', f1(liqV(b)) + ' mL'], ['Destilado recogido', f1(tot) + ' mL'], ['Refrigerante', d.cool ? 'con agua fría' : 'sin agua'], ['Columna', hasCol ? 'colocada' : 'sin columna']];
+      const last = receiverAt(d.x + 272, d.y - 150, d); if (last && aqV(last) > 0.1 && (tech === 5 || g0(last, 'ethanol') > 0)) items.push([`Alcohol en ${last.name || 'el matraz'}`, Math.round(g0(last, 'ethanol') / aqV(last) * 100) + ' %']);
       ro(items);
     }
   }
   if (tech === 6) {
-    const tp = objs.find(o => o.type === 'tripod'); if (tp) { $('v-flame').textContent = Math.round(tp.P * 100) + ' %'; $('b-burn').textContent = tp.on ? '⏻ Apagar mechero' : '🔥 Encender mechero'; $('b-burn').className = 'btn ' + (tp.on ? 'red' : 'pri'); }
+    const tp = objs.find(o => o.type === 'tripod'); if (tp && $('b-burn')) { $('v-flame').textContent = Math.round(tp.P * 100) + ' %'; $('b-burn').textContent = tp.on ? '⏻ Apagar mechero' : '🔥 Encender mechero'; $('b-burn').className = 'btn ' + (tp.on ? 'red' : 'pri'); }
     const c = (sel && objs.includes(sel) && g0(sel, 'cuso4') + g0(sel, 'salt') > 0) ? sel : objs.find(o => o.type === 'dish' && (g0(o, 'cuso4') > 0 || g0(o, 'salt') > 0)) || objs.find(o => isC(o) && g0(o, 'cuso4') > 0);
     if (c) {
       const s = g0(c, 'cuso4') > 0 ? 'cuso4' : 'salt', k = c.cry.filter(x => x.s === s), w = g0(c, 'water');
@@ -1185,7 +1477,7 @@ function labUpdate() {
     const c = objs.find(o => o.type === 'centrifuge');
     if (c) {
       $('v-rpm').textContent = c.rpm + ' rpm'; $('v-time').textContent = c.time + ' s'; $('b-cent').textContent = c.run ? '■ Detener' : '▶ Iniciar';
-      const slots = [0, 1, 2, 3].map(i => childAt(c, 's' + i)); const m = t => t ? (12 + liqV(t) + g0(t, 'clay')).toFixed(1) + ' g' : 'vacío';
+      const slots = [0, 1, 2, 3].map(i => childAt(c, 's' + i)); const m = t => t ? (12 + massOf(t)).toFixed(1) + ' g' : 'vacío';
       ro([['Estado', c.run ? (c.bad ? '¡desequilibrio!' : `girando · ${Math.ceil(c.tLeft)} s`) : 'detenida'], ['Hueco 1 ↔ 3', `${m(slots[0])} ↔ ${m(slots[2])}`], ['Hueco 2 ↔ 4', `${m(slots[1])} ↔ ${m(slots[3])}`], ['Fuerza relativa', '≈ ' + Math.round(1.118e-5 * 8 * c.rpm * c.rpm) + ' g']]);
     }
   }
@@ -1203,23 +1495,95 @@ function solChart(c, s) {
   const wv = g0(c, 'water'); if (wv > 0.5) { const conc = g0(c, s) / wv * 100; x.fillStyle = '#dc2626'; x.beginPath(); x.arc(X(clamp(c.T, 0, 100)), Y(clamp(conc, 0, 80)), 7, 0, 7); x.fill(); }
   x.fillStyle = '#374151'; x.fillText('g/100 mL', m.l + 6, m.t + 4);
 }
-// materiales
-const SPAWN = [
-  ['Recipientes', [['Vaso', 'beaker'], ['Erlenmeyer', 'erlen'], ['Tubo de ensayo', 'tube'], ['Cápsula', 'dish']]],
-  ['Equipos', [['Soporte con aro', 'standRing'], ['Soporte con pinza', 'standClamp'], ['Embudo + papel', 'funnel'], ['Embudo de decantación', 'sep'], ['Trípode + mechero', 'tripod'], ['Baño de hielo', 'iceBath'], ['Columna', 'column'], ['Papel cromatografía', 'paper'], ['Destilador', 'destilador'], ['Centrífuga', 'centrifuge']]],
-  ['Mezclas', [['Arena + agua', 'beaker', { water: 120, sand: 12 }, 1], ['Sal + agua', 'beaker', { water: 100, salt: 8 }], ['Aceite + agua', 'beaker', { water: 90, oil: 60 }, 1], ['Alcohol + agua', 'beaker', { water: 80, ethanol: 80 }], ['Sulfato de cobre', 'beaker', { water: 60, cuso4: 12 }], ['Agua turbia', 'beaker', { water: 150, clay: 6 }, 1], ['Arena + sal + agua', 'beaker', { water: 120, sand: 10, salt: 8 }, 1], ['Agua con colorante', 'beaker', { water: 120, dyeB: 1 }]]],
-  ['Disolventes', [['Agua destilada', 'bottleW'], ['Alcohol', 'bottleA']]],
+
+/* ============================== materiales y reactivos (con imagen) ============================== */
+const MATS = [
+  ['Recipientes', [['beaker', 'Vaso de precipitados'], ['erlen', 'Matraz Erlenmeyer'], ['probeta', 'Probeta'], ['aforado', 'Matraz aforado'], ['tube', 'Tubo de ensayo'], ['bottleW', 'Frasco lavador'], ['dish', 'Cápsula de porcelana'], ['vidrio', 'Vidrio de reloj'], ['mortero', 'Mortero y pistilo']]],
+  ['Medida y transferencia', [['pipeta', 'Pipeta'], ['bureta', 'Bureta'], ['funnel', 'Embudo'], ['sep', 'Embudo de decantación'], ['termometro', 'Termómetro'], ['balanza', 'Balanza'], ['varilla', 'Varilla de vidrio'], ['espatula', 'Espátula'], ['gradilla', 'Gradilla']]],
+  ['Equipos', [['standRing', 'Soporte con aro'], ['standClamp', 'Soporte con pinza'], ['tripod', 'Trípode y mechero'], ['iceBath', 'Baño de hielo'], ['column', 'Columna'], ['paper', 'Papel de cromatografía'], ['destilador', 'Equipo de destilación'], ['centrifuge', 'Centrífuga'], ['campana', 'Campana de extracción']]],
+  ['Mezclas preparadas', [['beaker', 'Arena + agua', { water: 120, sand: 12 }, 1], ['beaker', 'Sal + agua', { water: 100, salt: 8 }], ['beaker', 'Aceite + agua', { water: 90, oil: 60 }], ['beaker', 'Alcohol + agua', { water: 80, ethanol: 80 }], ['beaker', 'Sulfato de cobre', { water: 60, cuso4: 12 }], ['beaker', 'Agua turbia', { water: 150, clay: 6 }, 1], ['beaker', 'Arena + sal + agua', { water: 120, sand: 10, salt: 8 }, 1], ['beaker', 'Agua con colorante', { water: 120, dyeB: 1 }], ['bottleA', 'Alcohol', { ethanol: 450 }]]],
 ];
-function matRender() {
-  $('mat').innerHTML = SPAWN.map(([h, list], gi) => `<h4>${h}</h4><div class="g">${list.map((it, i) => `<button data-g="${gi}" data-i="${i}">${it[0]}</button>`).join('')}</div>`).join('');
-  $('mat').querySelectorAll('button').forEach(b => b.onclick = () => {
-    const it = SPAWN[+b.dataset.g][1][+b.dataset.i], w = S2W(W / 2 + (Math.random() - 0.5) * 120, H / 2);
-    const o = mk(it[1], w.x, 0);
-    if (o.type === 'paper') o.ink = inkSel;
-    if (it[2]) { fill(o, it[2], it[3]); o.name = it[0]; }
-    if (o.type === 'bottleW') fill(o, { water: 450 }); if (o.type === 'bottleA') fill(o, { ethanol: 450 });
-    layoutAll(); toast(`${it[0]} añadido a la mesa.`);
+function iconObj(type, comp, stirred) {
+  const o = { id: 900000 + Math.floor(Math.random() * 1e5), type, x: 0, y: 0, parent: null, tilt: 0, tdir: 1, ...newC(), armY: -235, P: 0.6, on: true, heat: 0, cool: true, headT: 20, front: 0, buf: {}, src: 'manta', ink: 'negra', wet: false, bled: false, e: 0, rpm: 3000, time: 20, run: false, tLeft: 0, open: false, tare: 0, spin: 0, read: 20, label: '', formula: '' };
+  if (comp) fill(o, comp, stirred);
+  if (type === 'bottleW' && !comp) fill(o, { water: 450 });
+  if (type === 'paper') o.front = 120, o.e = 0, o.wet = true;
+  return o;
+}
+function renderIcon(o, size = 56) {
+  const c = document.createElement('canvas'), d = 2; c.width = size * d; c.height = size * d; c.style.width = c.style.height = size + 'px';
+  const b = hitsBox(o), w = b[2] - b[0], h = b[3] - b[1], s = Math.min((size - 6) / w, (size - 6) / h);
+  const saved = ctx; ctx = c.getContext('2d');
+  ctx.setTransform(s * d, 0, 0, s * d, (size / 2 - (b[0] + w / 2) * s) * d, (size / 2 - (b[1] + h / 2) * s) * d);
+  try {
+    TYPES[o.type].draw(o);
+    if (o.type === 'destilador') { const bl = iconObj('balon'); drawCont(bl); }
+    if (TYPES[o.type].front) TYPES[o.type].front(o);
+  } catch (e) { }
+  ctx = saved;
+  return c;
+}
+function spawn(type, wx, comp, name, stirred, extra) {
+  const o = mk(type, wx, 0, extra || {});
+  if (comp) fill(o, comp, stirred);
+  if (name) o.name = name;
+  if (o.type === 'bottleW' && !comp) fill(o, { water: 450 });
+  if (o.type === 'paper') o.ink = inkSel;
+  layoutAll();
+  return o;
+}
+// arrastrar desde un panel al escenario
+function dragCard(el, makeGhost, onDrop, onClick) {
+  el.addEventListener('pointerdown', e => {
+    e.preventDefault(); el.setPointerCapture(e.pointerId);
+    const sx = e.clientX, sy = e.clientY; let moved = false; const g = $('ghost');
+    const mvh = ev => { if (!moved && Math.hypot(ev.clientX - sx, ev.clientY - sy) > 6) { moved = true; g.innerHTML = ''; g.appendChild(makeGhost()); g.style.display = 'block'; } if (moved) { g.style.left = ev.clientX + 'px'; g.style.top = ev.clientY + 'px'; } };
+    const up = ev => {
+      el.removeEventListener('pointermove', mvh); el.removeEventListener('pointerup', up); g.style.display = 'none';
+      if (!moved) { onClick(); return; }
+      const top = document.elementsFromPoint(ev.clientX, ev.clientY).find(x => x === cv || (x.closest && x.closest('.panel,#bar')));
+      if (top === cv) { const w = S2W(ev.clientX, ev.clientY); onDrop(w); }
+    };
+    el.addEventListener('pointermove', mvh); el.addEventListener('pointerup', up);
   });
+}
+function matRender() {
+  const root = $('mat'); root.innerHTML = '<div class="hint">Haz clic o arrastra un material a la mesa. Para quitarlo, arrástralo de vuelta a un panel.</div>';
+  for (const [h, list] of MATS) {
+    const sec = document.createElement('div'); sec.className = 'sec'; sec.textContent = h; root.appendChild(sec);
+    const grid = document.createElement('div'); grid.className = 'cards'; root.appendChild(grid);
+    for (const [type, name, comp, st] of list) {
+      const card = document.createElement('div'); card.className = 'card'; card.title = name;
+      const ic = renderIcon(iconObj(type, comp, st)); card.appendChild(ic);
+      const sp = document.createElement('span'); sp.textContent = name; card.appendChild(sp);
+      grid.appendChild(card);
+      const make = w => { const o = spawn(type, w.x, comp, comp ? name : null, st); o.x = w.x; if (w.y < -40 && !['campana'].includes(type)) o.y = Math.min(0, w.y + (hitsBox(o)[3] - hitsBox(o)[1]) / 2); dropObj(o); toast(`${name}: añadido.`); };
+      dragCard(card, () => renderIcon(iconObj(type, comp, st)), make, () => { const w = S2W(W / 2 + (Math.random() - 0.5) * 140, H / 2); make({ x: w.x, y: 0 }); });
+    }
+  }
+}
+function addReagent(r, c) {
+  if (r.k === 'water' || r.k === 'ethanol' || r.k === 'oil') { const room = Math.max(0, GEO[c.type].cap - totV(c)); if (room < 0.5) { toast('El recipiente está lleno.', 'bad'); return; } }
+  c.m[r.k] = (c.m[r.k] || 0) + r.a; if (SOLIDS[r.k] && liqV(c) > 0.5) c.sus[r.k] = (c.sus[r.k] || 0) + r.a * 0.6;
+  toast(`+${r.a} ${r.u} de ${r.n.toLowerCase()} → ${c.name || TYPES[c.type].lab}`);
+}
+function reagentContainer(r, x) {
+  const liquid = !r.s && !DYES[r.k];
+  const o = spawn(liquid ? 'botella' : 'jar', x, null, r.n, false, { label: r.n.toUpperCase(), formula: r.f });
+  fill(o, { [r.k]: liquid ? 350 : (DYES[r.k] ? 5 : 100) });
+  return o;
+}
+function reaRender() {
+  const root = $('rea');
+  root.innerHTML = '<div class="hint">Clic: se añade al recipiente seleccionado (o aparece un frasco). Arrastra sobre un recipiente para añadirlo dentro.</div><div class="rlist" id="rlist"></div>';
+  for (const r of REAG) {
+    const el = document.createElement('div'); el.className = 'rg';
+    el.innerHTML = `<span class="sw ${r.s ? 's' : ''}" style="background:${r.sw}"></span><div><b>${r.n}</b><small>${r.f}</small></div><em>${r.a} ${r.u}</em>`;
+    $('rlist').appendChild(el);
+    dragCard(el, () => { const s = document.createElement('div'); s.className = 'sw'; s.style.background = r.sw; s.style.border = '1px solid #d1d5db'; return s; },
+      w => { const c = containerUnder(w.x, w.y, null); if (c) addReagent(r, c); else { reagentContainer(r, w.x); toast(`Frasco de ${r.n.toLowerCase()} en la mesa.`); } },
+      () => { if (sel && objs.includes(sel) && isC(sel) && !GEO[sel.type].noTarget) addReagent(r, sel); else { const w = S2W(W / 2 + (Math.random() - 0.5) * 140, H / 2); reagentContainer(r, w.x); toast(`Frasco de ${r.n.toLowerCase()} en la mesa.`); } });
+  }
 }
 // paneles arrastrables y encogibles
 document.querySelectorAll('.panel').forEach(p => {
@@ -1230,6 +1594,7 @@ document.querySelectorAll('.panel').forEach(p => {
   hd.addEventListener('pointerdown', e => {
     if (e.target.closest('button')) return;
     const r = p.getBoundingClientRect(), ox = e.clientX - r.left, oy = e.clientY - r.top;
+    if (p.parentElement.id === 'dock') { document.body.appendChild(p); p.style.left = r.left + 'px'; p.style.top = r.top + 'px'; p.querySelector('.bd').style.maxHeight = 'calc(100vh - 150px)'; }
     hd.setPointerCapture(e.pointerId);
     const move = ev => { p.style.left = clamp(ev.clientX - ox, 0, innerWidth - 80) + 'px'; p.style.top = clamp(ev.clientY - oy, 0, innerHeight - 34) + 'px'; p.style.right = 'auto'; p.style.bottom = 'auto'; };
     const up = () => { hd.removeEventListener('pointermove', move); hd.removeEventListener('pointerup', up); };
@@ -1237,15 +1602,27 @@ document.querySelectorAll('.panel').forEach(p => {
   });
   setBtn();
 });
+// barra inferior
 $('z-in').onclick = () => zoomAt(W / 2, H / 2, 1.2);
 $('z-out').onclick = () => zoomAt(W / 2, H / 2, 1 / 1.2);
 $('z-lvl').onclick = () => zoomAt(W / 2, H / 2, 1 / cam.z);
 $('z-fit').onclick = fit;
+$('b-reset').onclick = () => { setTech(tech); toast('Experimento reiniciado.'); };
 $('b-lab').onclick = () => { showLabels = !showLabels; $('b-lab').classList.toggle('on', showLabels); };
 $('b-spd').onclick = () => { SPEED = SPEED === 1 ? 3 : SPEED === 3 ? 6 : 1; $('b-spd').textContent = '×' + SPEED; $('b-spd').classList.toggle('on', SPEED > 1); };
 $('b-pan').onclick = () => document.body.classList.toggle('nopanels');
 $('b-help').onclick = () => $('help').classList.add('on');
 $('help').onclick = e => { if (e.target.id === 'help') $('help').classList.remove('on'); };
+const BGS = ['#eef2f7', '#fdf6ec', '#ecfdf5', '#e0f2fe', '#f5f3ff', '#1e293b'];
+function setBG(c) {
+  BG = c; const n = parseInt(c.slice(1), 16), L = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+  BGdark = L < 0.45; document.body.classList.toggle('dark', BGdark); document.body.style.background = c; store.set('hted-bg', c);
+  $('bgpop').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.c === c));
+}
+$('bgpop').innerHTML = BGS.map(c => `<button data-c="${c}" style="background:${c}" title="${c}"></button>`).join('') + '<input type="color" id="bgc" title="Otro color">';
+$('bgpop').querySelectorAll('button').forEach(b => b.onclick = () => setBG(b.dataset.c));
+$('bgc').oninput = e => setBG(e.target.value);
+$('b-bg').onclick = e => { e.stopPropagation(); $('bgpop').classList.toggle('on'); };
 
 /* ============================== bucle ============================== */
 let last = performance.now(), acc = 0, accM = 0;
@@ -1258,8 +1635,9 @@ function loop(now) {
   accM += dt; if (accM > 0.4) { accM = 0; checkMissions(); }
   requestAnimationFrame(loop);
 }
-techRender(); matRender(); setTech(1);
-try { if (!localStorage.getItem('hted-sep-help')) { $('help').classList.add('on'); localStorage.setItem('hted-sep-help', '1'); } } catch (e) { $('help').classList.add('on'); }
+setBG(store.get('hted-bg') || BGS[0]);
+techRender(); matRender(); reaRender(); setTech(1);
+if (!store.get('hted-sep-help')) { $('help').classList.add('on'); store.set('hted-sep-help', '1'); }
 requestAnimationFrame(loop);
 </script>
 </body>
