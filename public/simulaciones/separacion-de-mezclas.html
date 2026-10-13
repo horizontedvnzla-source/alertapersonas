@@ -10,7 +10,7 @@
   html,body{height:100%;overflow:hidden;background:#eef2f7;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink)}
   #cv{position:fixed;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;display:block}
   #cv.grab{cursor:grabbing} #cv.hand{cursor:pointer} #cv.ns{cursor:ns-resize}
-  .brand{position:fixed;top:12px;right:18px;text-align:right;pointer-events:none;user-select:none;z-index:40}
+  .brand{position:fixed;top:12px;left:18px;text-align:left;pointer-events:none;user-select:none;z-index:40}
   .brand .logo{font-weight:800;font-size:28px;letter-spacing:-.6px;line-height:1}
   .brand .logo .h{color:var(--gray)} .brand .logo .t{color:var(--red)}
   .brand .sub{font-size:11.5px;color:var(--gray);margin-top:4px;letter-spacing:.02em}
@@ -94,7 +94,22 @@
   #help .card2{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:18px 20px;max-width:440px;font-size:13px;line-height:1.6}
   #help h3{font-size:15px;margin-bottom:6px} #help kbd{background:#f3f4f6;border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:11.5px}
   body.nopanels .panel{display:none}
-  #dock{position:fixed;left:14px;top:232px;z-index:30;display:flex;flex-direction:column;gap:8px;max-height:calc(100vh - 300px);overflow:auto;padding:2px 4px 6px 2px;scrollbar-width:thin}
+  #seltb{position:fixed;z-index:34;display:none;align-items:center;gap:1px;background:rgba(17,24,39,.92);color:#fff;border-radius:999px;padding:3px 5px;transform:translate(-50%,-100%);box-shadow:var(--shadow);font-size:12px;white-space:nowrap}
+  #seltb button{border:0;background:transparent;color:#e5e7eb;min-width:24px;height:24px;border-radius:999px;cursor:pointer;font-size:12.5px;padding:0 5px}
+  #seltb button:hover{background:rgba(255,255,255,.14);color:#fff}
+  #seltb button.off{opacity:.45}
+  #seltb .sz{min-width:40px;font-variant-numeric:tabular-nums;font-size:11px}
+  #seltb i{width:1px;height:16px;background:rgba(255,255,255,.2);margin:0 3px}
+  #seltb input{border:0;border-radius:999px;padding:3px 9px;font-size:12px;width:150px;outline:none}
+  #pourhud{position:fixed;z-index:55;pointer-events:none;display:none;background:rgba(14,116,144,.92);color:#fff;font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 9px;font-variant-numeric:tabular-nums}
+  .qty{display:flex;align-items:center;gap:4px;margin:6px 0 8px}
+  .qty button{border:1px solid var(--line);background:#fff;border-radius:7px;width:26px;height:26px;cursor:pointer;font-weight:700}
+  .qty input[type=number]{width:70px;border:1px solid var(--line);border-radius:7px;padding:4px 6px;font-size:12.5px;font-weight:700;text-align:right}
+  .qty span{font-size:11px;color:var(--muted)}
+  .qchips{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px}
+  .qchips button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:1px 7px;font-size:11px;cursor:pointer}
+  .qchips button.on{background:#111827;color:#fff;border-color:#111827}
+  #dock{position:fixed;left:14px;top:300px;z-index:30;display:flex;flex-direction:column;gap:8px;max-height:calc(100vh - 370px);overflow:auto;padding:2px 4px 6px 2px;scrollbar-width:thin}
   #dock .panel{position:relative;left:auto!important;top:auto!important;flex:none}
   #dock .panel .bd{max-height:none}
   @media (max-width:700px){.panel{width:220px}.brand .logo{font-size:22px}.brand .sub{font-size:10px}}
@@ -105,12 +120,12 @@
 
 <div class="brand"><div class="logo"><span class="h">Horizon</span><span class="t">TED</span></div><div class="sub">Exploración sin límites, aprendizaje sin riesgos</div></div>
 
-<div class="panel" id="p-tech" style="left:14px;top:14px">
+<div class="panel" id="p-tech" style="left:14px;top:82px">
   <div class="hd"><span class="dot"></span><span class="tt">Técnicas de separación</span><button class="mn">–</button></div>
   <div class="bd"><div class="tech" id="techs"></div></div>
 </div>
 
-<div class="panel" id="p-lab" style="right:14px;top:74px;width:280px">
+<div class="panel" id="p-lab" style="right:14px;top:14px;width:280px">
   <div class="hd"><span class="dot" id="lab-dot"></span><span class="tt" id="lab-title">Laboratorio</span><button class="mn">–</button></div>
   <div class="bd" id="lab"></div>
 </div>
@@ -133,12 +148,15 @@
   <span class="sep"></span>
   <button id="b-reset" title="Reiniciar el experimento">↺</button>
   <button id="b-bg" title="Color de fondo">◐</button>
-  <button id="b-lab" title="Etiquetas de los materiales" class="on">Aa</button>
+  <button id="b-lab" title="Nombres de los materiales" class="on">Aa</button>
+  <button id="b-tag" title="Etiquetas de contenido en los recipientes" class="on">🏷</button>
   <button id="b-spd" title="Velocidad del tiempo">×1</button>
   <button id="b-pan" title="Mostrar/ocultar paneles (H)">◧</button>
   <button id="b-help" title="Ayuda">?</button>
 </div>
 <div id="bgpop"></div>
+<div id="seltb"></div>
+<div id="pourhud"></div>
 <div id="trash">🗑</div>
 <div id="tip"></div>
 <div id="ghost"></div>
@@ -150,7 +168,9 @@
   • Suelta un embudo cerca del aro, un papel o una bureta cerca de la pinza o un tubo en la centrífuga o la gradilla: se <b>acoplan</b> solos.<br>
   • <b>Materiales</b> y <b>Reactivos</b>: haz clic o arrástralos a la mesa. Un reactivo soltado sobre un recipiente se añade dentro.<br>
   • <b>Rueda del ratón</b>: zoom · <b>arrastra el fondo</b>: mover la vista.<br>
-  • <b>Doble clic</b> en un recipiente: agitar · <b>clic</b> en llaves, mechero o tara de la balanza.<br>
+  • <b>Agitar</b>: doble clic, o sacude el recipiente de lado a lado con el ratón · <b>clic</b> en llaves, mechero o tara.<br>
+  • Al seleccionar un elemento aparece una barra para darle <b>zoom individual</b> (también <kbd>Alt</kbd> + rueda), ponerle o editar su <b>etiqueta</b>, agitarlo o quitarlo.<br>
+  • Mantén <kbd>Shift</kbd> al verter para hacerlo <b>gota a gota</b>; un contador muestra los mL vertidos.<br>
   • La <b>pipeta</b> absorbe si su punta está dentro de un líquido y gotea si está sobre un recipiente.<br>
   • Para quitar un objeto, arrástralo a cualquier <b>panel</b> o a la papelera (o pulsa <kbd>Supr</kbd>).<br>
   • Paneles: arrástralos por su título y encógelos con <kbd>–</kbd>. <kbd>H</kbd> los oculta todos.
@@ -340,8 +360,9 @@ GEO.bottleA = GEO.bottleW;
 const GLASS_MASS = { beaker: 55, erlen: 60, tube: 12, probeta: 80, aforado: 50, dish: 70, vidrio: 15, mortero: 180, funnel: 40, sep: 110, bureta: 70, pipeta: 5, balon: 90, bottleW: 40, bottleA: 40, jar: 90, botella: 120 };
 const isC = o => !!GEO[o.type];
 const hOf = (g, v) => { const f = Math.min(Math.max(v, 0) / g.cap, 1.05); return g.ih * (g.shape === 'cone' ? Math.cbrt(f) : g.shape === 'bowl' ? Math.sqrt(f) : f); };
-const surfaceY = o => o.y + GEO[o.type].ib - hOf(GEO[o.type], totV(o));
-function mouthOf(o) { const g = GEO[o.type]; return { x0: o.x + g.mouth[0], x1: o.x + g.mouth[1], y: o.y + g.mouth[2] }; }
+const E = o => (o.sc || 1) * (o.parent ? E(o.parent) : 1); // escala (zoom) individual efectiva
+const surfaceY = o => o.y + (GEO[o.type].ib - hOf(GEO[o.type], totV(o))) * E(o);
+function mouthOf(o) { const g = GEO[o.type], e = E(o); return { x0: o.x + g.mouth[0] * e, x1: o.x + g.mouth[1] * e, y: o.y + g.mouth[2] * e }; }
 
 /* ============================== escena ============================== */
 let objs = [], uid = 0, held = null, sel = null, tech = 1, puddles = [], steam = [], streams = [], drops = [], flags = {}, SPEED = 1, showLabels = true, drawn = [], missionDone = [], spaceDown = false;
@@ -355,15 +376,16 @@ function mk(type, x = 0, y = 0, props = {}) {
   return o;
 }
 const kids = o => objs.filter(c => c.parent === o);
+const selC = () => sel && objs.includes(sel) && isC(sel) ? sel : null;
 const childAt = (o, name) => objs.find(c => c.parent === o && c.sock === name);
 const root = o => { while (o.parent) o = o.parent; return o; };
 const isAnc = (a, b) => { while (b) { if (b === a) return true; b = b.parent; } return false; };
-const socketsOf = o => TYPES[o.type].sockets ? TYPES[o.type].sockets(o) : [];
+const socketsOf = o => { if (!TYPES[o.type].sockets) return []; const e = E(o); return TYPES[o.type].sockets(o).map(s => e === 1 ? s : { ...s, x: o.x + (s.x - o.x) * e, y: o.y + (s.y - o.y) * e, dy: s.dy === undefined ? undefined : s.dy * e }); };
 function attach(c, p, name) { c.parent = p; c.sock = name; layoutAll(); }
 function layout(o) {
   for (const c of objs) if (c.parent === o) {
     const s = socketsOf(o).find(s => s.name === c.sock);
-    if (s) { c.x = s.x; c.y = s.y + (s.dy ?? (TYPES[c.type].mountDy || 0)); }
+    if (s) { c.x = s.x; c.y = s.y + (s.dy ?? (TYPES[c.type].mountDy || 0) * E(c)); }
     layout(c);
   }
 }
@@ -384,12 +406,9 @@ function groundY(x, fromY = -1e9) {
   let y = 0;
   for (const o of objs) {
     if (o.parent || o === held) continue;
-    let top = null, x0 = 0, x1 = 0;
-    if (o.type.startsWith('stand')) { x0 = o.x - 74; x1 = o.x + 74; top = o.y - 13; }
-    else if (o.type === 'destilador') { x0 = o.x - 136; x1 = o.x - 54; top = o.y - 10; }
-    else if (o.type === 'balanza') { x0 = o.x - 66; x1 = o.x + 66; top = o.y - 36; }
-    else if (o.type === 'gradilla') { x0 = o.x - 70; x1 = o.x + 70; top = o.y - 8; }
-    else if (o.type === 'tripod') { x0 = o.x - 60; x1 = o.x + 60; top = o.y - 116; }
+    let top = null, x0 = 0, x1 = 0; const e = E(o);
+    const P = { standRing: [-74, 74, -13], standClamp: [-74, 74, -13], destilador: [-136, -54, -10], balanza: [-66, 66, -36], gradilla: [-70, 70, -8], tripod: [-60, 60, -116] }[o.type];
+    if (P) { x0 = o.x + P[0] * e; x1 = o.x + P[1] * e; top = o.y + P[2] * e; }
     if (top !== null && x >= x0 && x <= x1 && top > fromY && top < y) y = top;
   }
   return y;
@@ -513,6 +532,8 @@ function drawCont(o) {
   if (o.type === 'aforado') { ctx.strokeStyle = 'rgba(30,41,59,.85)'; ctx.lineWidth = 1.3; ctx.beginPath(); ctx.moveTo(-6, -140); ctx.lineTo(6, -140); ctx.stroke(); ctx.fillStyle = '#334155'; ctx.beginPath(); rr(ctx, -8, -188, 16, 10, 3); ctx.fill(); }
   if (o.type === 'pipeta') { ctx.fillStyle = '#ef4444'; ctx.beginPath(); rr(ctx, -8, -168, 16, 46, 8); ctx.fill(); ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.fillRect(-5, -162, 3, 30); }
   if (o.type === 'mortero') { ctx.save(); ctx.translate(14, -26); ctx.rotate(-0.55); ctx.beginPath(); rr(ctx, -6, -86, 12, 92, 6); const pg = ctx.createLinearGradient(-6, 0, 6, 0); pg.addColorStop(0, '#d1d5db'); pg.addColorStop(0.5, '#fff'); pg.addColorStop(1, '#cbd5e1'); ctx.fillStyle = pg; ctx.fill(); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore(); }
+  if (showTags && o.tagOn !== false && !o.icon && totV(o) > 0.05) drawTag(o, g);
+  if (o.shakeT && performance.now() - o.shakeT < 250) { /* vibración al sacudir: se dibuja en drawObj */ }
   if (o.type === 'sep' || o.type === 'bureta') { // llave y punta
     const ty = o.type === 'sep' ? -57 : -26, top = o.type === 'sep' ? -64 : -34;
     ctx.fillStyle = 'rgba(226,238,252,.6)'; ctx.fillRect(-2.5, top, 5, -top); ctx.strokeStyle = 'rgba(71,85,105,.9)'; ctx.lineWidth = 1.4; ctx.strokeRect(-2.5, top, 5, -top);
@@ -522,6 +543,33 @@ function drawCont(o) {
     ctx.save(); ctx.translate(0, ty); if (o.open) ctx.rotate(Math.PI / 2); ctx.beginPath(); rr(ctx, -16, -3, 32, 6, 3); ctx.fill(); ctx.restore();
     if (o.type === 'sep') { ctx.fillStyle = '#334155'; ctx.beginPath(); rr(ctx, -9, -236, 18, 12, 3); ctx.fill(); }
   }
+  ctx.restore();
+}
+
+const SHORT = { water: 'Agua', ethanol: 'Alcohol', oil: 'Aceite', sand: 'Arena', clay: 'Arcilla', salt: 'Sal', cuso4: 'CuSO₄' };
+const fq = x => x < 10 ? x.toFixed(1) : x.toFixed(0);
+function compName(c) {
+  const it = [];
+  for (const k in SHORT) if (g0(c, k) > 0.02) it.push([SHORT[k], g0(c, k)]);
+  let dy = 0; for (const d in DYES) dy += g0(c, d); if (dy > 0.001) it.push(['Colorante', dy * 0.01]);
+  it.sort((a, b) => b[1] - a[1]);
+  return it.slice(0, 3).map(x => x[0]).join(' + ') || 'Vacío';
+}
+function compQty(c) { const L = liqV(c); let S = 0; for (const k in SOLIDS) S += g0(c, k); for (const k in SOL) S += g0(c, k); return [L > 0.05 ? fq(L) + ' mL' : '', S > 0.01 ? fq(S) + ' g' : ''].filter(Boolean).join(' · '); }
+const TAG_ON = { beaker: [0, -50], erlen: [0, -34], sep: [0, -152], balon: [0, -86], aforado: [0, -36] };
+function drawTag(o, g) {
+  const t1 = o.tag || compName(o), t2 = compQty(o);
+  ctx.save(); ctx.font = '700 8.5px system-ui,sans-serif'; const w1 = ctx.measureText(t1).width; ctx.font = '600 7.5px system-ui,sans-serif'; const w2 = ctx.measureText(t2).width;
+  const w = Math.max(w1, w2) + 10, h = 23, on = TAG_ON[o.type];
+  let cx, cy;
+  if (on) { cx = on[0]; cy = on[1]; }
+  else { const hb = CONT_HITS[o.type] || [-10, -300, 10, 0]; cx = hb[2] + 8 + w / 2; cy = g.mouth[2] + 24; ctx.strokeStyle = 'rgba(100,116,139,.7)'; ctx.lineWidth = 0.8; ctx.beginPath(); ctx.moveTo(hb[2] - 4, cy); ctx.lineTo(cx - w / 2, cy); ctx.stroke(); }
+  ctx.fillStyle = 'rgba(255,255,255,.93)'; ctx.strokeStyle = 'rgba(148,163,184,.9)'; ctx.lineWidth = 0.8;
+  ctx.beginPath(); rr(ctx, cx - w / 2, cy - h / 2, w, h, 3.5); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#dc2626'; ctx.fillRect(cx - w / 2, cy - h / 2 + 3, 1.6, h - 6);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#0f172a'; ctx.font = '700 8.5px system-ui,sans-serif'; ctx.fillText(t1, cx + 1, cy - 5);
+  ctx.fillStyle = '#475569'; ctx.font = '600 7.5px system-ui,sans-serif'; ctx.fillText(t2, cx + 1, cy + 5.5);
   ctx.restore();
 }
 
@@ -845,7 +893,7 @@ function heatOpen(o, P, amb, dt) {
       boiling = true;
       const e = Math.min(aqV(o), 1.3 * P * dt * (o.type === 'dish' ? 1.5 : 1)), x = g0(o, 'ethanol') / aqV(o), y = vaporY(x, 1);
       const eE = Math.min(g0(o, 'ethanol'), e * y); sub(o, 'ethanol', eE); sub(o, 'water', Math.min(g0(o, 'water'), e - eE));
-      if (Math.random() < dt * 14) steam.push({ x: o.x + (Math.random() - 0.5) * GEO[o.type].half * 1.3, y: surfaceY(o), life: 1 });
+      if (Math.random() < dt * 14) steam.push({ x: o.x + (Math.random() - 0.5) * GEO[o.type].half * 1.3 * E(o), y: surfaceY(o), life: 1 });
     }
   }
   if (aqV(o) <= 0.05) T = Math.min(T, 250);
@@ -878,8 +926,8 @@ function contUpdate(o, dt) {
   crystUpdate(o, dt);
   const g2 = GEO[o.type];
   if (totV(o) > g2.cap * 1.04 && !o.type.startsWith('bottle')) {
-    const part = take(o, totV(o) - g2.cap, 'top'), ex = o.x + (o.tdir || 1) * g2.half, y = spill(ex, part, o.y + g2.mouth[2]);
-    drops.push({ x: ex, y: o.y + g2.mouth[2], x2: ex, y2: y, col: liquidColor(part) });
+    const part = take(o, totV(o) - g2.cap, 'top'), ex = o.x + (o.tdir || 1) * g2.half * E(o), y = spill(ex, part, o.y + g2.mouth[2] * E(o));
+    drops.push({ x: ex, y: o.y + g2.mouth[2] * E(o), x2: ex, y2: y, col: liquidColor(part) });
     toastOnce('over', 'El recipiente se desbordó.', 'bad');
   }
   if (o.type === 'funnel' && liqV(o) > 0.01) {
@@ -924,7 +972,7 @@ function destUpdate(o, dt) {
     const k = Math.min(1, dt * 2), oW = o.buf.water * k, oE = o.buf.ethanol * k;
     o.buf.water -= oW; o.buf.ethanol -= oE;
     if (oW + oE > 1e-5) {
-      if (o.cool) { const part = newC(); part.T = 25; if (oW > 0) part.m.water = oW; if (oE > 0) part.m.ethanol = oE; const r = receiverAt(o.x + 272, o.y - 150, o); if (r) { add(r, part); r.fromCond = true; } else { const gy = spill(o.x + 272, part, o.y - 150); drops.push({ x: o.x + 272, y: o.y - 150, x2: o.x + 272, y2: gy, col: `rgba(${AQ},.9)` }); } o.dripping = true; }
+      if (o.cool) { const part = newC(); part.T = 25; if (oW > 0) part.m.water = oW; if (oE > 0) part.m.ethanol = oE; const e = E(o), tx = o.x + 272 * e, ty = o.y - 150 * e, r = receiverAt(tx, ty, o); if (r) { add(r, part); r.fromCond = true; } else { const gy = spill(tx, part, ty); drops.push({ x: tx, y: ty, x2: tx, y2: gy, col: `rgba(${AQ},.9)` }); } o.dripping = true; }
       else { flags.lostVapor = true; toastOnce('vap', 'Sin agua fría en el refrigerante el vapor no se condensa y se pierde.', 'bad'); }
     }
   }
@@ -933,7 +981,7 @@ function paperUpdate(p, dt) {
   const bx = p.x, by = p.y; let cont = null;
   for (const o of objs) if (isC(o) && o !== held && !GEO[o.type].noTarget) { const m = mouthOf(o); if (bx > m.x0 + 4 && bx < m.x1 - 4 && by > m.y && by <= o.y) { cont = o; break; } }
   if (!cont) return;
-  const sy = surfaceY(cont), aq = aqV(cont), dip = by - sy;
+  const sy = surfaceY(cont), aq = aqV(cont), dip = (by - sy) / E(p);
   if (aq > 0.5 && dip > 0) {
     p.wet = true; p.e = g0(cont, 'ethanol') / aq;
     if (dip > 30 && !p.bled) { p.bled = true; const d = INKS[p.ink].d; for (const k in d) cont.m[k] = (cont.m[k] || 0) + 0.6 * d[k]; toast('¡La mancha quedó sumergida! La tinta se disolvió en el disolvente.', 'bad'); }
@@ -971,34 +1019,34 @@ function heldPour(dt) {
     }
     if (totV(o) > 0.01) {
       const r = receiverAt(o.x, o.y, o);
-      if (r && mouthOf(r).y - o.y < 160) { const part = take(o, 2.5 * dt, 'bottom'); add(r, part); r.fromPour = true; drops.push({ x: o.x, y: o.y, x2: o.x, y2: surfaceY(r), col: liquidColor(part) }); }
+      if (r && mouthOf(r).y - o.y < 160) { const part = take(o, (shiftDown ? 0.6 : 2.5) * dt, 'bottom'); poured += totV(part); pouredT = performance.now(); add(r, part); r.fromPour = true; drops.push({ x: o.x, y: o.y, x2: o.x, y2: surfaceY(r), col: liquidColor(part) }); }
     }
     return;
   }
   if (g.noPour) { o.tilt = 0; return; }
-  const bottle = !!g.nozzle;
-  const mx = o.x + (g.mouth[0] + g.mouth[1]) / 2, my = o.y + g.mouth[2];
+  const bottle = !!g.nozzle, e = E(o);
+  const mx = o.x + (g.mouth[0] + g.mouth[1]) / 2 * e, my = o.y + g.mouth[2] * e;
   let tgt = null, bd = 1e9, L = null;
   for (const t of objs) {
     if (t === o || !isC(t) || isAnc(o, t) || GEO[t.type].noTarget) continue;
     if (t.parent && t.parent.type === 'centrifuge' && t.parent.run) continue;
     const m = mouthOf(t), cx = (m.x0 + m.x1) / 2, dir = cx >= mx ? 1 : -1;
-    const lx = bottle ? o.x + g.nozzle[0] : o.x + dir * g.half, ly = bottle ? o.y + g.nozzle[1] : my;
+    const lx = bottle ? o.x + g.nozzle[0] * e : o.x + dir * g.half * e, ly = bottle ? o.y + g.nozzle[1] * e : my;
     if (ly < m.y - 4 && m.y - ly < 320 && lx >= m.x0 - 16 && lx <= m.x1 + 16) { const d = m.y - ly + Math.abs(lx - cx); if (d < bd) { bd = d; tgt = t; L = { lx, ly, dir, m }; } }
   }
   const free = !tgt && spaceDown && totV(o) > 0.05;
   if (!bottle) { const want = (tgt && totV(o) > 0.05) || free ? 0.95 : 0; if (tgt) o.tdir = L.dir; o.tilt += (want - o.tilt) * Math.min(1, dt * 8); }
   if (tgt && totV(o) > 0.01 && (bottle || o.tilt > 0.6)) {
-    const rate = (tgt.type === 'tube' ? 5 : bottle ? 14 : 30) * dt;
-    const part = take(o, rate, 'top');
+    const rate = (shiftDown ? 1.5 : tgt.type === 'tube' ? 5 : bottle ? 14 : 30) * dt;
+    const part = take(o, rate, 'top'); poured += totV(part); pouredT = performance.now();
     if (totV(part) > 0) {
       add(tgt, part); tgt.fromPour = true; if (o.type === 'tube') tgt.fromTube = true;
       if (tgt.type === 'balon' && tgt.parent) tgt.parent.front = 0;
       streams.push({ x1: L.lx, y1: L.ly, x2: clamp(L.lx, L.m.x0 + 4, L.m.x1 - 4), y2: tgt.type === 'balon' ? L.m.y : surfaceY(tgt), col: liquidColor(part) });
     }
   } else if (free && (bottle || o.tilt > 0.6)) {
-    const lx = bottle ? o.x + g.nozzle[0] : o.x + o.tdir * g.half, ly = bottle ? o.y + g.nozzle[1] : my;
-    const part = take(o, 30 * dt, 'top');
+    const lx = bottle ? o.x + g.nozzle[0] * e : o.x + o.tdir * g.half * e, ly = bottle ? o.y + g.nozzle[1] * e : my;
+    const part = take(o, (shiftDown ? 1.5 : 30) * dt, 'top'); poured += totV(part); pouredT = performance.now();
     const gy = spill(lx, part, ly);
     streams.push({ x1: lx, y1: ly, x2: lx + o.tdir * 6, y2: gy, col: liquidColor(part) });
   }
@@ -1020,18 +1068,19 @@ function update(dt) {
 }
 
 /* ============================== dibujo de la escena ============================== */
-function hitsBox(o) { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (const h of TYPES[o.type].hits(o)) { const r = h.r || (h.c ? [h.c[0] - h.c[2], h.c[1] - h.c[2], h.c[0] + h.c[2], h.c[1] + h.c[2]] : [Math.min(h.seg[0], h.seg[2]), Math.min(h.seg[1], h.seg[3]), Math.max(h.seg[0], h.seg[2]), Math.max(h.seg[1], h.seg[3])]); x0 = Math.min(x0, r[0]); y0 = Math.min(y0, r[1]); x1 = Math.max(x1, r[2]); y1 = Math.max(y1, r[3]); } return [o.x + x0, o.y + y0, o.x + x1, o.y + y1]; }
+function hitsBox(o) { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (const h of TYPES[o.type].hits(o)) { const r = h.r || (h.c ? [h.c[0] - h.c[2], h.c[1] - h.c[2], h.c[0] + h.c[2], h.c[1] + h.c[2]] : [Math.min(h.seg[0], h.seg[2]), Math.min(h.seg[1], h.seg[3]), Math.max(h.seg[0], h.seg[2]), Math.max(h.seg[1], h.seg[3])]); x0 = Math.min(x0, r[0]); y0 = Math.min(y0, r[1]); x1 = Math.max(x1, r[2]); y1 = Math.max(y1, r[3]); } const e = E(o); return [o.x + x0 * e, o.y + y0 * e, o.x + x1 * e, o.y + y1 * e]; }
 function drawObj(o) {
   const T = TYPES[o.type];
   ctx.save();
   if (o.parent && o.parent.type === 'centrifuge') { const s = socketsOf(o.parent).find(s => s.name === o.sock); ctx.beginPath(); ctx.rect(-1e5, -1e5, 2e5, s.y + 1e5); ctx.clip(); }
-  T.draw(o); drawn.push(o);
+  const e = E(o), sk = o.shakeT && performance.now() - o.shakeT < 250 ? Math.sin(performance.now() / 18) * 0.06 : 0, sAb = () => { if (e !== 1 || sk) { ctx.translate(o.x, o.y); ctx.scale(e, e); ctx.rotate(sk); ctx.translate(-o.x, -o.y); } };
+  ctx.save(); sAb(); T.draw(o); ctx.restore(); drawn.push(o);
   if (!(o.type === 'centrifuge' && o.run)) { const ks = kids(o); if (o.type === 'centrifuge') ks.sort((a, b) => a.y - b.y); ks.forEach(drawObj); }
-  if (T.front) T.front(o);
+  if (T.front) { ctx.save(); sAb(); T.front(o); ctx.restore(); }
   ctx.restore();
   if (o === sel) { const b = hitsBox(o); ctx.save(); ctx.setLineDash([5, 4]); ctx.strokeStyle = 'rgba(220,38,38,.7)'; ctx.lineWidth = 1.5 / cam.z; ctx.strokeRect(b[0] - 5, b[1] - 5, b[2] - b[0] + 10, b[3] - b[1] + 10); ctx.restore(); }
 }
-let BG = '#eef2f7', BGdark = false;
+let BG = '#eef2f7', BGdark = false, showTags = true;
 function drawLabels() {
   if (!showLabels || cam.z < 0.45) return;
   const placed = []; ctx.font = '600 11px system-ui,sans-serif';
@@ -1039,7 +1088,7 @@ function drawLabels() {
     if (o.fixed) continue;
     const name = o.name || TYPES[o.type].lab;
     if (!o.parent) {
-      const x = o.x + (o.type === 'destilador' ? 90 : o.type.startsWith('stand') ? -55 : 0), w = ctx.measureText(name).width + 10;
+      const x = o.x + (o.type === 'destilador' ? 90 : o.type.startsWith('stand') ? -55 : 0) * E(o), w = ctx.measureText(name).width + 10;
       let y = 30; while (placed.some(p => p.y === y && x - w / 2 < p.x1 && x + w / 2 > p.x0)) y += 15;
       placed.push({ x0: x - w / 2, x1: x + w / 2, y });
       text(name, x, y, 11, '#cbd5e1', 'center', 600);
@@ -1085,7 +1134,7 @@ function hitTest(wx, wy) {
   for (let i = drawn.length - 1; i >= 0; i--) {
     const o = drawn[i];
     if (o.parent && o.parent.type === 'centrifuge' && o.parent.run) continue;
-    const lx = wx - o.x, ly = wy - o.y;
+    const e = E(o), lx = (wx - o.x) / e, ly = (wy - o.y) / e;
     for (const h of TYPES[o.type].hits(o)) {
       let ok = false;
       if (h.r) ok = lx >= h.r[0] && lx <= h.r[2] && ly >= h.r[1] && ly <= h.r[3];
@@ -1110,7 +1159,7 @@ function dropObj(o) {
     if (isAnc(o, p)) continue;
     for (const s of socketsOf(p)) {
       if (!s.acc.includes(o.type) || childAt(p, s.name)) continue;
-      const dy = s.dy ?? (TYPES[o.type].mountDy || 0), lim = s.name === 'rod' ? 140 : 50, d = Math.hypot(o.x - s.x, (o.y - dy) - s.y);
+      const dy = s.dy ?? (TYPES[o.type].mountDy || 0) * E(o), lim = s.name === 'rod' ? 140 : 50, d = Math.hypot(o.x - s.x, (o.y - dy) - s.y);
       if (s.name === 'rod') { const m = mouthOf(p); if (!(o.x > m.x0 - 8 && o.x < m.x1 + 8 && o.y > m.y - 20 && o.y < p.y)) continue; }
       if (d < Math.min(bd, lim)) { bd = d; best = { p, s }; }
     }
@@ -1137,10 +1186,10 @@ cv.addEventListener('pointerdown', e => {
     if (h.part === 'arm') { drag = { mode: 'arm', o: h.o }; cv.className = 'ns'; return; }
     let o = h.o; if (o.fixed) o = root(o);
     if (o.parent) { if (o.parent.type === 'centrifuge' && o.parent.run) return; o.parent = null; o.sock = null; }
-    bringFront(o); if (isC(o)) sel = o;
-    drag = { mode: 'obj', o, dx: w.x - o.x, dy: w.y - o.y, moved: false }; held = o; o.vy = 0; cv.className = 'grab';
+    bringFront(o); sel = o;
+    drag = { mode: 'obj', o, dx: w.x - o.x, dy: w.y - o.y, moved: false }; held = o; poured = 0; o.vy = 0; cv.className = 'grab';
     $('trash').classList.add('show');
-  } else drag = { mode: 'pan', sx: e.clientX, sy: e.clientY, cx: cam.x, cy: cam.y };
+  } else { drag = { mode: 'pan', sx: e.clientX, sy: e.clientY, cx: cam.x, cy: cam.y }; sel = null; }
 });
 cv.addEventListener('pointermove', e => {
   if (pointers.has(e.pointerId)) pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -1151,6 +1200,11 @@ cv.addEventListener('pointermove', e => {
     if (drag.mode === 'pan') { cam.x = drag.cx - (e.clientX - drag.sx) / cam.z; cam.y = drag.cy - (e.clientY - drag.sy) / cam.z; }
     else if (drag.mode === 'obj') {
       drag.o.x = w.x - drag.dx; drag.o.y = Math.min(0, w.y - drag.dy);
+      if (isC(drag.o) && !drag.o.fixed) { // sacudir de lado a lado = agitar
+        const now = performance.now(), vx = e.clientX - (drag.lx ?? e.clientX); drag.lx = e.clientX; drag.rev = (drag.rev || []).filter(t => now - t < 700);
+        if (Math.abs(vx) > 5) { const sg = Math.sign(vx); if (drag.sg && sg !== drag.sg) drag.rev.push(now); drag.sg = sg; }
+        if (drag.rev.length >= 3) { stir(drag.o); drag.o.shakeT = now; if (drag.o.type === 'sep') flags.sepShake = true; if (!drag.shook) { drag.shook = true; toast('Agitando ' + (drag.o.name || TYPES[drag.o.type].lab).toLowerCase() + '…'); } }
+      }
       markZone(removeZone(e.clientX, e.clientY));
       if (drag.o.type === 'varilla') { const c = containerUnder(drag.o.x, drag.o.y, drag.o); if (c && surfaceY(c) < drag.o.y) stir(c); }
     }
@@ -1188,17 +1242,24 @@ cv.addEventListener('dblclick', e => {
   if (h && isC(h.o) && !h.o.fixed) { stir(h.o); if (h.o.type === 'sep') flags.sepShake = true; toast(`Agitaste: ${h.o.name || TYPES[h.o.type].lab}`); }
 });
 function zoomAt(sx, sy, f) { const w0 = S2W(sx, sy); cam.z = clamp(cam.z * f, 0.2, 4); const w1 = S2W(sx, sy); cam.x += w0.x - w1.x; cam.y += w0.y - w1.y; $('z-lvl').textContent = Math.round(cam.z * 100) + '%'; }
-cv.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.0015)); }, { passive: false });
+cv.addEventListener('wheel', e => {
+  e.preventDefault();
+  if (e.altKey) { const w = S2W(e.clientX, e.clientY), h = hitTest(w.x, w.y); if (h) { let o = h.o; if (o.fixed) o = root(o); objZoom(o, Math.exp(-e.deltaY * 0.0015)); sel = o; return; } }
+  zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.0015));
+}, { passive: false });
+function objZoom(o, f) { o.sc = clamp((o.sc || 1) * f, 0.4, 4); if (Math.abs(o.sc - 1) < 0.03) o.sc = 1; layoutAll(); }
 addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
   if (e.key === ' ') { spaceDown = true; e.preventDefault(); }
-  if ((e.key === 'Delete' || e.key === 'Backspace') && sel && !sel.fixed) { removeObj(sel); toast('Material retirado del escenario.'); }
+  if ((e.key === 'Delete' || e.key === 'Backspace') && sel && !sel.fixed) { removeObj(sel); sel = null; toast('Material retirado del escenario.'); }
   if (e.key === 'h' || e.key === 'H') document.body.classList.toggle('nopanels');
   if (e.key === '+' || e.key === '=') zoomAt(W / 2, H / 2, 1.2);
   if (e.key === '-') zoomAt(W / 2, H / 2, 1 / 1.2);
   if (e.key === '0') fit();
 });
-addEventListener('keyup', e => { if (e.key === ' ') spaceDown = false; });
+addEventListener('keyup', e => { if (e.key === ' ') spaceDown = false; if (e.key === 'Shift') shiftDown = false; });
+addEventListener('keydown', e => { if (e.key === 'Shift') shiftDown = true; });
+let shiftDown = false, poured = 0, pouredT = 0;
 function showTip(h, x, y) {
   const tip = $('tip');
   if (!h) { tip.style.display = 'none'; return; }
@@ -1406,7 +1467,7 @@ function labRender() {
   misRender(); labUpdate();
 }
 function act(a) {
-  const pickC = () => sel && objs.includes(sel) ? sel : objs.find(o => isC(o) && (g0(o, 'sand') > 0 || g0(o, 'clay') > 0 || g0(o, 'oil') > 0));
+  const pickC = () => selC() || objs.find(o => isC(o) && (g0(o, 'sand') > 0 || g0(o, 'clay') > 0 || g0(o, 'oil') > 0));
   if (a === 'stir') { const c = pickC(); if (c) { stir(c); toast(`Agitaste: ${c.name || TYPES[c.type].lab}`); } }
   if (a === 'tap') { const s = objs.find(o => o.type === 'sep'); if (s) s.open = !s.open; }
   if (a === 'shake') { const s = objs.find(o => o.type === 'sep'); if (s) { stir(s); flags.sepShake = true; toast('Embudo agitado: se forma una emulsión que luego se separa.'); } }
@@ -1440,7 +1501,7 @@ function ro(items) { const el = $('ro'); if (el) el.innerHTML = items.map(([k, v
 function labUpdate() {
   if (document.body.classList.contains('nopanels') || $('p-lab').classList.contains('min') || !$('ro')) return;
   if (tech === 1 || tech === 2) {
-    const c = sel && objs.includes(sel) ? sel : objs.find(o => isC(o) && g0(o, 'sand') > 0);
+    const c = selC() || objs.find(o => isC(o) && g0(o, 'sand') > 0);
     if (c) { const s = g0(c, 'sand') + g0(c, 'clay'), su = (c.sus.sand || 0) + (c.sus.clay || 0); ro([['Recipiente', c.name || TYPES[c.type].lab], ['Líquido', f1(liqV(c)) + ' mL'], ['Sólido', s.toFixed(1) + ' g'], ['Sedimentado', s > 0 ? Math.round((1 - su / s) * 100) + ' %' : '—']]); }
     const f = objs.find(o => o.type === 'funnel'); if (tech === 1 && f) $('ro').innerHTML += `<dt>Residuo en el papel</dt><dd>${(g0(f, 'sand') + g0(f, 'clay')).toFixed(1)} g</dd>`;
   }
@@ -1451,13 +1512,13 @@ function labUpdate() {
       const b = d.balon, hasCol = !!childAt(d, 'col'), tot = objs.filter(o => o.fromCond).reduce((a, o) => a + aqV(o), 0);
       $('v-heat').textContent = Math.round(d.heat * 100) + ' %';
       const items = [['Fuente de calor', d.src === 'manta' ? 'manta calefactora' : 'mechero Bunsen'], ['Temperatura del balón', b.T.toFixed(1) + ' °C' + (b.boil ? ' 🔥' : '')], ['Termómetro (vapor)', d.headT.toFixed(1) + ' °C'], ['Líquido en el balón', f1(liqV(b)) + ' mL'], ['Destilado recogido', f1(tot) + ' mL'], ['Refrigerante', d.cool ? 'con agua fría' : 'sin agua'], ['Columna', hasCol ? 'colocada' : 'sin columna']];
-      const last = receiverAt(d.x + 272, d.y - 150, d); if (last && aqV(last) > 0.1 && (tech === 5 || g0(last, 'ethanol') > 0)) items.push([`Alcohol en ${last.name || 'el matraz'}`, Math.round(g0(last, 'ethanol') / aqV(last) * 100) + ' %']);
+      const last = receiverAt(d.x + 272 * E(d), d.y - 150 * E(d), d); if (last && aqV(last) > 0.1 && (tech === 5 || g0(last, 'ethanol') > 0)) items.push([`Alcohol en ${last.name || 'el matraz'}`, Math.round(g0(last, 'ethanol') / aqV(last) * 100) + ' %']);
       ro(items);
     }
   }
   if (tech === 6) {
     const tp = objs.find(o => o.type === 'tripod'); if (tp && $('b-burn')) { $('v-flame').textContent = Math.round(tp.P * 100) + ' %'; $('b-burn').textContent = tp.on ? '⏻ Apagar mechero' : '🔥 Encender mechero'; $('b-burn').className = 'btn ' + (tp.on ? 'red' : 'pri'); }
-    const c = (sel && objs.includes(sel) && g0(sel, 'cuso4') + g0(sel, 'salt') > 0) ? sel : objs.find(o => o.type === 'dish' && (g0(o, 'cuso4') > 0 || g0(o, 'salt') > 0)) || objs.find(o => isC(o) && g0(o, 'cuso4') > 0);
+    const c = (selC() && g0(sel, 'cuso4') + g0(sel, 'salt') > 0) ? sel : objs.find(o => o.type === 'dish' && (g0(o, 'cuso4') > 0 || g0(o, 'salt') > 0)) || objs.find(o => isC(o) && g0(o, 'cuso4') > 0);
     if (c) {
       const s = g0(c, 'cuso4') > 0 ? 'cuso4' : 'salt', k = c.cry.filter(x => x.s === s), w = g0(c, 'water');
       ro([['Recipiente', c.name || TYPES[c.type].lab], ['Temperatura', c.T.toFixed(0) + ' °C'], ['Agua', f1(w) + ' mL'], ['Concentración', w > 0.5 ? (dissolved(c, s) / w * 100).toFixed(1) + ' g/100 mL' : '—'], ['Solubilidad a esta T', SOL[s].S(c.T).toFixed(1) + ' g/100 mL'], ['Cristales', k.length ? `${k.length} · media ${(k.reduce((a, x) => a + x.mass, 0) / k.length).toFixed(2)} g` : '—']]);
@@ -1504,7 +1565,7 @@ const MATS = [
   ['Mezclas preparadas', [['beaker', 'Arena + agua', { water: 120, sand: 12 }, 1], ['beaker', 'Sal + agua', { water: 100, salt: 8 }], ['beaker', 'Aceite + agua', { water: 90, oil: 60 }], ['beaker', 'Alcohol + agua', { water: 80, ethanol: 80 }], ['beaker', 'Sulfato de cobre', { water: 60, cuso4: 12 }], ['beaker', 'Agua turbia', { water: 150, clay: 6 }, 1], ['beaker', 'Arena + sal + agua', { water: 120, sand: 10, salt: 8 }, 1], ['beaker', 'Agua con colorante', { water: 120, dyeB: 1 }], ['bottleA', 'Alcohol', { ethanol: 450 }]]],
 ];
 function iconObj(type, comp, stirred) {
-  const o = { id: 900000 + Math.floor(Math.random() * 1e5), type, x: 0, y: 0, parent: null, tilt: 0, tdir: 1, ...newC(), armY: -235, P: 0.6, on: true, heat: 0, cool: true, headT: 20, front: 0, buf: {}, src: 'manta', ink: 'negra', wet: false, bled: false, e: 0, rpm: 3000, time: 20, run: false, tLeft: 0, open: false, tare: 0, spin: 0, read: 20, label: '', formula: '' };
+  const o = { icon: true, id: 900000 + Math.floor(Math.random() * 1e5), type, x: 0, y: 0, parent: null, tilt: 0, tdir: 1, ...newC(), armY: -235, P: 0.6, on: true, heat: 0, cool: true, headT: 20, front: 0, buf: {}, src: 'manta', ink: 'negra', wet: false, bled: false, e: 0, rpm: 3000, time: 20, run: false, tLeft: 0, open: false, tare: 0, spin: 0, read: 20, label: '', formula: '' };
   if (comp) fill(o, comp, stirred);
   if (type === 'bottleW' && !comp) fill(o, { water: 450 });
   if (type === 'paper') o.front = 120, o.e = 0, o.wet = true;
@@ -1562,11 +1623,15 @@ function matRender() {
     }
   }
 }
+let QTY = 10;
 function addReagent(r, c) {
-  if (r.k === 'water' || r.k === 'ethanol' || r.k === 'oil') { const room = Math.max(0, GEO[c.type].cap - totV(c)); if (room < 0.5) { toast('El recipiente está lleno.', 'bad'); return; } }
-  c.m[r.k] = (c.m[r.k] || 0) + r.a; if (SOLIDS[r.k] && liqV(c) > 0.5) c.sus[r.k] = (c.sus[r.k] || 0) + r.a * 0.6;
-  toast(`+${r.a} ${r.u} de ${r.n.toLowerCase()} → ${c.name || TYPES[c.type].lab}`);
+  let a = QTY;
+  if (r.u === 'mL') { const room = Math.max(0, GEO[c.type].cap - totV(c)); if (room < 0.05) { toast('El recipiente está lleno.', 'bad'); return; } if (a > room) { a = room; toast(`Solo cabían ${fq(a)} mL.`); } }
+  c.m[r.k] = (c.m[r.k] || 0) + a; if (SOLIDS[r.k] && liqV(c) > 0.5) c.sus[r.k] = (c.sus[r.k] || 0) + a * 0.6;
+  toast(`+${fq(a)} ${r.u} de ${r.n.toLowerCase()} → ${c.tag || c.name || TYPES[c.type].lab}`);
 }
+function qtyRender() { const i = $('qin'); if (i && document.activeElement !== i) i.value = QTY; document.querySelectorAll('#rlist em').forEach((e, k) => e.textContent = `${fq(QTY)} ${REAG[k].u}`); document.querySelectorAll('.qchips button').forEach(b => b.classList.toggle('on', +b.dataset.q === QTY)); }
+function setQty(v) { QTY = Math.round(clamp(v, 0.1, 250) * 10) / 10; qtyRender(); }
 function reagentContainer(r, x) {
   const liquid = !r.s && !DYES[r.k];
   const o = spawn(liquid ? 'botella' : 'jar', x, null, r.n, false, { label: r.n.toUpperCase(), formula: r.f });
@@ -1575,7 +1640,15 @@ function reagentContainer(r, x) {
 }
 function reaRender() {
   const root = $('rea');
-  root.innerHTML = '<div class="hint">Clic: se añade al recipiente seleccionado (o aparece un frasco). Arrastra sobre un recipiente para añadirlo dentro.</div><div class="rlist" id="rlist"></div>';
+  root.innerHTML = `<div class="sec">Cantidad a añadir</div>
+    <div class="qty"><button id="qm">−</button><input type="number" id="qin" min="0.1" max="250" step="0.1"><button id="qp">+</button><span>mL o g</span></div>
+    <div class="qchips">${[0.1, 0.5, 1, 2, 5, 10, 25, 50, 100].map(q => `<button data-q="${q}">${q}</button>`).join('')}</div>
+    <div class="hint" style="margin-bottom:6px">Clic: se añade al recipiente seleccionado (o aparece un frasco). Arrastra sobre un recipiente para añadirlo dentro.</div><div class="rlist" id="rlist"></div>`;
+  const step = d => { const v = QTY, st = v < 1 ? 0.1 : v < 10 ? 0.5 : v < 50 ? 1 : 5; setQty(v + d * st); };
+  $('qm').onclick = () => step(-1); $('qp').onclick = () => step(1);
+  $('qin').oninput = e => { const v = parseFloat(e.target.value); if (v > 0) { QTY = Math.round(clamp(v, 0.1, 250) * 10) / 10; qtyRender(); } };
+  $('qin').onkeydown = e => e.stopPropagation();
+  root.querySelectorAll('.qchips button').forEach(b => b.onclick = () => setQty(+b.dataset.q));
   for (const r of REAG) {
     const el = document.createElement('div'); el.className = 'rg';
     el.innerHTML = `<span class="sw ${r.s ? 's' : ''}" style="background:${r.sw}"></span><div><b>${r.n}</b><small>${r.f}</small></div><em>${r.a} ${r.u}</em>`;
@@ -1609,6 +1682,7 @@ $('z-lvl').onclick = () => zoomAt(W / 2, H / 2, 1 / cam.z);
 $('z-fit').onclick = fit;
 $('b-reset').onclick = () => { setTech(tech); toast('Experimento reiniciado.'); };
 $('b-lab').onclick = () => { showLabels = !showLabels; $('b-lab').classList.toggle('on', showLabels); };
+$('b-tag').onclick = () => { showTags = !showTags; $('b-tag').classList.toggle('on', showTags); tbRender(); };
 $('b-spd').onclick = () => { SPEED = SPEED === 1 ? 3 : SPEED === 3 ? 6 : 1; $('b-spd').textContent = '×' + SPEED; $('b-spd').classList.toggle('on', SPEED > 1); };
 $('b-pan').onclick = () => document.body.classList.toggle('nopanels');
 $('b-help').onclick = () => $('help').classList.add('on');
@@ -1624,19 +1698,64 @@ $('bgpop').querySelectorAll('button').forEach(b => b.onclick = () => setBG(b.dat
 $('bgc').oninput = e => setBG(e.target.value);
 $('b-bg').onclick = e => { e.stopPropagation(); $('bgpop').classList.toggle('on'); };
 
+/* ============================== barra del elemento seleccionado ============================== */
+let tbFor = null, editing = false;
+function tbRender() {
+  const o = sel, tb = $('seltb'); tbFor = o;
+  if (!o) { tb.style.display = 'none'; return; }
+  const c = isC(o) && !o.fixed;
+  tb.innerHTML = `<button data-a="zout" title="Reducir este elemento">−</button><button class="sz" data-a="z1" title="Tamaño original">${Math.round((o.sc || 1) * 100)}%</button><button data-a="zin" title="Ampliar este elemento">+</button>`
+    + (c ? `<i></i><button data-a="tag" class="${o.tagOn === false || !showTags ? 'off' : ''}" title="Mostrar/ocultar etiqueta">🏷</button><button data-a="name" title="Escribir el nombre de la etiqueta">✎</button><button data-a="stir" title="Agitar">🥄</button>` : '')
+    + `<i></i><button data-a="del" title="Quitar del escenario">✕</button>`;
+  tb.querySelectorAll('button').forEach(b => b.onclick = ev => { ev.stopPropagation(); tbAct(b.dataset.a); });
+}
+function tbAct(a) {
+  const o = sel; if (!o) return;
+  if (a === 'zin') objZoom(o, 1.25);
+  if (a === 'zout') objZoom(o, 1 / 1.25);
+  if (a === 'z1') { o.sc = 1; layoutAll(); }
+  if (a === 'tag') { if (!showTags) { showTags = true; $('b-tag').classList.add('on'); o.tagOn = true; } else o.tagOn = o.tagOn === false; }
+  if (a === 'stir') { stir(o); o.shakeT = performance.now(); if (o.type === 'sep') flags.sepShake = true; toast(`Agitaste: ${(o.name || TYPES[o.type].lab).toLowerCase()}`); }
+  if (a === 'del') { removeObj(o); sel = null; toast('Material retirado del escenario.'); }
+  if (a === 'name') {
+    editing = true; const tb = $('seltb');
+    tb.innerHTML = `<input id="tagin" maxlength="32" placeholder="Nombre de la etiqueta (vacío = automático)" value="${(o.tag || '').replace(/"/g, '&quot;')}"><button data-a="ok">✓</button>`;
+    const inp = $('tagin'); inp.focus(); inp.select();
+    const done = () => { if (!editing) return; editing = false; o.tag = inp.value.trim() || null; o.tagOn = true; showTags = true; $('b-tag').classList.add('on'); tbRender(); };
+    inp.onkeydown = ev => { ev.stopPropagation(); if (ev.key === 'Enter') done(); if (ev.key === 'Escape') { editing = false; tbRender(); } };
+    tb.querySelector('button').onclick = ev => { ev.stopPropagation(); done(); };
+    inp.onblur = () => setTimeout(done, 120);
+    return;
+  }
+  tbRender();
+}
+function tbPlace() {
+  const tb = $('seltb');
+  if (sel && !objs.includes(sel)) sel = null;
+  if (sel !== tbFor && !editing) tbRender();
+  // contador de vertido
+  const hud = $('pourhud');
+  if (held && performance.now() - pouredT < 600 && poured > 0.05) { const p = W2S(held.x, held.y + 20 * E(held)); hud.style.display = 'block'; hud.style.left = p.x + 'px'; hud.style.top = (p.y + 8) + 'px'; hud.textContent = `${shiftDown ? 'gota a gota · ' : ''}vertido ${fq(poured)} mL`; }
+  else hud.style.display = 'none';
+  if (!sel || (drag && drag.mode !== 'pan') || document.body.classList.contains('nopanels')) { tb.style.display = 'none'; return; }
+  const b = hitsBox(sel), sx = W2S((b[0] + b[2]) / 2, b[1]);
+  tb.style.display = 'flex'; tb.style.left = clamp(sx.x, 120, W - 120) + 'px'; tb.style.top = clamp(sx.y - 10, 50, H - 10) + 'px';
+  const z = tb.querySelector('.sz'); if (z && !editing) z.textContent = Math.round((sel.sc || 1) * 100) + '%';
+}
+
 /* ============================== bucle ============================== */
 let last = performance.now(), acc = 0, accM = 0;
 function loop(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   const sdt = dt * SPEED, n = Math.ceil(SPEED);
   for (let i = 0; i < n; i++) update(sdt / n);
-  draw();
+  draw(); tbPlace();
   acc += dt; if (acc > 0.25) { acc = 0; labUpdate(); }
   accM += dt; if (accM > 0.4) { accM = 0; checkMissions(); }
   requestAnimationFrame(loop);
 }
 setBG(store.get('hted-bg') || BGS[0]);
-techRender(); matRender(); reaRender(); setTech(1);
+techRender(); matRender(); reaRender(); qtyRender(); setTech(1);
 if (!store.get('hted-sep-help')) { $('help').classList.add('on'); store.set('hted-sep-help', '1'); }
 requestAnimationFrame(loop);
 </script>
