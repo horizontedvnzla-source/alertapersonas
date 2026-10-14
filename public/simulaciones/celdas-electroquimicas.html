@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laboratorio de Celdas Electroquímicas</title>
+<style>
+  :root{
+    --bg:#0a1324; --bg2:#0f1c33; --panel:#13223d; --panel2:#182a4a; --line:#253a5e;
+    --txt:#e6edf8; --muted:#93a4c0; --gold:#f5c542; --blue:#60a5fa; --red:#f87171;
+    --green:#4ade80; --violet:#a78bfa; --orange:#fb923c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:radial-gradient(ellipse at top,#132649 0%,var(--bg) 60%);background-color:var(--bg);color:var(--txt);min-height:100vh;line-height:1.4}
+  header{padding:18px 20px 8px;max-width:1400px;margin:0 auto}
+  header h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.4rem,3vw,2.1rem);letter-spacing:.04em;text-transform:uppercase}
+  header p{color:var(--gold);font-family:Georgia,serif;letter-spacing:.08em;text-transform:uppercase;font-size:.85rem}
+  nav{max-width:1400px;margin:8px auto 0;padding:0 16px;display:flex;gap:6px;flex-wrap:wrap}
+  nav button{background:var(--panel);color:var(--muted);border:1px solid var(--line);padding:9px 14px;border-radius:10px 10px 0 0;font-weight:600;cursor:pointer;font-size:.9rem}
+  nav button.on{background:var(--panel2);color:var(--txt);border-color:var(--gold);border-bottom-color:var(--panel2);box-shadow:inset 0 3px 0 var(--gold)}
+  main{max-width:1400px;margin:0 auto;padding:0 16px 40px}
+  .tab{display:none;background:var(--panel2);border:1px solid var(--line);border-radius:0 14px 14px 14px;padding:14px}
+  .tab.on{display:block}
+  .concept{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;background:#f3efe6;color:#1d2433;border-radius:12px;padding:12px 16px;margin-bottom:12px}
+  .concept .num{width:34px;height:34px;border-radius:50%;background:#c0392b;color:#fff;font-weight:800;display:grid;place-items:center;font-size:1.1rem}
+  .concept h2{font-size:1.05rem;text-transform:uppercase;letter-spacing:.03em}
+  .concept h2 small{display:block;font-size:.7rem;letter-spacing:.12em;color:#555}
+  .concept p{font-size:.88rem}
+  .concept .used{color:#c0392b;font-weight:700;font-size:.8rem}
+  .concept .eq{font-family:Georgia,serif;font-style:italic;border:2px solid #c0392b;border-radius:8px;padding:6px 12px;text-align:center;font-size:1rem;background:#fff9f2;white-space:nowrap}
+  .concept .eq small{display:block;font-size:.75rem;color:#444}
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:14px}
+  .grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-top:14px}
+  @media (max-width:1020px){.grid,.grid2{grid-template-columns:1fr}.concept{grid-template-columns:auto 1fr}.concept .eq{grid-column:1/-1}}
+  .stage{display:flex;flex-direction:column;gap:10px;min-width:0}
+  canvas.sim{width:100%;height:auto;display:block;border-radius:12px;background:#0b1730;border:1px solid var(--line)}
+  canvas.chart{width:100%;height:auto;display:block;border-radius:10px;background:#0b1730;border:1px solid var(--line)}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .box h3{font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:8px}
+  aside{display:flex;flex-direction:column;gap:10px}
+  .ctl{display:block;margin:8px 0}
+  .ctl>span{display:flex;justify-content:space-between;font-size:.84rem;color:var(--muted);margin-bottom:3px}
+  .ctl b{color:var(--txt);font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:var(--gold)}
+  select{width:100%;background:var(--bg2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:6px}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .row>*{flex:1}
+  .seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  .seg label{flex:1;text-align:center;padding:6px 4px;font-size:.82rem;cursor:pointer;color:var(--muted);background:var(--bg2)}
+  .seg input{display:none}
+  .seg label:has(input:checked){background:var(--gold);color:#1b1b1b;font-weight:700}
+  .chk{display:flex;gap:8px;align-items:center;font-size:.86rem;margin:8px 0;cursor:pointer}
+  .chk input{width:18px;height:18px;accent-color:var(--gold)}
+  .btn{background:var(--bg2);color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-weight:600;cursor:pointer;font-size:.85rem}
+  .btn:hover{border-color:var(--gold)}
+  .btn.pri{background:var(--gold);color:#1b1b1b;border-color:var(--gold)}
+  .out{display:grid;grid-template-columns:1fr auto;gap:3px 10px;font-size:.85rem}
+  .out dt{color:var(--muted)}
+  .out dd{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+  .steps{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  @media (max-width:640px){.steps{grid-template-columns:1fr}}
+  .step{background:#1a2744;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-size:.84rem;transition:all .3s;cursor:pointer}
+  .step .n{font-family:Georgia,serif;color:var(--muted);margin-right:6px;font-size:1rem}
+  .step i{display:block;color:var(--red);font-family:Georgia,serif;font-size:.84rem;margin-top:2px}
+  .step.hl{background:#fffdf5;color:#1d2433;border-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}
+  .step.hl i{color:#b4232c}
+  .formula{font-family:Georgia,serif;font-size:1rem;background:#0b1730;border:1px solid var(--line);border-radius:9px;padding:10px;overflow-x:auto;white-space:nowrap}
+  .formula .big{font-size:1.1rem}
+  .note{font-size:.82rem;color:var(--muted);margin-top:6px}
+  .warn{background:#3b1d1d;border:1px solid #7f1d1d;color:#fecaca;border-radius:8px;padding:6px 10px;font-size:.82rem;margin-top:6px;display:none}
+  .warn.on{display:block}
+  .exp{display:flex;flex-direction:column;gap:8px}
+  .exp details{background:#1a2744;border:1px solid var(--line);border-radius:9px;padding:8px 10px}
+  .exp summary{cursor:pointer;font-weight:600;font-size:.88rem}
+  .exp details p{font-size:.84rem;color:var(--muted);margin:6px 0}
+  .exp details p b{color:var(--txt)}
+  table{width:100%;border-collapse:collapse;font-size:.8rem;font-variant-numeric:tabular-nums}
+  th,td{border-bottom:1px solid var(--line);padding:4px 6px;text-align:right}
+  th{color:var(--gold);font-weight:600;position:sticky;top:0;background:var(--panel)}
+  .tablewrap{max-height:260px;overflow:auto;margin-top:8px}
+  .eqdir{font-family:Georgia,serif;text-align:center;font-size:1.05rem;padding:8px;border-radius:9px;background:#0b1730;border:1px solid var(--line)}
+  .eqdir .arr{display:inline-block;padding:0 6px;font-weight:700}
+  .eqdir .on{color:var(--gold)}
+  .eqdir .off{color:#3a4a6a}
+  /* ejercicios */
+  .ex-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .ex-q{font-size:1rem;margin:10px 0 14px;line-height:1.55}
+  .ex-q .data{display:inline-block;background:#0b1730;border:1px solid var(--line);border-radius:6px;padding:0 6px;font-variant-numeric:tabular-nums}
+  .ex-ans{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .ex-ans input{background:var(--bg2);color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:9px 10px;font-size:1rem;width:180px}
+  .mc{display:flex;flex-direction:column;gap:6px;width:100%}
+  .mc button{text-align:left}
+  .fb{margin-top:12px;padding:10px 12px;border-radius:9px;display:none;font-size:.9rem}
+  .fb.ok{display:block;background:#0f2e1d;border:1px solid #166534;color:#bbf7d0}
+  .fb.bad{display:block;background:#3b1d1d;border:1px solid #7f1d1d;color:#fecaca}
+  .sol{margin-top:12px;padding:12px;border-radius:9px;background:#0b1730;border:1px dashed var(--gold);display:none;font-size:.9rem;line-height:1.6}
+  .sol.on{display:block}
+  .score{display:flex;gap:16px;font-size:.9rem;color:var(--muted)}
+  .score b{color:var(--gold);font-size:1.1rem}
+  .tbl-pot td,.tbl-pot th{text-align:center}
+  footer{text-align:center;color:var(--muted);font-size:.75rem;padding:16px;letter-spacing:.12em;text-transform:uppercase}
+  .pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:.75rem;font-weight:700}
+  .pill.neg{background:#14532d;color:#bbf7d0}.pill.pos{background:#7f1d1d;color:#fecaca}
+</style>
+</head>
+<body>
+<header>
+  <h1>Celdas electroquímicas</h1>
+  <p>Laboratorio interactivo · la pila de Daniell átomo por átomo y sus parientes</p>
+</header>
+<nav id="tabs">
+  <button data-tab="galv" class="on">① Pila galvánica</button>
+  <button data-tab="elec">② Celda electrolítica</button>
+  <button data-tab="fuel">③ Celda de combustible</button>
+  <button data-tab="lead">④ Batería de plomo</button>
+  <button data-tab="ejer">✎ Ejercicios</button>
+  <button data-tab="comp">⚖ Comparar</button>
+</nav>
+<main>
+
+<!-- ============ 1. GALVÁNICA ============ -->
+<section class="tab on" id="tab-galv">
+  <div class="concept">
+    <div class="num">1</div>
+    <div><h2>Celda galvánica <small>química → eléctrica · ΔG &lt; 0</small></h2>
+      <p>El metal más activo cede electrones <b>por sí solo</b>. Viajan por el cable hasta el otro metal y el puente salino mantiene ambos vasos neutros.</p>
+      <p class="used">SE USA EN: relojes, linternas, pilas de botón</p></div>
+    <div class="eq" id="g-eqcard">Zn + Cu²⁺ → Zn²⁺ + Cu<small>E° = 0.34 − (−0.76) = 1.10 V</small></div>
+  </div>
+  <div class="grid">
+    <div class="stage">
+      <canvas class="sim" id="cv-galv"></canvas>
+      <div class="steps" id="g-steps"></div>
+      <div class="formula" id="g-nernst"></div>
+      <canvas class="chart" id="ch-galv"></canvas>
+    </div>
+    <aside>
+      <div class="box">
+        <h3>Electrodos</h3>
+        <div class="row">
+          <label class="ctl"><span>Izquierdo</span><select id="g-L"></select></label>
+          <label class="ctl"><span>Derecho</span><select id="g-R"></select></label>
+        </div>
+        <label class="ctl"><span><span id="g-cL-l">[Zn²⁺] izquierda</span><b id="g-cL-v"></b></span><input type="range" id="g-cL" min="0" max="1000"></label>
+        <label class="ctl"><span><span id="g-cR-l">[Cu²⁺] derecha</span><b id="g-cR-v"></b></span><input type="range" id="g-cR" min="0" max="1000"></label>
+        <label class="ctl"><span>Temperatura <b id="g-T-v"></b></span><input type="range" id="g-T" min="0" max="90" step="1"></label>
+        <label class="ctl"><span>Volumen de cada vaso <b id="g-vol-v"></b></span><input type="range" id="g-vol" min="20" max="500" step="10"></label>
+      </div>
+      <div class="box">
+        <h3>Circuito</h3>
+        <div class="seg">
+          <label><input type="radio" name="g-modo" value="volt" checked>Voltímetro (abierto)</label>
+          <label><input type="radio" name="g-modo" value="carga">Bombilla (cerrado)</label>
+        </div>
+        <label class="ctl"><span>Resistencia de la bombilla <b id="g-Rx-v"></b></span><input type="range" id="g-Rx" min="0" max="1000"></label>
+        <label class="chk"><input type="checkbox" id="g-puente" checked> Puente salino (KNO₃) colocado</label>
+        <label class="ctl"><span>Velocidad del tiempo <b id="g-vel-v"></b></span><input type="range" id="g-vel" min="0" max="1000"></label>
+        <div class="row">
+          <button class="btn pri" id="g-run">⏸ Pausa</button>
+          <button class="btn" id="g-reset">↺ Reiniciar</button>
+        </div>
+        <div class="warn" id="g-warn"></div>
+      </div>
+      <div class="box">
+        <h3>Mediciones en vivo</h3>
+        <dl class="out" id="g-out"></dl>
+      </div>
+    </aside>
+  </div>
+  <div class="grid2">
+    <div class="box"><h3>Experimentos guiados</h3><div class="exp" id="g-exp"></div></div>
+    <div class="box"><h3>Cuaderno de datos</h3>
+      <div class="row"><button class="btn" id="g-log">＋ Registrar medición</button><button class="btn" id="g-csv">⬇ CSV</button><button class="btn" id="g-clr">🗑 Borrar</button></div>
+      <div class="tablewrap"><table id="g-tbl"></table></div></div>
+  </div>
+</section>
+
+<!-- ============ 2. ELECTROLÍTICA ============ -->
+<section class="tab" id="tab-elec">
+  <div class="concept">
+    <div class="num">2</div>
+    <div><h2>Celda electrolítica <small>eléctrica → química · ΔG &gt; 0</small></h2>
+      <p>Una fuente de corriente continua <b>fuerza</b> una reacción que nunca ocurriría sola. Los aniones nadan al ánodo (+) y los cationes al cátodo (−).</p>
+      <p class="used">SE USA EN: galvanoplastia (dorado, plateado), refinado de cobre, cloro-álcali</p></div>
+    <div class="eq" id="e-eqcard">Cu²⁺ + 2Cl⁻ → Cu + Cl₂<small>m = Q·M / (n·F)</small></div>
+  </div>
+  <div class="grid">
+    <div class="stage">
+      <canvas class="sim" id="cv-elec"></canvas>
+      <div class="steps" id="e-steps"></div>
+      <div class="formula" id="e-faraday"></div>
+      <canvas class="chart" id="ch-elec"></canvas>
+    </div>
+    <aside>
+      <div class="box">
+        <h3>Electrolito</h3>
+        <label class="ctl"><select id="e-sol"></select></label>
+        <label class="ctl"><span>Concentración <b id="e-c-v"></b></span><input type="range" id="e-c" min="0" max="1000"></label>
+        <label class="ctl"><span>Separación entre electrodos <b id="e-d-v"></b></span><input type="range" id="e-d" min="2" max="10" step="0.5"></label>
+        <label class="ctl"><span>Volumen <b id="e-vol-v"></b></span><input type="range" id="e-vol" min="100" max="1000" step="50"></label>
+      </div>
+      <div class="box">
+        <h3>Fuente de corriente continua</h3>
+        <div class="seg">
+          <label><input type="radio" name="e-modo" value="V" checked>Voltaje fijo</label>
+          <label><input type="radio" name="e-modo" value="I">Corriente fija</label>
+        </div>
+        <label class="ctl" id="e-V-box"><span>Voltaje aplicado <b id="e-V-v"></b></span><input type="range" id="e-V" min="0" max="12" step="0.05"></label>
+        <label class="ctl" id="e-I-box" style="display:none"><span>Corriente <b id="e-I-v"></b></span><input type="range" id="e-I" min="0.05" max="5" step="0.05"></label>
+        <label class="ctl"><span>Velocidad del tiempo <b id="e-vel-v"></b></span><input type="range" id="e-vel" min="0" max="1000"></label>
+        <label class="ctl"><span>Detener automáticamente a t = (s, 0 = sin límite)</span><input type="number" id="e-tstop" min="0" step="1" value="0" style="width:100%;background:var(--bg2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:6px"></label>
+        <div class="row">
+          <button class="btn pri" id="e-run">⏸ Pausa</button>
+          <button class="btn" id="e-reset">↺ Reiniciar</button>
+        </div>
+        <div class="warn" id="e-warn"></div>
+      </div>
+      <div class="box"><h3>Mediciones en vivo</h3><dl class="out" id="e-out"></dl></div>
+    </aside>
+  </div>
+  <div class="grid2">
+    <div class="box"><h3>Experimentos guiados</h3><div class="exp" id="e-exp"></div></div>
+    <div class="box"><h3>Cuaderno de datos</h3>
+      <div class="row"><button class="btn" id="e-log">＋ Registrar medición</button><button class="btn" id="e-csv">⬇ CSV</button><button class="btn" id="e-clr">🗑 Borrar</button></div>
+      <div class="tablewrap"><table id="e-tbl"></table></div></div>
+  </div>
+</section>
+
+<!-- ============ 3. COMBUSTIBLE ============ -->
+<section class="tab" id="tab-fuel">
+  <div class="concept">
+    <div class="num">3</div>
+    <div><h2>Celda de combustible <small>entra combustible · sale agua · ΔG &lt; 0</small></h2>
+      <p>Hidrógeno y oxígeno se alimentan sin parar, así que la celda nunca “se agota”. Sin llama: el único residuo es agua. En la celda alcalina el OH⁻ transporta la carga.</p>
+      <p class="used">SE USA EN: autobuses de H₂, naves espaciales (Apolo, transbordador)</p></div>
+    <div class="eq">2H₂ + O₂ → 2H₂O<small>electrolito KOH · ~60–70 % eficiente</small></div>
+  </div>
+  <div class="grid">
+    <div class="stage">
+      <canvas class="sim" id="cv-fuel"></canvas>
+      <div class="steps" id="f-steps"></div>
+      <canvas class="chart" id="ch-fuel"></canvas>
+    </div>
+    <aside>
+      <div class="box">
+        <h3>Alimentación de gases</h3>
+        <label class="ctl"><span>Caudal de H₂ <b id="f-h2-v"></b></span><input type="range" id="f-h2" min="0" max="120" step="1"></label>
+        <label class="ctl"><span>Caudal de O₂ <b id="f-o2-v"></b></span><input type="range" id="f-o2" min="0" max="60" step="1"></label>
+        <label class="ctl"><span>Presión de los gases <b id="f-P-v"></b></span><input type="range" id="f-P" min="1" max="5" step="0.1"></label>
+        <label class="ctl"><span>Temperatura <b id="f-T-v"></b></span><input type="range" id="f-T" min="20" max="90" step="1"></label>
+      </div>
+      <div class="box">
+        <h3>Carga eléctrica</h3>
+        <label class="ctl"><span>Resistencia de carga <b id="f-R-v"></b></span><input type="range" id="f-R" min="0" max="1000"></label>
+        <label class="ctl"><span>Velocidad del tiempo <b id="f-vel-v"></b></span><input type="range" id="f-vel" min="0" max="1000"></label>
+        <div class="row">
+          <button class="btn pri" id="f-run">⏸ Pausa</button>
+          <button class="btn" id="f-reset">↺ Reiniciar</button>
+          <button class="btn" id="f-sweep">📈 Barrido de R</button>
+        </div>
+        <div class="warn" id="f-warn"></div>
+      </div>
+      <div class="box"><h3>Mediciones en vivo</h3><dl class="out" id="f-out"></dl></div>
+    </aside>
+  </div>
+  <div class="grid2">
+    <div class="box"><h3>Experimentos guiados</h3><div class="exp" id="f-exp"></div></div>
+    <div class="box"><h3>Cuaderno de datos</h3>
+      <div class="row"><button class="btn" id="f-log">＋ Registrar medición</button><button class="btn" id="f-csv">⬇ CSV</button><button class="btn" id="f-clr">🗑 Borrar</button></div>
+      <div class="tablewrap"><table id="f-tbl"></table></div></div>
+  </div>
+</section>
+
+<!-- ============ 4. PLOMO ============ -->
+<section class="tab" id="tab-lead">
+  <div class="concept">
+    <div class="num">4</div>
+    <div><h2>Batería de plomo-ácido <small>ambas, una cada vez</small></h2>
+      <p>Al <b>descargarse</b> es una celda galvánica; al <b>cargarse</b>, una electrolítica. Ambas placas se convierten en PbSO₄ a medida que se agota y el ácido se diluye.</p>
+      <p class="used">SE USA EN: automóviles, inversores domésticos, UPS</p></div>
+    <div class="eq">Pb + PbO₂ + 2H₂SO₄ ⇌ 2PbSO₄ + 2H₂O<small>≈ 2.0 V por celda · 6 celdas = 12 V</small></div>
+  </div>
+  <div class="grid">
+    <div class="stage">
+      <canvas class="sim" id="cv-lead"></canvas>
+      <div class="eqdir" id="p-eqdir"></div>
+      <div class="steps" id="p-steps"></div>
+      <canvas class="chart" id="ch-lead"></canvas>
+    </div>
+    <aside>
+      <div class="box">
+        <h3>Modo</h3>
+        <div class="seg">
+          <label><input type="radio" name="p-modo" value="desc" checked>Descarga</label>
+          <label><input type="radio" name="p-modo" value="rep">Reposo</label>
+          <label><input type="radio" name="p-modo" value="carga">Carga</label>
+        </div>
+        <label class="ctl"><span>Resistencia de la carga <b id="p-R-v"></b></span><input type="range" id="p-R" min="0" max="1000"></label>
+        <label class="ctl"><span>Voltaje del cargador (por celda) <b id="p-Vch-v"></b></span><input type="range" id="p-Vch" min="2.0" max="2.7" step="0.01"></label>
+        <label class="ctl"><span>Corriente máx. del cargador <b id="p-Imax-v"></b></span><input type="range" id="p-Imax" min="0.1" max="5" step="0.1"></label>
+      </div>
+      <div class="box">
+        <h3>Batería</h3>
+        <div class="seg">
+          <label><input type="radio" name="p-cells" value="1" checked>1 celda (2 V)</label>
+          <label><input type="radio" name="p-cells" value="6">6 celdas (12 V)</label>
+        </div>
+        <label class="ctl"><span>Capacidad <b id="p-cap-v"></b></span><input type="range" id="p-cap" min="1" max="60" step="1"></label>
+        <label class="ctl"><span>Estado de carga inicial <b id="p-soc-v"></b></span><input type="range" id="p-soc" min="0" max="100" step="1"></label>
+        <label class="ctl"><span>Velocidad del tiempo <b id="p-vel-v"></b></span><input type="range" id="p-vel" min="0" max="1000"></label>
+        <div class="row">
+          <button class="btn pri" id="p-run">⏸ Pausa</button>
+          <button class="btn" id="p-reset">↺ Reiniciar</button>
+        </div>
+        <div class="warn" id="p-warn"></div>
+      </div>
+      <div class="box"><h3>Mediciones en vivo</h3><dl class="out" id="p-out"></dl></div>
+    </aside>
+  </div>
+  <div class="grid2">
+    <div class="box"><h3>Experimentos guiados</h3><div class="exp" id="p-exp"></div></div>
+    <div class="box"><h3>Cuaderno de datos</h3>
+      <div class="row"><button class="btn" id="p-log">＋ Registrar medición</button><button class="btn" id="p-csv">⬇ CSV</button><button class="btn" id="p-clr">🗑 Borrar</button></div>
+      <div class="tablewrap"><table id="p-tbl"></table></div></div>
+  </div>
+</section>
+
+<!-- ============ EJERCICIOS ============ -->
+<section class="tab" id="tab-ejer">
+  <div class="grid">
+    <div class="ex-card">
+      <div class="row" style="justify-content:space-between">
+        <label class="ctl" style="max-width:340px"><span>Tipo de ejercicio</span><select id="x-tipo"></select></label>
+        <div class="score">Correctas <b id="x-ok">0</b> Intentos <b id="x-tot">0</b> Racha <b id="x-streak">0</b></div>
+      </div>
+      <div class="ex-q" id="x-q"></div>
+      <div class="ex-ans" id="x-ans"></div>
+      <div class="fb" id="x-fb"></div>
+      <div class="sol" id="x-sol"></div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn pri" id="x-new">⟳ Nuevo ejercicio</button>
+        <button class="btn" id="x-show">👁 Ver solución</button>
+        <button class="btn" id="x-sim">🔬 Comprobar en el simulador</button>
+      </div>
+    </div>
+    <aside>
+      <div class="box"><h3>Potenciales estándar de reducción (25 °C)</h3>
+        <table class="tbl-pot" id="x-pot"></table></div>
+      <div class="box"><h3>Fórmulas útiles</h3>
+        <div style="font-family:Georgia,serif;font-size:.9rem;line-height:1.9">
+          E°<sub>celda</sub> = E°<sub>cátodo</sub> − E°<sub>ánodo</sub><br>
+          E = E° − (0.0592/n)·log Q &nbsp;(25 °C)<br>
+          ΔG° = −n·F·E°<br>
+          log K = n·E° / 0.0592<br>
+          Q = I·t &nbsp;&nbsp; m = Q·M / (n·F)<br>
+          F = 96 485 C/mol · V<sub>m</sub>(25 °C, 1 atm) = 24.47 L/mol
+        </div></div>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ COMPARAR ============ -->
+<section class="tab" id="tab-comp">
+  <div class="box">
+    <h3>Mismos electrones, mismos cables: en una celda se empujan solos, en la otra los empujan</h3>
+    <div class="tablewrap" style="max-height:none">
+    <table>
+      <tr><th style="text-align:left">Celda</th><th>Conversión</th><th>ΔG</th><th>Ánodo (oxidación)</th><th>Cátodo (reducción)</th><th>Signo del ánodo</th><th style="text-align:left">Uso</th></tr>
+      <tr><td style="text-align:left">① Galvánica (Daniell)</td><td>química → eléctrica</td><td><span class="pill neg">&lt; 0</span></td><td>Zn → Zn²⁺ + 2e⁻</td><td>Cu²⁺ + 2e⁻ → Cu</td><td>−</td><td style="text-align:left">relojes, linternas</td></tr>
+      <tr><td style="text-align:left">② Electrolítica</td><td>eléctrica → química</td><td><span class="pill pos">&gt; 0</span></td><td>2Cl⁻ → Cl₂ + 2e⁻</td><td>Cu²⁺ + 2e⁻ → Cu</td><td>+</td><td style="text-align:left">galvanoplastia, Cu puro</td></tr>
+      <tr><td style="text-align:left">③ Combustible</td><td>química → eléctrica</td><td><span class="pill neg">&lt; 0</span></td><td>H₂ + 2OH⁻ → 2H₂O + 2e⁻</td><td>O₂ + 2H₂O + 4e⁻ → 4OH⁻</td><td>−</td><td style="text-align:left">buses de H₂, naves</td></tr>
+      <tr><td style="text-align:left">④ Plomo (descarga)</td><td>química → eléctrica</td><td><span class="pill neg">&lt; 0</span></td><td>Pb + SO₄²⁻ → PbSO₄ + 2e⁻</td><td>PbO₂ + 4H⁺ + SO₄²⁻ + 2e⁻ → PbSO₄ + 2H₂O</td><td>−</td><td style="text-align:left">autos</td></tr>
+      <tr><td style="text-align:left">④ Plomo (carga)</td><td>eléctrica → química</td><td><span class="pill pos">&gt; 0</span></td><td>PbSO₄ + 2H₂O → PbO₂ + … + 2e⁻</td><td>PbSO₄ + 2e⁻ → Pb + SO₄²⁻</td><td>+</td><td style="text-align:left">inversores, UPS</td></tr>
+    </table></div>
+    <p class="note" style="margin-top:12px">Regla de oro: <b>el ánodo siempre oxida y el cátodo siempre reduce</b> (“ánodo–oxidación”, ambas empiezan por vocal; “cátodo–reducción”, ambas por consonante). Lo que cambia es el signo: en la galvánica el ánodo es (−) porque fabrica electrones; en la electrolítica es (+) porque la fuente se los arranca.</p>
+  </div>
+</section>
+</main>
+<footer>Laboratorio virtual de electroquímica · modelo didáctico (valores aproximados)</footer>
+
+<script>
+"use strict";
+/* ===================== utilidades ===================== */
+const F = 96485, Rg = 8.314, VM = 24.47; // C/mol, J/(mol·K), L/mol a 25 °C
+const $ = id => document.getElementById(id);
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const ease = t => t < 0 ? 0 : t > 1 ? 1 : t * t * (3 - 2 * t);
+const gcd = (a, b) => b ? gcd(b, a % b) : a;
+const lcm = (a, b) => a * b / gcd(a, b);
+const logMap = (v, a, b) => a * Math.pow(b / a, v / 1000);
+const logInv = (x, a, b) => 1000 * Math.log(x / a) / Math.log(b / a);
+function fmt(x, d = 2) { if (!isFinite(x)) return '—'; return x.toFixed(d); }
+function fmtSig(x, s = 3) { if (!isFinite(x)) return '—'; if (x === 0) return '0'; const a = Math.abs(x); if (a >= 1e5 || a < 1e-3) return x.toExponential(s - 1).replace('e', '×10^'); return Number(x.toPrecision(s)).toString(); }
+function fmtT(s) {
+  if (s < 60) return s.toFixed(1) + ' s';
+  if (s < 3600) return Math.floor(s / 60) + ' min ' + Math.floor(s % 60) + ' s';
+  if (s < 86400 * 2) return Math.floor(s / 3600) + ' h ' + Math.floor((s % 3600) / 60) + ' min';
+  return (s / 86400).toFixed(1) + ' días';
+}
+function fmtI(I) { return Math.abs(I) < 1 ? (I * 1000).toFixed(1) + ' mA' : I.toFixed(3) + ' A'; }
+function fmtC(c) { return c >= 0.1 ? c.toFixed(2) + ' M' : c >= 0.001 ? c.toFixed(4) + ' M' : c.toExponential(1) + ' M'; }
+function fmtVel(v) { return v < 10 ? v.toFixed(1) + '×' : Math.round(v).toLocaleString('es') + '×'; }
+
+function setupCanvas(cv, W, H) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  cv.width = W * dpr; cv.height = H * dpr;
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.W = W; ctx.H = H;
+  return ctx;
+}
+function rr(ctx, x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+function txt(ctx, s, x, y, o = {}) {
+  ctx.save();
+  ctx.font = `${o.weight || 600} ${o.size || 13}px ${o.font || 'system-ui,sans-serif'}`;
+  ctx.fillStyle = o.color || '#e6edf8'; ctx.textAlign = o.align || 'center'; ctx.textBaseline = o.base || 'middle';
+  if (o.rot) { ctx.translate(x, y); ctx.rotate(o.rot); ctx.fillText(s, 0, 0); } else ctx.fillText(s, x, y);
+  ctx.restore();
+}
+function chip(ctx, s, x, y, bg = '#f5c542', fg = '#111', size = 11) {
+  ctx.save(); ctx.font = `800 ${size}px system-ui,sans-serif`;
+  const w = ctx.measureText(s).width + 14;
+  rr(ctx, x - w / 2, y - size * 0.9, w, size * 1.8, 5); ctx.fillStyle = bg; ctx.fill();
+  ctx.fillStyle = fg; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(s, x, y + 0.5);
+  ctx.restore();
+}
+function makePath(pts) {
+  const segs = []; let L = 0;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const a = pts[i], b = pts[i + 1], len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    segs.push({ a, b, len, s0: L }); L += len;
+  }
+  return {
+    pts, L,
+    at(s) {
+      s = ((s % L) + L) % L;
+      for (const g of segs) if (s <= g.s0 + g.len) { const t = (s - g.s0) / g.len; return [lerp(g.a[0], g.b[0], t), lerp(g.a[1], g.b[1], t)]; }
+      return pts[pts.length - 1];
+    }
+  };
+}
+function strokePath(ctx, pts, color, w) {
+  ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
+  for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+  ctx.strokeStyle = color; ctx.lineWidth = w; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.stroke();
+}
+function electron(ctx, x, y, a = 1, r = 5) {
+  ctx.save(); ctx.globalAlpha = a;
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r * 2.4);
+  g.addColorStop(0, 'rgba(120,190,255,0.9)'); g.addColorStop(1, 'rgba(60,140,255,0)');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r * 2.4, 0, 7); ctx.fill();
+  ctx.fillStyle = '#3b82f6'; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.font = `800 ${r * 1.5}px system-ui`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('−', x, y);
+  ctx.restore();
+}
+// electrones a lo largo de un camino; offset avanza con la corriente
+function drawElectrons(ctx, path, offset, gap, skip) {
+  const n = Math.floor(path.L / gap);
+  for (let i = 0; i < n; i++) {
+    const p = path.at(offset + i * gap);
+    if (skip && skip(p)) continue;
+    electron(ctx, p[0], p[1], 1, 4.5);
+  }
+}
+function ball(ctx, x, y, r, color, label, a = 1, labelColor = '#fff') {
+  ctx.save(); ctx.globalAlpha = a;
+  const g = ctx.createRadialGradient(x - r * 0.35, y - r * 0.4, r * 0.1, x, y, r);
+  g.addColorStop(0, '#ffffff'); g.addColorStop(0.25, color); g.addColorStop(1, shade(color, -0.45));
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+  if (label) { ctx.fillStyle = labelColor; ctx.font = `800 ${Math.max(8, r * 0.85)}px system-ui`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(label, x, y + 0.5); }
+  ctx.restore();
+}
+function shade(hex, k) {
+  let c = hex.replace('#', ''); if (c.length === 3) c = c.split('').map(x => x + x).join('');
+  let r = parseInt(c.slice(0, 2), 16), g = parseInt(c.slice(2, 4), 16), b = parseInt(c.slice(4, 6), 16);
+  const f = k < 0 ? 0 : 255, t = Math.abs(k);
+  r = Math.round(lerp(r, f, t)); g = Math.round(lerp(g, f, t)); b = Math.round(lerp(b, f, t));
+  return `rgb(${r},${g},${b})`;
+}
+function water(ctx, x, y, s = 1, a = 1, rot = 0) {
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y); ctx.rotate(rot);
+  ball(ctx, -7 * s, -6 * s, 4.2 * s, '#f1f5f9'); ball(ctx, 7 * s, -6 * s, 4.2 * s, '#f1f5f9');
+  ball(ctx, 0, 0, 7 * s, '#e0313b');
+  ctx.restore();
+}
+function bulb(ctx, x, y, power) {
+  const glow = clamp(Math.sqrt(power) * 2.2, 0, 1);
+  if (glow > 0.02) {
+    const g = ctx.createRadialGradient(x, y, 2, x, y, 30 + 60 * glow);
+    g.addColorStop(0, `rgba(255,236,150,${0.9 * glow})`); g.addColorStop(1, 'rgba(255,200,60,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 30 + 60 * glow, 0, 7); ctx.fill();
+  }
+  ctx.fillStyle = glow > 0.02 ? `rgb(255,${200 + 40 * glow},${90 + 100 * glow})` : '#3a4560';
+  ctx.beginPath(); ctx.arc(x, y - 4, 15, 0, 7); ctx.fill();
+  ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = '#94a3b8'; ctx.fillRect(x - 8, y + 9, 16, 9);
+  ctx.strokeStyle = glow > 0.02 ? '#fff7d6' : '#64748b'; ctx.lineWidth = 1.4;
+  ctx.beginPath(); ctx.moveTo(x - 5, y + 8); ctx.lineTo(x - 3, y - 6); ctx.lineTo(x, y - 2); ctx.lineTo(x + 3, y - 6); ctx.lineTo(x + 5, y + 8); ctx.stroke();
+}
+function meter(ctx, x, y, w, h, value, title) {
+  rr(ctx, x, y, w, h, 8); ctx.fillStyle = '#1f2937'; ctx.fill(); ctx.strokeStyle = '#64748b'; ctx.lineWidth = 2; ctx.stroke();
+  rr(ctx, x + 10, y + 7, w - 20, h - 26, 5); ctx.fillStyle = '#0f2a12'; ctx.fill();
+  txt(ctx, value, x + w / 2, y + 7 + (h - 26) / 2, { size: 22, color: '#a3ff8f', font: 'ui-monospace,Consolas,monospace', weight: 700 });
+  txt(ctx, title, x + w / 2, y + h - 9, { size: 8, color: '#94a3b8', weight: 700 });
+}
+function beaker(ctx, x, y, w, h, liq, fill) {
+  // líquido
+  ctx.save(); rr(ctx, x + 3, liq, w - 6, y + h - liq - 3, 10); ctx.fillStyle = fill; ctx.fill(); ctx.restore();
+  // brillo superficie
+  ctx.fillStyle = 'rgba(255,255,255,0.18)'; ctx.fillRect(x + 4, liq, w - 8, 3);
+}
+function beakerGlass(ctx, x, y, w, h) {
+  ctx.save();
+  ctx.strokeStyle = 'rgba(220,235,255,0.75)'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(x - 6, y); ctx.lineTo(x, y + 4); ctx.lineTo(x, y + h - 12); ctx.quadraticCurveTo(x, y + h, x + 12, y + h);
+  ctx.lineTo(x + w - 12, y + h); ctx.quadraticCurveTo(x + w, y + h, x + w, y + h - 12); ctx.lineTo(x + w, y + 4); ctx.lineTo(x + w + 6, y); ctx.stroke();
+  const g = ctx.createLinearGradient(x, 0, x + w, 0);
+  g.addColorStop(0, 'rgba(255,255,255,0.10)'); g.addColorStop(0.15, 'rgba(255,255,255,0.0)'); g.addColorStop(0.85, 'rgba(255,255,255,0.0)'); g.addColorStop(1, 'rgba(255,255,255,0.08)');
+  ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+  ctx.restore();
+}
+function bg(ctx) {
+  const g = ctx.createLinearGradient(0, 0, 0, ctx.H);
+  g.addColorStop(0, '#0d1c38'); g.addColorStop(1, '#0a1428');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, ctx.W, ctx.H);
+}
+/* gráfica genérica */
+function chart(ctx, o) {
+  const W = ctx.W, H = ctx.H, m = { l: 52, r: o.y2 ? 52 : 14, t: 24, b: 34 };
+  ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#0b1730'; ctx.fillRect(0, 0, W, H);
+  const pw = W - m.l - m.r, ph = H - m.t - m.b;
+  const X = x => m.l + (x - o.xmin) / ((o.xmax - o.xmin) || 1) * pw;
+  const Y = (y, ax) => { const a = ax === 2 ? o.y2 : o; return m.t + ph - (y - a.ymin) / ((a.ymax - a.ymin) || 1) * ph; };
+  ctx.strokeStyle = '#1e3358'; ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) { const y = m.t + ph * i / 4; ctx.beginPath(); ctx.moveTo(m.l, y); ctx.lineTo(m.l + pw, y); ctx.stroke(); }
+  for (let i = 0; i <= 5; i++) { const x = m.l + pw * i / 5; ctx.beginPath(); ctx.moveTo(x, m.t); ctx.lineTo(x, m.t + ph); ctx.stroke(); }
+  for (let i = 0; i <= 4; i++) {
+    const v = o.ymin + (o.ymax - o.ymin) * (4 - i) / 4;
+    txt(ctx, fmtSig(v, 3), m.l - 6, m.t + ph * i / 4, { size: 10, align: 'right', color: o.series[0].color, weight: 500 });
+    if (o.y2) { const v2 = o.y2.ymin + (o.y2.ymax - o.y2.ymin) * (4 - i) / 4; txt(ctx, fmtSig(v2, 3), m.l + pw + 6, m.t + ph * i / 4, { size: 10, align: 'left', color: o.y2.color, weight: 500 }); }
+  }
+  for (let i = 0; i <= 5; i++) { const v = o.xmin + (o.xmax - o.xmin) * i / 5; txt(ctx, o.xfmt ? o.xfmt(v) : fmtSig(v, 3), m.l + pw * i / 5, m.t + ph + 12, { size: 10, color: '#93a4c0', weight: 500 }); }
+  txt(ctx, o.xlab, m.l + pw / 2, H - 7, { size: 11, color: '#93a4c0' });
+  txt(ctx, o.title || '', m.l, 11, { size: 11, align: 'left', color: '#f5c542', weight: 700 });
+  let lx = W - m.r;
+  for (let k = o.series.length - 1; k >= 0; k--) { const s = o.series[k]; ctx.font = '600 11px system-ui'; const w = ctx.measureText(s.label).width; txt(ctx, s.label, lx, 11, { size: 11, align: 'right', color: s.color }); lx -= w + 18; }
+  ctx.save(); ctx.beginPath(); ctx.rect(m.l, m.t, pw, ph); ctx.clip();
+  for (const s of o.series) {
+    if (!s.pts.length) continue;
+    ctx.beginPath();
+    s.pts.forEach((p, i) => { const x = X(p[0]), y = Y(p[1], s.axis); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+    ctx.strokeStyle = s.color; ctx.lineWidth = s.w || 2; ctx.setLineDash(s.dash || []); ctx.stroke(); ctx.setLineDash([]);
+    if (s.dots) for (const p of s.pts) { ctx.fillStyle = s.color; ctx.beginPath(); ctx.arc(X(p[0]), Y(p[1], s.axis), 3.5, 0, 7); ctx.fill(); }
+  }
+  if (o.point) { const p = o.point; ctx.fillStyle = '#f5c542'; ctx.beginPath(); ctx.arc(X(p[0]), Y(p[1]), 6, 0, 7); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke(); }
+  ctx.restore();
+}
+/* cuaderno de datos */
+function makeLog(prefix, cols, getRow) {
+  const rows = [], tbl = $(prefix + '-tbl');
+  const render = () => {
+    tbl.innerHTML = '<tr><th>#</th>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr>' +
+      rows.map((r, i) => `<tr><td>${i + 1}</td>${r.map(v => `<td>${v}</td>`).join('')}</tr>`).join('');
+  };
+  $(prefix + '-log').onclick = () => { rows.push(getRow()); render(); tbl.parentElement.scrollTop = 1e6; };
+  $(prefix + '-clr').onclick = () => { rows.length = 0; render(); };
+  $(prefix + '-csv').onclick = () => {
+    const csv = ['#,' + cols.join(',')].concat(rows.map((r, i) => (i + 1) + ',' + r.join(','))).join('\n');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv' }));
+    a.download = `datos-${prefix}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  };
+  render();
+  return { add: r => { rows.push(r); render(); }, rows };
+}
+function out(id, items) { $(id).innerHTML = items.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join(''); }
+function warn(id, msg) { const w = $(id); w.textContent = msg || ''; w.classList.toggle('on', !!msg); }
+function experiments(id, list) {
+  $(id).innerHTML = list.map((e, i) => `<details><summary>${i + 1}. ${e.t}</summary><p>${e.d}</p><p><b>Pregunta:</b> ${e.q}</p><button class="btn" data-i="${i}">▶ Preparar experimento</button></details>`).join('');
+  $(id).querySelectorAll('button').forEach(b => b.onclick = () => list[+b.dataset.i].set());
+}
+function radioVal(name) { return document.querySelector(`input[name="${name}"]:checked`).value; }
+function setRadio(name, v) { const r = document.querySelector(`input[name="${name}"][value="${v}"]`); if (r) r.checked = true; }
+
+/* ===================== datos ===================== */
+const METALES = {
+  Mg: { nombre: 'Magnesio', E: -2.37, n: 2, M: 24.31, color: '#cfd4dc', ion: 'Mg²⁺', sal: 'MgSO₄', sol: null, ic: '#94a3b8' },
+  Al: { nombre: 'Aluminio', E: -1.66, n: 3, M: 26.98, color: '#d6dbe2', ion: 'Al³⁺', sal: 'Al₂(SO₄)₃', sol: null, ic: '#a5b4c8' },
+  Zn: { nombre: 'Zinc', E: -0.76, n: 2, M: 65.38, color: '#aab6c6', ion: 'Zn²⁺', sal: 'ZnSO₄', sol: [170, 150, 225], ic: '#8b6fe0' },
+  Fe: { nombre: 'Hierro', E: -0.44, n: 2, M: 55.85, color: '#868a93', ion: 'Fe²⁺', sal: 'FeSO₄', sol: [160, 210, 130], ic: '#84cc16' },
+  Ni: { nombre: 'Níquel', E: -0.25, n: 2, M: 58.69, color: '#b5ae9f', ion: 'Ni²⁺', sal: 'NiSO₄', sol: [70, 185, 105], ic: '#22c55e' },
+  Pb: { nombre: 'Plomo', E: -0.13, n: 2, M: 207.2, color: '#6f7885', ion: 'Pb²⁺', sal: 'Pb(NO₃)₂', sol: null, ic: '#64748b' },
+  Cu: { nombre: 'Cobre', E: 0.34, n: 2, M: 63.55, color: '#c8703f', ion: 'Cu²⁺', sal: 'CuSO₄', sol: [45, 125, 235], ic: '#3b82f6' },
+  Ag: { nombre: 'Plata', E: 0.80, n: 1, M: 107.87, color: '#e3e6eb', ion: 'Ag⁺', sal: 'AgNO₃', sol: null, ic: '#cbd5e1' },
+  Au: { nombre: 'Oro', E: 1.50, n: 3, M: 196.97, color: '#e8b923', ion: 'Au³⁺', sal: 'AuCl₃', sol: [235, 200, 80], ic: '#eab308' },
+};
+const eStr = n => n === 1 ? 'e⁻' : n + 'e⁻';
+const signed = v => (v < 0 ? '(' + v.toFixed(2) + ')' : v.toFixed(2));
+
+/* ===================== zoom atómico (compartido) ===================== */
+function zoomAtoms(ctx, cx, cy, r, metal, kind, ph, count, active, tint) {
+  const M = METALES[metal];
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.clip();
+  const g = ctx.createLinearGradient(0, cy - r, 0, cy + r);
+  g.addColorStop(0, '#f4f6fa'); g.addColorStop(1, tint || '#dfe6f0');
+  ctx.fillStyle = g; ctx.fillRect(cx - r, cy - r, 2 * r, 2 * r);
+  const ar = 12.5, dx = 25, topY = cy + r * 0.2;
+  const cols = []; for (let x = cx - r - dx; x <= cx + r + dx; x += dx) cols.push(x);
+  const order = cols.map((x, i) => i).sort((a, b) => Math.abs(cols[a] - cx) - Math.abs(cols[b] - cx)).filter(i => Math.abs(cols[i] - cx) < r * 0.6);
+  // waters flotando
+  const t = performance.now() / 1000;
+  for (let k = 0; k < 4; k++) {
+    const wx = cx - r * 0.7 + ((k * 53 + t * 9 * (k % 2 ? 1 : -1)) % (r * 1.4) + r * 1.4) % (r * 1.4);
+    const wy = cy - r * 0.6 + k * 12 + Math.sin(t + k) * 6;
+    water(ctx, wx, wy, 0.75, 0.75, Math.sin(t * 0.7 + k));
+  }
+  // red cristalina
+  for (let row = 3; row >= 0; row--) {
+    const y = topY + row * 21, off = row % 2 ? dx / 2 : 0;
+    cols.forEach((x, i) => {
+      if (row === 0 && kind === 'ox') { const k = order.indexOf(i); if (k >= 0 && k < count) return; }
+      ball(ctx, x + off, y, ar, M.color);
+    });
+  }
+  // capa nueva (cátodo)
+  const adY = topY - 21;
+  if (kind === 'red') for (let k = 0; k < count && k < order.length; k++) ball(ctx, cols[order[k]] + dx / 2, adY, ar, M.color);
+  // evento
+  if (active) {
+    const lab = M.ion, n = M.n;
+    if (kind === 'ox') {
+      const k = order[count % order.length], sx = cols[k], sy = topY;
+      const p = ph;
+      const jit = p < 0.25 ? Math.sin(t * 60) * 2.5 * (p / 0.25) : 0;
+      const up = ease((p - 0.25) / 0.3), drift = ease((p - 0.8) / 0.2);
+      const ax = sx + jit + drift * 30, ay = sy - up * 48 - drift * 40;
+      // waters convergen
+      const wc = ease((p - 0.45) / 0.35);
+      if (p > 0.45) for (let w = 0; w < 4; w++) {
+        const ang = w * Math.PI / 2 + 0.6;
+        const rad = lerp(70, 27, wc);
+        water(ctx, ax + Math.cos(ang) * rad, ay + Math.sin(ang) * rad, 0.75, 1 - drift, ang + Math.PI / 2);
+      }
+      const col = p < 0.3 ? M.color : M.ic;
+      ball(ctx, ax, ay, ar, col, p > 0.35 ? lab.replace(metal, '') : '', 1 - drift * 0.8);
+      if (p > 0.35) txt(ctx, lab, ax, ay - 24, { size: 12, color: '#3b2a7a', weight: 800 });
+      // electrones al metal
+      if (p > 0.25 && p < 0.75) {
+        const e = ease((p - 0.25) / 0.5);
+        for (let j = 0; j < Math.min(n, 3); j++) electron(ctx, sx - 8 + j * 9, sy + e * 60, 1 - e * 0.6, 4);
+      }
+      if (p > 0.05 && p < 0.35) { ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(sx, sy, ar + 4, 0, 7); ctx.stroke(); }
+    } else {
+      const k = order[count % order.length], sx = cols[k] + dx / 2, sy = adY;
+      const p = ph;
+      const fall = ease(p / 0.4), land = ease((p - 0.7) / 0.3);
+      const ax = lerp(sx - 45, sx, fall), ay = lerp(cy - r + 10, sy - 42, fall) + land * 42;
+      const wo = ease((p - 0.35) / 0.25);
+      if (p < 0.6) for (let w = 0; w < 4; w++) {
+        const ang = w * Math.PI / 2 + 0.6;
+        const rad = lerp(27, 80, wo);
+        water(ctx, ax + Math.cos(ang) * rad, ay + Math.sin(ang) * rad - wo * 20, 0.75, 1 - wo, ang + Math.PI / 2);
+      }
+      if (p > 0.45 && p < 0.8) {
+        const e = ease((p - 0.45) / 0.3);
+        for (let j = 0; j < Math.min(n, 3); j++) electron(ctx, sx - 8 + j * 9, lerp(sy + 60, ay, e), 1, 4);
+      }
+      const col = p < 0.7 ? M.ic : M.color;
+      ball(ctx, ax, ay, ar, col, p < 0.7 ? lab.replace(metal, '') : '');
+      if (p < 0.7) txt(ctx, lab, ax, ay - 24, { size: 12, color: '#1d4ed8', weight: 800 });
+    }
+  }
+  ctx.restore();
+  ctx.lineWidth = 4; ctx.strokeStyle = active ? '#f59e0b' : '#cbd5e1';
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.stroke();
+}
+
+/* ======================================================================
+   1. PILA GALVÁNICA
+   ====================================================================== */
+const G = {
+  L: 'Zn', R: 'Cu', cL: 1, cR: 1, T: 25, vol: 0.1, modo: 'volt', Rx: 10, puente: true, vel: 1000, run: true,
+  t: 0, q: 0, mL: 10, mR: 10, m0: 10, hist: [], histT: 0,
+  ions: { L: [], R: [] }, an: { L: [], R: [] }, eOff: 0, bOff: 0,
+  zoom: { L: { ph: 0, active: false, count: 0 }, R: { ph: 0, active: false, count: 0 } },
+  stepT: 0, step: -1, pin: -1, last: null, msg: ''
+};
+const gGeo = { bx: { L: 110, R: 630 }, bw: 260, by: 200, bh: 205, liq: 232, ex: { L: 175, R: 825 }, eTop: 128, eBot: 380, leg: { L: 315, R: 685 }, zx: { L: 205, R: 795 }, zy: 548, zr: 92 };
+
+function gCalc() {
+  let a = METALES[G.L].E < METALES[G.R].E ? 'L' : METALES[G.L].E > METALES[G.R].E ? 'R' : (G.cL <= G.cR ? 'L' : 'R');
+  const T = G.T + 273.15;
+  const build = a => {
+    const c = a === 'L' ? 'R' : 'L';
+    const A = METALES[G[a]], C = METALES[G[c]];
+    const cA = G['c' + a], cC = G['c' + c];
+    const n = lcm(A.n, C.n), nuA = n / A.n, nuC = n / C.n;
+    const E0 = C.E - A.E;
+    const lnQ = nuA * Math.log(cA) - nuC * Math.log(cC);
+    const E = E0 - Rg * T / (n * F) * lnQ;
+    return { a, c, A, C, cA, cC, n, nuA, nuC, E0, lnQ, E, T };
+  };
+  let r = build(a);
+  if (r.E < 0) r = build(r.c); // la concentración invierte el sentido
+  r.rint = 6;
+  const mA = G['m' + r.a];
+  r.I = 0; r.V = r.E; r.dead = mA <= 1e-6;
+  if (!G.puente) { r.V = 0; r.I = 0; }
+  else if (G.modo === 'carga' && !r.dead) { r.I = Math.max(0, r.E) / (G.Rx + r.rint); r.V = r.I * G.Rx; }
+  else if (r.dead) { r.V = G.modo === 'carga' ? 0 : r.E; }
+  r.P = r.I * r.I * G.Rx;
+  r.dG = -r.n * F * r.E / 1000;
+  r.logK = r.n * F * r.E0 / (Rg * T * Math.LN10);
+  return r;
+}
+function gStep(dt) {
+  const r = gCalc(); G.last = r;
+  if (!G.run) return;
+  const dts = dt * G.vel;
+  G.t += dts;
+  let mol = r.I * dts / F;
+  if (mol > 0) {
+    const kC = 'c' + r.c, kA = 'c' + r.a, mA = 'm' + r.a, mC = 'm' + r.c;
+    mol = Math.min(mol, 0.5 * G[kC] * G.vol * r.C.n, G[mA] / r.A.M * r.A.n);
+    G[kA] += mol / r.A.n / G.vol;
+    G[kC] = Math.max(1e-30, G[kC] - mol / r.C.n / G.vol);
+    G[mA] = Math.max(0, G[mA] - mol / r.A.n * r.A.M);
+    G[mC] += mol / r.C.n * r.C.M;
+    G.q += mol * F;
+    gSyncUI();
+  }
+  G.histT += dt;
+  if (G.histT > 0.15) {
+    G.histT = 0;
+    G.hist.push([G.t, G.modo === 'carga' ? r.V : r.E, r.I * 1000]);
+    if (G.hist.length > 800) G.hist = G.hist.filter((_, i) => i % 2 === 0);
+  }
+  // zoom
+  const rate = r.I > 1e-6 ? clamp(0.35 + Math.sqrt(r.I) * 2.2, 0.35, 1.6) : 0;
+  for (const s of ['L', 'R']) {
+    const z = G.zoom[s];
+    if (z.active) { z.ph += dt * rate; if (z.ph >= 1) { z.ph = 0; z.count = (z.count + 1) % 6; z.active = rate > 0; } }
+    else if (rate > 0) { z.active = true; z.ph = 0; }
+  }
+  // electrones y puente
+  const v = r.I > 1e-7 ? 30 + 170 * Math.sqrt(clamp(r.I / 0.15, 0, 1)) : 0;
+  G.eOff += v * dt; G.bOff += v * 0.35 * dt;
+  // pasos
+  if (r.I > 1e-6) { G.stepT += dt; if (G.stepT > 2.6) { G.stepT = 0; G.step = (G.step + 1) % 4; } } else G.step = -1;
+  gIons(dt, r);
+}
+function gIons(dt, r) {
+  for (const s of ['L', 'R']) {
+    const c = G['c' + s], bx = gGeo.bx[s];
+    const target = c < 1e-4 ? 0 : Math.min(34, Math.max(1, Math.round(c * 14)));
+    const arr = G.ions[s];
+    const alive = arr.filter(p => !p.dying);
+    const isA = r.a === s && r.I > 1e-6 && G.run;
+    const ex = gGeo.ex[s];
+    if (alive.length < target) {
+      const p = isA ? { x: ex + (s === 'L' ? 22 : -22), y: lerp(260, 370, Math.random()), vx: (s === 'L' ? 40 : -40), vy: 0, a: 0 }
+        : { x: lerp(bx + 20, bx + gGeo.bw - 20, Math.random()), y: lerp(gGeo.liq + 15, gGeo.by + gGeo.bh - 15, Math.random()), vx: 0, vy: 0, a: 0 };
+      arr.push(p);
+    } else if (alive.length > target) {
+      // el más cercano al electrodo se dirige a él
+      let best = null, bd = 1e9; for (const p of alive) { const d = Math.abs(p.x - ex); if (d < bd) { bd = d; best = p; } }
+      if (best) { best.dying = true; best.ty = clamp(best.y, 250, 370); }
+    }
+    for (let i = arr.length - 1; i >= 0; i--) {
+      const p = arr[i];
+      p.a = Math.min(1, p.a + dt * 2);
+      if (!G.run) continue;
+      if (p.dying) {
+        const tx = ex + (s === 'L' ? 16 : -16), dx = tx - p.x, dy = p.ty - p.y, d = Math.hypot(dx, dy);
+        if (d < 4) { arr.splice(i, 1); continue; }
+        p.x += dx / d * 140 * dt; p.y += dy / d * 140 * dt;
+      } else {
+        p.vx += (Math.random() - 0.5) * 160 * dt; p.vy += (Math.random() - 0.5) * 160 * dt;
+        p.vx *= 0.96; p.vy *= 0.96;
+        p.x += p.vx * dt; p.y += p.vy * dt;
+        const x0 = bx + 14, x1 = bx + gGeo.bw - 14, y0 = gGeo.liq + 12, y1 = gGeo.by + gGeo.bh - 12;
+        if (p.x < x0) { p.x = x0; p.vx = Math.abs(p.vx); } if (p.x > x1) { p.x = x1; p.vx = -Math.abs(p.vx); }
+        if (p.y < y0) { p.y = y0; p.vy = Math.abs(p.vy); } if (p.y > y1) { p.y = y1; p.vy = -Math.abs(p.vy); }
+      }
+    }
+    // contraiones (sulfato/nitrato)
+    const an = G.an[s];
+    while (an.length < 8) an.push({ x: lerp(bx + 20, bx + gGeo.bw - 20, Math.random()), y: lerp(gGeo.liq + 15, gGeo.by + gGeo.bh - 15, Math.random()), ph: Math.random() * 6 });
+    if (G.run) for (const p of an) { p.ph += dt; p.x += Math.sin(p.ph * 1.3) * 8 * dt; p.y += Math.cos(p.ph * 1.1) * 8 * dt; }
+  }
+}
+function solFill(M, c) {
+  const base = [190, 205, 230];
+  const col = M.sol || base;
+  const a = M.sol ? clamp(0.2 + 0.45 * Math.min(c, 1.5) / 1.5 + 0.0, 0.12, 0.75) : 0.22;
+  const k = M.sol ? clamp(Math.min(c, 1.5) / 1.5, 0, 1) : 0;
+  const mix = col.map((v, i) => Math.round(lerp(base[i], v, 0.25 + 0.75 * k)));
+  return `rgba(${mix[0]},${mix[1]},${mix[2]},${a})`;
+}
+function gDraw() {
+  const ctx = G.ctx, r = G.last, g = gGeo; if (!r) return;
+  bg(ctx);
+  // insignias
+  chip(ctx, 'ΔG < 0', 54, 22, '#14532d', '#bbf7d0', 12);
+  txt(ctx, `E°celda = ${r.E0.toFixed(2)} V`, 985, 22, { size: 15, color: '#5eead4', align: 'right', font: 'Georgia,serif', weight: 700 });
+  // cables
+  const anod = r.a, cat = r.c;
+  const wireL = [[g.ex.L, g.eTop + 2], [g.ex.L, 62], [400, 62]], wireR = [[600, 62], [g.ex.R, 62], [g.ex.R, g.eTop + 2]];
+  const colA = '#2b3445', colC = '#dc2626';
+  strokePath(ctx, wireL, '#0f172a', 9); strokePath(ctx, wireL, anod === 'L' ? colA : colC, 5);
+  strokePath(ctx, wireR, '#0f172a', 9); strokePath(ctx, wireR, anod === 'R' ? colA : colC, 5);
+  // medidor
+  const vtxt = G.puente ? (r.V >= 0 ? '' : '−') + Math.abs(r.V).toFixed(3) + ' V' : '0.000 V';
+  meter(ctx, 400, 30, 200, 64, vtxt, G.modo === 'volt' ? 'VOLTÍMETRO DIGITAL' : 'VOLTAJE EN LA BOMBILLA');
+  if (G.modo === 'carga') { bulb(ctx, 290, 62, r.P); txt(ctx, `${fmt(G.Rx, 0)} Ω`, 290, 100, { size: 11, color: '#cbd5e1' }); }
+  // electrones
+  if (r.I > 1e-7) {
+    const pts = anod === 'L' ? [[g.ex.L, g.eTop + 6], [g.ex.L, 62], [g.ex.R, 62], [g.ex.R, g.eTop + 6]] : [[g.ex.R, g.eTop + 6], [g.ex.R, 62], [g.ex.L, 62], [g.ex.L, g.eTop + 6]];
+    drawElectrons(ctx, makePath(pts), G.eOff, 26, p => p[0] > 398 && p[0] < 602 && p[1] < 96);
+    const dir = anod === 'L' ? '→' : '←';
+    chip(ctx, `e⁻ FLUJO ${dir}`, anod === 'L' ? 345 : 655, 38, '#1e3a8a', '#bfdbfe', 10);
+  } else if (G.modo === 'volt' && G.puente) {
+    txt(ctx, 'circuito abierto: I ≈ 0 (el voltímetro no deja pasar corriente)', 500, 112, { size: 11, color: '#93a4c0', weight: 500 });
+  }
+  // vasos
+  for (const s of ['L', 'R']) {
+    const M = METALES[G[s]];
+    beaker(ctx, g.bx[s], g.by, g.bw, g.bh, g.liq, solFill(M, G['c' + s]));
+  }
+  // iones
+  for (const s of ['L', 'R']) {
+    const M = METALES[G[s]];
+    for (const p of G.an[s]) ball(ctx, p.x, p.y, 4, '#d6c27a', '', 0.7);
+    for (const p of G.ions[s]) ball(ctx, p.x, p.y, 7.5, M.ic, M.n + '+', p.a * (p.dying ? 0.85 : 1));
+  }
+  // electrodos
+  for (const s of ['L', 'R']) {
+    const M = METALES[G[s]], m = G['m' + s];
+    const w = clamp(10 + 24 * Math.sqrt(m / G.m0), 4, 46);
+    const x = g.ex[s] - w / 2;
+    const grd = ctx.createLinearGradient(x, 0, x + w, 0);
+    grd.addColorStop(0, shade(M.color, -0.3)); grd.addColorStop(0.4, M.color); grd.addColorStop(1, shade(M.color, -0.4));
+    ctx.fillStyle = grd; ctx.fillRect(x, g.eTop, w, g.eBot - g.eTop);
+    if (m <= 1e-6) { ctx.fillStyle = '#0d1c38'; ctx.fillRect(x, g.liq, w, g.eBot - g.liq); }
+    rr(ctx, g.ex[s] - 15, g.eTop + 18, 30, 22, 4); ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fill();
+    txt(ctx, G[s], g.ex[s], g.eTop + 29, { size: 14, weight: 800, color: '#fff' });
+    const isA = r.a === s;
+    chip(ctx, isA ? 'ÁNODO −' : 'CÁTODO +', g.ex[s], g.eTop - 14, '#e2e8f0', '#0f172a', 10);
+    // marcador zoom
+    ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(g.ex[s] + (s === 'L' ? w / 2 : -w / 2), 345, 9, 0, 7); ctx.stroke();
+  }
+  // puente salino
+  const bp = [[g.leg.L, 340], [g.leg.L, 150], [g.leg.R, 150], [g.leg.R, 340]];
+  if (G.puente) {
+    strokePath(ctx, bp, 'rgba(203,213,225,0.9)', 34); strokePath(ctx, bp, 'rgba(236,241,247,0.95)', 26);
+    txt(ctx, 'puente salino · KNO₃', 500, 126, { size: 11, color: '#475569', weight: 700 });
+    const path = makePath(bp);
+    for (let i = 0; i < 9; i++) {
+      // K+ hacia el cátodo, NO3- hacia el ánodo
+      const toR = r.c === 'R';
+      const sK = (toR ? 1 : -1) * G.bOff + i * path.L / 9;
+      const sN = (toR ? -1 : 1) * G.bOff + i * path.L / 9 + path.L / 18;
+      const pk = path.at(sK), pn = path.at(sN);
+      ball(ctx, pk[0] + 5, pk[1] + 3, 5.5, '#a855f7', '+');
+      ball(ctx, pn[0] - 5, pn[1] - 3, 5.5, '#22c55e', '−');
+    }
+    if (r.I > 1e-6) {
+      chip(ctx, r.c === 'R' ? 'NO₃⁻ → ÁNODO' : 'K⁺ → CÁTODO', 400, 178, '#0f172a', '#e2e8f0', 10);
+      chip(ctx, r.c === 'R' ? 'K⁺ → CÁTODO' : 'NO₃⁻ → ÁNODO', 600, 178, '#0f172a', '#e2e8f0', 10);
+    }
+  } else {
+    ctx.setLineDash([6, 6]); strokePath(ctx, bp, 'rgba(148,163,184,0.5)', 2); ctx.setLineDash([]);
+    txt(ctx, 'PUENTE SALINO RETIRADO', 500, 140, { size: 12, color: '#f87171', weight: 800 });
+  }
+  for (const s of ['L', 'R']) beakerGlass(ctx, g.bx[s], g.by, g.bw, g.bh);
+  for (const s of ['L', 'R']) {
+    const M = METALES[G[s]];
+    chip(ctx, `${M.sal}(aq) · ${fmtC(G['c' + s])}`, g.bx[s] + g.bw / 2, g.by + g.bh + 16, '#e2e8f0', '#0f172a', 11);
+  }
+  // zoom
+  for (const s of ['L', 'R']) {
+    const z = G.zoom[s], isA = r.a === s, zx = g.zx[s];
+    const m = G['m' + s], w = clamp(10 + 24 * Math.sqrt(m / G.m0), 4, 46);
+    const sx = g.ex[s] + (s === 'L' ? w / 2 : -w / 2);
+    ctx.strokeStyle = 'rgba(245,158,11,0.45)'; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(sx - 6, 352); ctx.lineTo(zx - g.zr * 0.8, g.zy - g.zr * 0.6); ctx.moveTo(sx + 6, 352); ctx.lineTo(zx + g.zr * 0.8, g.zy - g.zr * 0.6); ctx.stroke();
+    zoomAtoms(ctx, zx, g.zy, g.zr, G[s], isA ? 'ox' : 'red', z.ph, z.count, z.active && r.I > 1e-6, solFill(METALES[G[s]], G['c' + s]).replace(/[\d.]+\)$/, '0.55)'));
+    chip(ctx, `SUPERFICIE DE ${G[s]} · ESCALA ATÓMICA · ${isA ? 'OXIDACIÓN' : 'REDUCCIÓN'}`, zx, g.zy + g.zr + 14, '#f5c542', '#111', 9);
+  }
+  // ecuación central
+  txt(ctx, `${r.nuA > 1 ? r.nuA : ''}${G[r.a]} + ${r.nuC > 1 ? r.nuC : ''}${r.C.ion} → ${r.nuA > 1 ? r.nuA : ''}${r.A.ion} + ${r.nuC > 1 ? r.nuC : ''}${G[r.c]}`, 500, 470, { size: 15, font: 'Georgia,serif', color: '#fde68a', weight: 700 });
+  txt(ctx, `n = ${r.n} e⁻ por reacción`, 500, 492, { size: 11, color: '#93a4c0', weight: 500 });
+  txt(ctx, G.L === G.R ? 'PILA DE CONCENTRACIÓN' : (r.I > 1e-6 ? `${r.A.nombre.toUpperCase()} SE DISUELVE, ${r.C.nombre.toUpperCase()} CRECE` : ''), 500, 520, { size: 12, color: '#4ade80', weight: 800 });
+  if (r.dead) txt(ctx, `¡El ánodo de ${G[r.a]} se consumió por completo!`, 500, 545, { size: 13, color: '#f87171', weight: 800 });
+}
+function gPanel() {
+  const r = G.last; if (!r) return;
+  const nombres = [r.A, r.C];
+  // pasos
+  const steps = [
+    [`Los átomos de ${G[r.a]} dejan el metal como iones (oxidación)`, `${G[r.a]} → ${r.A.ion}(aq) + ${eStr(r.A.n)}`],
+    [`Los electrones viajan por el cable, de ${G[r.a]} a ${G[r.c]}`, `E°celda = ${signed(r.C.E)} − ${signed(r.A.E)} = ${r.E0.toFixed(2)} V`],
+    [`Los ${r.C.ion} los toman y se depositan (reducción)`, `${r.C.ion}(aq) + ${eStr(r.C.n)} → ${G[r.c]}`],
+    ['El puente salino mantiene ambos vasos neutros', 'K⁺ hacia el cátodo · NO₃⁻ hacia el ánodo'],
+  ];
+  const hl = G.pin >= 0 ? G.pin : G.step;
+  const html = steps.map((s, i) => `<div class="step ${i === hl ? 'hl' : ''}" data-i="${i}"><span class="n">0${i + 1}</span>${s[0]}<i>${s[1]}</i></div>`).join('');
+  if ($('g-steps').dataset.h !== html) { $('g-steps').innerHTML = html; $('g-steps').dataset.h = html; }
+  const k = 2.303 * Rg * r.T / F;
+  const Qv = Math.exp(r.lnQ);
+  $('g-nernst').innerHTML = `<span class="big">E = E° − (${k.toFixed(4)}/${r.n})·log Q</span> &nbsp;=&nbsp; ${r.E0.toFixed(3)} − ${(k / r.n).toFixed(5)}·log(${fmtSig(Qv, 3)}) &nbsp;=&nbsp; <b style="color:#f5c542">${r.E.toFixed(3)} V</b>
+    <div class="note">Q = [${r.A.ion}]${r.nuA > 1 ? '<sup>' + r.nuA + '</sup>' : ''} / [${r.C.ion}]${r.nuC > 1 ? '<sup>' + r.nuC + '</sup>' : ''} = ${fmtC(r.cA)}${r.nuA > 1 ? '^' + r.nuA : ''} / ${fmtC(r.cC)}${r.nuC > 1 ? '^' + r.nuC : ''} · T = ${r.T.toFixed(1)} K · Si Q = 1 → E = E° = ${r.E0.toFixed(3)} V</div>`;
+  $('g-eqcard').innerHTML = `${r.nuA > 1 ? r.nuA : ''}${G[r.a]} + ${r.nuC > 1 ? r.nuC : ''}${r.C.ion} → ${r.nuA > 1 ? r.nuA : ''}${r.A.ion} + ${r.nuC > 1 ? r.nuC : ''}${G[r.c]}<small>E° = ${signed(r.C.E)} − ${signed(r.A.E)} = ${r.E0.toFixed(2)} V</small>`;
+  out('g-out', [
+    ['Ánodo (−) / Cátodo (+)', `${G[r.a]} / ${G[r.c]}`],
+    ['E° de la celda', r.E0.toFixed(3) + ' V'],
+    ['E (Nernst)', r.E.toFixed(3) + ' V'],
+    ['Lectura del medidor', (G.puente ? r.V : 0).toFixed(3) + ' V'],
+    ['Corriente I', fmtI(r.I)],
+    ['Potencia en la bombilla', (r.P * 1000).toFixed(2) + ' mW'],
+    ['ΔG = −nFE', r.dG.toFixed(1) + ' kJ/mol'],
+    ['log K (equilibrio)', r.logK.toFixed(1)],
+    ['Tiempo simulado', fmtT(G.t)],
+    ['Carga transferida', fmtSig(G.q, 4) + ' C'],
+    [`Δm ánodo (${G[r.a]})`, ((G['m' + r.a] - G.m0) * 1000).toFixed(1) + ' mg'],
+    [`Δm cátodo (${G[r.c]})`, '+' + ((G['m' + r.c] - G.m0) * 1000).toFixed(1) + ' mg'],
+  ]);
+  let msg = '';
+  if (!G.puente) msg = 'Sin puente salino el circuito está abierto: las cargas se acumularían en cada vaso y la corriente se detiene. El medidor marca 0.';
+  else if (r.dead) msg = 'El electrodo del ánodo se agotó. Pulsa Reiniciar.';
+  else if (G.L === G.R && Math.abs(r.E) < 1e-4) msg = 'Mismo metal y misma concentración: E = 0. Cambia una de las concentraciones para tener una pila de concentración.';
+  warn('g-warn', msg);
+  // gráfica
+  const h = G.hist, tmax = Math.max(1, h.length ? h[h.length - 1][0] : 1);
+  const ys = h.map(p => p[1]); const ymax = Math.max(0.2, ...ys, r.E) * 1.15;
+  chart(G.chx, { title: G.modo === 'carga' ? 'Voltaje e intensidad vs tiempo' : 'E vs tiempo', xlab: 'tiempo simulado', xmin: h.length ? h[0][0] : 0, xmax: tmax, ymin: 0, ymax,
+    xfmt: v => fmtT(v).replace(/ \d+ s$/, ''),
+    y2: G.modo === 'carga' ? { ymin: 0, ymax: Math.max(1, ...h.map(p => p[2])) * 1.15, color: '#f87171' } : null,
+    series: [{ pts: h.map(p => [p[0], p[1]]), color: '#5eead4', label: 'V (V)' }].concat(G.modo === 'carga' ? [{ pts: h.map(p => [p[0], p[2]]), color: '#f87171', label: 'I (mA)', axis: 2 }] : []) });
+}
+function gSyncUI() {
+  const ML = METALES[G.L], MR = METALES[G.R];
+  $('g-cL-l').textContent = `[${ML.ion}] izquierda`; $('g-cR-l').textContent = `[${MR.ion}] derecha`;
+  $('g-cL').value = logInv(clamp(G.cL, 0.001, 2), 0.001, 2); $('g-cR').value = logInv(clamp(G.cR, 0.001, 2), 0.001, 2);
+  $('g-cL-v').textContent = fmtC(G.cL); $('g-cR-v').textContent = fmtC(G.cR);
+}
+function gToUI() {
+  $('g-L').value = G.L; $('g-R').value = G.R; $('g-T').value = G.T; $('g-vol').value = G.vol * 1000;
+  $('g-Rx').value = logInv(G.Rx, 1, 500); $('g-vel').value = logInv(G.vel, 1, 50000);
+  setRadio('g-modo', G.modo); $('g-puente').checked = G.puente;
+  gLabels(); gSyncUI();
+}
+function gLabels() {
+  $('g-T-v').textContent = G.T + ' °C'; $('g-vol-v').textContent = Math.round(G.vol * 1000) + ' mL';
+  $('g-Rx-v').textContent = fmt(G.Rx, G.Rx < 10 ? 1 : 0) + ' Ω'; $('g-vel-v').textContent = fmtVel(G.vel);
+  $('g-run').textContent = G.run ? '⏸ Pausa' : '▶ Continuar';
+}
+function gReset() {
+  G.t = 0; G.q = 0; G.mL = G.mR = G.m0; G.hist = []; G.ions = { L: [], R: [] }; G.zoom.L.count = G.zoom.R.count = 0;
+}
+function gInit() {
+  G.ctx = setupCanvas($('cv-galv'), 1000, 660); G.chx = setupCanvas($('ch-galv'), 700, 200);
+  const opts = Object.entries(METALES).map(([k, m]) => `<option value="${k}">${k} · ${m.nombre} (E° ${m.E >= 0 ? '+' : ''}${m.E.toFixed(2)} V)</option>`).join('');
+  $('g-L').innerHTML = opts; $('g-R').innerHTML = opts;
+  $('g-L').onchange = e => { G.L = e.target.value; gReset(); gSyncUI(); };
+  $('g-R').onchange = e => { G.R = e.target.value; gReset(); gSyncUI(); };
+  $('g-cL').oninput = e => { G.cL = logMap(+e.target.value, 0.001, 2); gSyncUI(); };
+  $('g-cR').oninput = e => { G.cR = logMap(+e.target.value, 0.001, 2); gSyncUI(); };
+  $('g-T').oninput = e => { G.T = +e.target.value; gLabels(); };
+  $('g-vol').oninput = e => { G.vol = +e.target.value / 1000; gLabels(); };
+  $('g-Rx').oninput = e => { G.Rx = logMap(+e.target.value, 1, 500); gLabels(); };
+  $('g-vel').oninput = e => { G.vel = logMap(+e.target.value, 1, 50000); gLabels(); };
+  document.querySelectorAll('input[name="g-modo"]').forEach(r => r.onchange = () => { G.modo = radioVal('g-modo'); });
+  $('g-puente').onchange = e => { G.puente = e.target.checked; };
+  $('g-run').onclick = () => { G.run = !G.run; gLabels(); };
+  $('g-reset').onclick = () => { gReset(); G.cL = 1; G.cR = 1; gSyncUI(); };
+  $('g-steps').onclick = e => { const d = e.target.closest('.step'); if (!d) return; G.pin = G.pin === +d.dataset.i ? -1 : +d.dataset.i; };
+  makeLog('g', ['t (s)', 'Ánodo', 'Cátodo', '[ánodo] M', '[cátodo] M', 'T (°C)', 'E (V)', 'V medidor (V)', 'I (mA)', 'Q (C)'], () => {
+    const r = G.last; return [G.t.toFixed(1), G[r.a], G[r.c], r.cA.toPrecision(3), r.cC.toPrecision(3), G.T, r.E.toFixed(4), (G.puente ? r.V : 0).toFixed(4), (r.I * 1000).toFixed(3), G.q.toFixed(1)];
+  });
+  const set = o => { Object.assign(G, { cL: 1, cR: 1, T: 25, vol: 0.1, modo: 'volt', Rx: 10, puente: true, vel: 1000, run: true }, o); gReset(); gToUI(); };
+  experiments('g-exp', [
+    { t: 'Potencial estándar de la pila de Daniell', d: 'Zn | Zn²⁺ (1 M) ‖ Cu²⁺ (1 M) | Cu a 25 °C con voltímetro.', q: '¿El voltímetro coincide con E° = 0.34 − (−0.76)? ¿Por qué Q = 1 hace que E = E°?', set: () => set({ L: 'Zn', R: 'Cu' }) },
+    { t: 'Efecto de la concentración (Nernst)', d: 'Baja [Cu²⁺] a 0.01 M dejando [Zn²⁺] = 1 M. Luego prueba al revés.', q: '¿Cuánto cambia E por cada factor 10 en [Cu²⁺]? (Predicción: 0.0592/2 ≈ 0.030 V).', set: () => set({ L: 'Zn', R: 'Cu', cR: 0.01 }) },
+    { t: 'Pila de concentración', d: 'Cobre en ambos lados: 0.01 M a la izquierda y 1 M a la derecha.', q: 'Si E° = 0, ¿de dónde sale el voltaje? ¿Qué lado es el ánodo?', set: () => set({ L: 'Cu', R: 'Cu', cL: 0.01, cR: 1 }) },
+    { t: 'Retira el puente salino', d: 'Cierra el circuito con la bombilla y luego desmarca “Puente salino”.', q: '¿Qué pasa con la corriente y por qué es necesario mantener ambos vasos eléctricamente neutros?', set: () => set({ L: 'Zn', R: 'Cu', modo: 'carga', Rx: 5 }) },
+    { t: 'Agota la pila', d: 'Bombilla de 3 Ω, vasos de 30 mL y tiempo a 20 000×. Observa la gráfica y el color azul.', q: '¿Por qué E cae lentamente al principio y bruscamente al final? Relaciónalo con log Q.', set: () => set({ L: 'Zn', R: 'Cu', modo: 'carga', Rx: 3, vol: 0.03, vel: 20000 }) },
+    { t: 'La pila más potente de la tabla', d: 'Mg frente a Au.', q: '¿Por qué n = 6 en esta reacción? Calcula ΔG° y compáralo con el medidor.', set: () => set({ L: 'Mg', R: 'Au' }) },
+    { t: 'Temperatura y Nernst', d: '[Zn²⁺] = 2 M, [Cu²⁺] = 0.001 M. Mueve la temperatura de 0 a 90 °C.', q: '¿Aumenta o disminuye E con T cuando Q > 1? ¿Y si Q < 1?', set: () => set({ L: 'Zn', R: 'Cu', cL: 2, cR: 0.001 }) },
+  ]);
+  gToUI();
+}
+
+/* ======================================================================
+   2. CELDA ELECTROLÍTICA
+   ====================================================================== */
+const ELECTROLITOS = {
+  CuCl2: { nombre: 'CuCl₂ (cloruro de cobre)', cat: { tipo: 'metal', sim: 'Cu', semi: 'Cu²⁺ + 2e⁻ → Cu' }, an: { tipo: 'gas', gas: 'Cl₂', z: 2, E: 1.36, eta: 0.15, anion: 'Cl⁻', semi: '2Cl⁻ → Cl₂ + 2e⁻', gc: '#bef264' }, global: 'Cu²⁺ + 2Cl⁻ → Cu + Cl₂', anodo: 'grafito' },
+  CuSO4: { nombre: 'CuSO₄ (sulfato de cobre)', cat: { tipo: 'metal', sim: 'Cu', semi: 'Cu²⁺ + 2e⁻ → Cu' }, an: { tipo: 'gas', gas: 'O₂', z: 4, E: 1.23, eta: 0.45, anion: 'SO₄²⁻', semi: '2H₂O → O₂ + 4H⁺ + 4e⁻', gc: '#fecaca' }, global: '2Cu²⁺ + 2H₂O → 2Cu + O₂ + 4H⁺', anodo: 'platino' },
+  CuRef: { nombre: 'CuSO₄ con ánodo de Cu (refinado)', cat: { tipo: 'metal', sim: 'Cu', semi: 'Cu²⁺ + 2e⁻ → Cu (puro)' }, an: { tipo: 'disuelve', E: 0.34, eta: 0.08, anion: 'SO₄²⁻', semi: 'Cu (impuro) → Cu²⁺ + 2e⁻' }, global: 'Cu(ánodo impuro) → Cu(cátodo puro)', anodo: 'Cu impuro' },
+  AgNO3: { nombre: 'AgNO₃ (plateado)', cat: { tipo: 'metal', sim: 'Ag', semi: 'Ag⁺ + e⁻ → Ag' }, an: { tipo: 'gas', gas: 'O₂', z: 4, E: 1.23, eta: 0.45, anion: 'NO₃⁻', semi: '2H₂O → O₂ + 4H⁺ + 4e⁻', gc: '#fecaca' }, global: '4Ag⁺ + 2H₂O → 4Ag + O₂ + 4H⁺', anodo: 'platino' },
+  NiSO4: { nombre: 'NiSO₄ (niquelado)', cat: { tipo: 'metal', sim: 'Ni', semi: 'Ni²⁺ + 2e⁻ → Ni' }, an: { tipo: 'gas', gas: 'O₂', z: 4, E: 1.23, eta: 0.45, anion: 'SO₄²⁻', semi: '2H₂O → O₂ + 4H⁺ + 4e⁻', gc: '#fecaca' }, global: '2Ni²⁺ + 2H₂O → 2Ni + O₂ + 4H⁺', anodo: 'platino' },
+  NaCl: { nombre: 'NaCl (salmuera, cloro-álcali)', cat: { tipo: 'gas', gas: 'H₂', z: 2, E: -0.83, semi: '2H₂O + 2e⁻ → H₂ + 2OH⁻', gc: '#e2e8f0' }, an: { tipo: 'gas', gas: 'Cl₂', z: 2, E: 1.36, eta: 0.15, anion: 'Cl⁻', semi: '2Cl⁻ → Cl₂ + 2e⁻', gc: '#bef264' }, global: '2Cl⁻ + 2H₂O → Cl₂ + H₂ + 2OH⁻', anodo: 'grafito' },
+};
+const EL = {
+  sol: 'CuCl2', c: 1, d: 4, vol: 0.25, modo: 'V', Vs: 6, Iset: 1, vel: 50, tstop: 0, run: true,
+  t: 0, q: 0, m: 0, gasA: 0, gasC: 0, energy: 0, c0: 1, hist: [], histT: 0,
+  cat: [], ani: [], bub: [], eOff: 0, step: -1, stepT: 0, last: null, flashes: []
+};
+const eGeo = { bx: 210, bw: 580, by: 200, bh: 270, liq: 232, eTop: 150, eBot: 445 };
+function eInfo() {
+  const S = ELECTROLITOS[EL.sol];
+  const metal = S.cat.tipo === 'metal' ? METALES[S.cat.sim] : null;
+  const Ecat = metal ? metal.E : S.cat.E;
+  const Emin = S.an.E - Ecat;
+  const Vmin = Math.max(0, Emin) + S.an.eta + 0.05;
+  return { S, metal, Ecat, Emin, Vmin };
+}
+function eCalc() {
+  const k = eInfo();
+  const Rsol = 2.4 * (EL.d / 4) / Math.max(EL.c, 0.004) + 0.3;
+  let I, V;
+  const agotado = EL.c < 0.002;
+  if (EL.modo === 'V') { V = EL.Vs; I = agotado ? 0 : Math.max(0, (V - k.Vmin) / Rsol); }
+  else { I = agotado ? 0 : EL.Iset; V = I > 0 ? k.Vmin + I * Rsol : 0; }
+  return Object.assign(k, { Rsol, I, V, agotado, dG: (k.metal ? k.metal.n : 2) * F * Math.max(0, k.Emin) / 1000 });
+}
+function eStep(dt) {
+  const r = eCalc(); EL.last = r;
+  if (!EL.run) return;
+  let dts = dt * EL.vel;
+  if (EL.tstop > 0 && EL.t + dts >= EL.tstop) { dts = Math.max(0, EL.tstop - EL.t); EL.run = false; eLabels(); }
+  EL.t += dts;
+  const mol = r.I * dts / F;
+  if (mol > 0) {
+    EL.q += mol * F; EL.energy += r.V * r.I * dts;
+    if (r.metal) EL.m += mol / r.metal.n * r.metal.M; else EL.gasC += mol / r.S.cat.z;
+    if (r.S.an.tipo === 'gas') EL.gasA += mol / r.S.an.z;
+    // agotamiento
+    if (EL.sol === 'NaCl') EL.c = Math.max(0, EL.c - mol / EL.vol);
+    else if (r.S.an.tipo !== 'disuelve') EL.c = Math.max(0, EL.c - mol / r.metal.n / EL.vol);
+    $('e-c').value = logInv(clamp(EL.c, 0.01, 2), 0.01, 2); $('e-c-v').textContent = fmtC(EL.c);
+  }
+  EL.histT += dt;
+  if (EL.histT > 0.15 && mol > 0) { EL.histT = 0; EL.hist.push([EL.q, r.metal ? EL.m * 1000 : EL.gasC * VM * 1000]); if (EL.hist.length > 800) EL.hist = EL.hist.filter((_, i) => i % 2 === 0); }
+  if (r.I > 0) { EL.stepT += dt; if (EL.stepT > 2.6) { EL.stepT = 0; EL.step = (EL.step + 1) % 4; } } else EL.step = -1;
+  EL.eOff += (r.I > 0 ? 30 + 120 * Math.sqrt(clamp(r.I / 3, 0, 1)) : 0) * dt;
+  eParticles(dt, r);
+}
+function eX() { const half = EL.d * 32; return { an: 500 - half, cat: 500 + half }; }
+function eParticles(dt, r) {
+  const X = eX(), g = eGeo;
+  const target = EL.c < 0.002 ? 0 : Math.min(30, Math.max(2, Math.round(EL.c * 16)));
+  const drift = r.I > 0 ? 25 + 90 * Math.sqrt(clamp(r.I / 3, 0, 1)) : 0;
+  const rnd = () => ({ x: lerp(g.bx + 20, g.bx + g.bw - 20, Math.random()), y: lerp(g.liq + 15, g.by + g.bh - 15, Math.random()), vx: 0, vy: 0, a: 0 });
+  const cat = EL.cat, ani = EL.ani;
+  while (cat.length < target) { const p = rnd(); if (EL.sol === 'CuRef' && r.I > 0) { p.x = X.an + 16; } cat.push(p); }
+  if (cat.length > target) cat.length = target;
+  const tA = target * (EL.sol === 'CuCl2' ? 2 : 1);
+  while (ani.length < Math.min(40, tA)) ani.push(rnd());
+  if (ani.length > tA) ani.length = Math.min(40, tA);
+  const move = (arr, dir, xT, onHit) => {
+    for (let i = arr.length - 1; i >= 0; i--) {
+      const p = arr[i]; p.a = Math.min(1, p.a + dt * 2);
+      p.vx += (Math.random() - 0.5) * 160 * dt; p.vy += (Math.random() - 0.5) * 160 * dt; p.vx *= 0.95; p.vy *= 0.95;
+      p.x += (p.vx + dir * drift) * dt; p.y += p.vy * dt;
+      const y0 = g.liq + 12, y1 = g.by + g.bh - 12;
+      if (p.y < y0) { p.y = y0; p.vy = Math.abs(p.vy); } if (p.y > y1) { p.y = y1; p.vy = -Math.abs(p.vy); }
+      if (p.x < g.bx + 14) { p.x = g.bx + 14; p.vx = Math.abs(p.vx); } if (p.x > g.bx + g.bw - 14) { p.x = g.bx + g.bw - 14; p.vx = -Math.abs(p.vx); }
+      const hit = dir > 0 ? p.x > xT - 14 : p.x < xT + 14;
+      if (hit && drift > 0) { onHit(p); const n = rnd(); n.x = dir > 0 ? lerp(g.bx + 20, X.an, Math.random()) : lerp(X.cat, g.bx + g.bw - 20, Math.random()); if (EL.sol === 'CuRef' && dir > 0) n.x = X.an + 16; arr[i] = n; }
+    }
+  };
+  if (EL.run) {
+    move(cat, 1, X.cat - 10, p => EL.flashes.push({ x: X.cat - 12, y: p.y, t: 0, c: r.metal ? r.metal.color : '#fff' }));
+    move(ani, -1, X.an + 10, p => { if (r.S.an.tipo === 'gas') EL.bub.push({ x: X.an + 12 + Math.random() * 6, y: p.y, r: 3 + Math.random() * 3, side: 'an' }); });
+  }
+  // burbujas
+  if (EL.run && r.I > 0) {
+    const rate = 6 * Math.sqrt(clamp(r.I / 2, 0, 2));
+    if (r.S.an.tipo === 'gas' && Math.random() < rate * dt * 2) EL.bub.push({ x: X.an + 12 + Math.random() * 8, y: lerp(260, 430, Math.random()), r: 2.5 + Math.random() * 3, side: 'an' });
+    if (r.S.cat.tipo === 'gas' && Math.random() < rate * dt * 2) EL.bub.push({ x: X.cat - 12 - Math.random() * 8, y: lerp(260, 430, Math.random()), r: 2.5 + Math.random() * 3, side: 'cat' });
+  }
+  if (EL.run) for (let i = EL.bub.length - 1; i >= 0; i--) { const b = EL.bub[i]; b.y -= (40 + b.r * 12) * dt; b.x += Math.sin(b.y / 8) * 0.3; if (b.y < g.liq) EL.bub.splice(i, 1); }
+  for (let i = EL.flashes.length - 1; i >= 0; i--) { EL.flashes[i].t += dt; if (EL.flashes[i].t > 0.5) EL.flashes.splice(i, 1); }
+}
+function eDraw() {
+  const ctx = EL.ctx, r = EL.last, g = eGeo; if (!r) return;
+  bg(ctx);
+  const X = eX();
+  chip(ctx, 'ΔG > 0', 54, 22, '#7f1d1d', '#fecaca', 12);
+  const prod = r.metal ? `${r.metal === METALES.Cu ? 'Cu' : r.S.cat.sim} = ${(EL.m * 1000).toFixed(0)} mg` : `H₂ = ${(EL.gasC * VM * 1000).toFixed(1)} mL`;
+  txt(ctx, `Q = ${EL.q.toFixed(0)} C → ${prod}`, 985, 22, { size: 15, color: '#5eead4', align: 'right', font: 'Georgia,serif', weight: 700 });
+  // fuente
+  rr(ctx, 430, 40, 140, 64, 8); ctx.fillStyle = '#1f2937'; ctx.fill(); ctx.strokeStyle = '#64748b'; ctx.lineWidth = 2; ctx.stroke();
+  txt(ctx, 'DC', 500, 60, { size: 16, weight: 900 }); txt(ctx, `${r.V.toFixed(2)} V · ${fmtI(r.I)}`, 500, 84, { size: 11, color: '#a3ff8f', font: 'ui-monospace,monospace' });
+  ball(ctx, 445, 72, 8, '#dc2626', '+'); ball(ctx, 555, 72, 8, '#2563eb', '−');
+  // cables
+  const wA = [[X.an, g.eTop + 2], [X.an, 72], [437, 72]], wC = [[563, 72], [X.cat, 72], [X.cat, g.eTop + 2]];
+  strokePath(ctx, wA, '#0f172a', 9); strokePath(ctx, wA, '#dc2626', 5);
+  strokePath(ctx, wC, '#0f172a', 9); strokePath(ctx, wC, '#2b3445', 5);
+  if (r.I > 0) {
+    drawElectrons(ctx, makePath([[X.an, g.eTop + 6], [X.an, 72], [430, 72]]), EL.eOff, 24);
+    drawElectrons(ctx, makePath([[570, 72], [X.cat, 72], [X.cat, g.eTop + 6]]), EL.eOff, 24);
+    chip(ctx, 'e⁻ ← la fuente los arranca', 330, 28, '#1e3a8a', '#bfdbfe', 9);
+    chip(ctx, 'la fuente los empuja → e⁻', 670, 28, '#1e3a8a', '#bfdbfe', 9);
+  }
+  // vaso
+  const M = r.metal;
+  const solCol = M ? solFill(M, EL.c) : 'rgba(190,205,230,0.22)';
+  beaker(ctx, g.bx, g.by, g.bw, g.bh, g.liq, solCol);
+  for (const b of EL.bub) { ctx.strokeStyle = b.side === 'an' ? (r.S.an.gc || '#fff') : '#e2e8f0'; ctx.lineWidth = 1.4; ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 7); ctx.fill(); ctx.stroke(); }
+  const catCol = M ? M.ic : '#facc15', catLab = M ? M.n + '+' : '+';
+  for (const p of EL.cat) ball(ctx, p.x, p.y, 7.5, catCol, catLab, p.a);
+  const anCol = r.S.an.anion === 'Cl⁻' ? '#22c55e' : '#d6c27a';
+  for (const p of EL.ani) ball(ctx, p.x, p.y, r.S.an.anion === 'Cl⁻' ? 6.5 : 5.5, anCol, '−', p.a, '#0f172a');
+  for (const f of EL.flashes) { ctx.fillStyle = `rgba(255,240,180,${1 - f.t * 2})`; ctx.beginPath(); ctx.arc(f.x, f.y, 6 + f.t * 20, 0, 7); ctx.fill(); }
+  // electrodos
+  const anCol2 = EL.sol === 'CuRef' ? METALES.Cu.color : r.S.anodo === 'platino' ? '#d4d4d8' : '#3f3f46';
+  let anW = 22;
+  if (EL.sol === 'CuRef') anW = clamp(22 - EL.m * 2.2, 5, 22);
+  ctx.fillStyle = anCol2; ctx.fillRect(X.an - anW / 2, g.eTop, anW, g.eBot - g.eTop);
+  ctx.fillStyle = '#52525b'; ctx.fillRect(X.cat - 11, g.eTop, 22, g.eBot - g.eTop);
+  if (M) { const th = clamp(Math.sqrt(EL.m) * 9, 0, 16); if (th > 0.3) { ctx.fillStyle = M.color; ctx.fillRect(X.cat - 11 - th, g.liq + 4, th, g.eBot - g.liq - 4); ctx.fillRect(X.cat + 11, g.liq + 4, th, g.eBot - g.liq - 4); } }
+  chip(ctx, 'ÁNODO +', X.an, g.eTop - 14, '#fecaca', '#7f1d1d', 10);
+  chip(ctx, 'CÁTODO −', X.cat, g.eTop - 14, '#bfdbfe', '#1e3a8a', 10);
+  txt(ctx, r.S.anodo, X.an, g.eBot + 16, { size: 10, color: '#93a4c0' });
+  txt(ctx, 'acero / objeto', X.cat, g.eBot + 16, { size: 10, color: '#93a4c0' });
+  if (r.S.an.tipo === 'gas') chip(ctx, `${r.S.an.gas}↑`, X.an - 40, g.liq + 20, '#0f172a', r.S.an.gc, 11);
+  if (r.S.cat.tipo === 'gas') chip(ctx, `${r.S.cat.gas}↑`, X.cat + 40, g.liq + 20, '#0f172a', '#e2e8f0', 11);
+  beakerGlass(ctx, g.bx, g.by, g.bw, g.bh);
+  chip(ctx, `${r.S.nombre.split(' ')[0]}(aq) · ${fmtC(EL.c)}`, 500, g.by + g.bh + 18, '#e2e8f0', '#0f172a', 11);
+  if (r.I > 0) txt(ctx, 'ANIONES AL (+), CATIONES AL (−)', 500, 560, { size: 14, color: '#4ade80', weight: 800 });
+  else if (!r.agotado) txt(ctx, `Voltaje insuficiente: se necesitan al menos ${r.Vmin.toFixed(2)} V para forzar la reacción`, 500, 560, { size: 13, color: '#fbbf24', weight: 700 });
+  txt(ctx, r.S.global, 500, 590, { size: 15, font: 'Georgia,serif', color: '#fde68a', weight: 700 });
+  txt(ctx, `ánodo: ${r.S.an.semi}    ·    cátodo: ${r.S.cat.semi}`, 500, 614, { size: 12, color: '#cbd5e1', weight: 500 });
+}
+function ePanel() {
+  const r = EL.last; if (!r) return;
+  const M = r.metal;
+  const steps = [
+    ['La fuente arranca electrones del ánodo (+)', r.S.an.semi],
+    ['Los electrones viajan por la fuente hasta el cátodo (−)', `V mínimo ≈ ${r.Vmin.toFixed(2)} V (E° + sobrepotencial)`],
+    [M ? `Los ${M.ion} capturan electrones y se depositan` : 'El agua se reduce en el cátodo', r.S.cat.semi],
+    ['Los iones migran y cierran el circuito', 'cationes → cátodo (−) · aniones → ánodo (+)'],
+  ];
+  const html = steps.map((s, i) => `<div class="step ${i === EL.step ? 'hl' : ''}"><span class="n">0${i + 1}</span>${s[0]}<i>${s[1]}</i></div>`).join('');
+  if ($('e-steps').dataset.h !== html) { $('e-steps').innerHTML = html; $('e-steps').dataset.h = html; }
+  const n = M ? M.n : r.S.cat.z, Mm = M ? M.M : 2.016;
+  const mt = EL.q * Mm / (n * F);
+  $('e-faraday').innerHTML = `<span class="big">m = Q·M / (n·F)</span> = ${EL.q.toFixed(1)} C × ${Mm} g/mol / (${n} × 96485) = <b style="color:#f5c542">${(mt * 1000).toFixed(1)} mg</b> ${M ? 'de ' + r.S.cat.sim : 'de H₂'}
+    <div class="note">Q = I·t · Con 1 F (96 485 C) se deposita 1/n mol de metal. ${r.S.an.tipo === 'gas' ? `Gas en el ánodo: n = Q/(${r.S.an.z}F) = ${(EL.gasA * 1000).toFixed(2)} mmol → ${(EL.gasA * VM * 1000).toFixed(1)} mL de ${r.S.an.gas} (25 °C, 1 atm)` : 'El ánodo de cobre se disuelve tanto como crece el cátodo.'}</div>`;
+  $('e-eqcard').innerHTML = `${r.S.global}<small>m = Q·M / (n·F)</small>`;
+  out('e-out', [
+    ['E° necesario (|E°ánodo − E°cátodo|)', Math.max(0, r.Emin).toFixed(2) + ' V'],
+    ['Voltaje mínimo (con sobrepotencial)', r.Vmin.toFixed(2) + ' V'],
+    ['Voltaje aplicado', r.V.toFixed(2) + ' V'],
+    ['Resistencia de la disolución', r.Rsol.toFixed(2) + ' Ω'],
+    ['Corriente I', fmtI(r.I)],
+    ['Tiempo', fmtT(EL.t)],
+    ['Carga Q = I·t', EL.q.toFixed(1) + ' C'],
+    ['Moles de e⁻ (Q/F)', (EL.q / F * 1000).toFixed(3) + ' mmol'],
+    [M ? `Masa de ${r.S.cat.sim} depositada` : 'H₂ en el cátodo', M ? (EL.m * 1000).toFixed(1) + ' mg' : (EL.gasC * VM * 1000).toFixed(1) + ' mL'],
+    [r.S.an.tipo === 'gas' ? `${r.S.an.gas} en el ánodo` : 'Cu disuelto del ánodo', r.S.an.tipo === 'gas' ? (EL.gasA * VM * 1000).toFixed(1) + ' mL' : (EL.m * 1000).toFixed(1) + ' mg'],
+    ['Energía eléctrica consumida', EL.energy < 3600 ? EL.energy.toFixed(0) + ' J' : (EL.energy / 3600).toFixed(2) + ' Wh'],
+    ['ΔG mínimo (+nFE)', '+' + r.dG.toFixed(0) + ' kJ/mol'],
+  ]);
+  let msg = '';
+  if (r.agotado) msg = 'El electrolito se agotó: ya no quedan iones suficientes que reducir. Pulsa Reiniciar.';
+  else if (r.I === 0 && EL.modo === 'V') msg = `El voltaje aplicado (${r.V.toFixed(2)} V) es menor que el mínimo (${r.Vmin.toFixed(2)} V): no hay electrólisis.`;
+  else if (EL.tstop > 0 && !EL.run && EL.t >= EL.tstop) msg = `Detenido automáticamente en t = ${EL.tstop} s.`;
+  warn('e-warn', msg);
+  const h = EL.hist; const qmax = Math.max(10, EL.q * 1.1);
+  const slope = M ? Mm / (n * F) * 1000 : VM * 1000 / (r.S.cat.z * F);
+  chart(EL.chx, { title: M ? 'Masa depositada vs carga (Ley de Faraday)' : 'Volumen de H₂ vs carga', xlab: 'Q (C)', xmin: 0, xmax: qmax, ymin: 0, ymax: Math.max(1, slope * qmax * 1.05),
+    series: [{ pts: [[0, 0], [qmax, slope * qmax]], color: '#64748b', label: 'teoría', dash: [5, 5], w: 1.5 }, { pts: h, color: '#f5c542', label: M ? 'm (mg)' : 'V (mL)' }] });
+}
+function eLabels() {
+  $('e-c-v').textContent = fmtC(EL.c); $('e-d-v').textContent = EL.d.toFixed(1) + ' cm'; $('e-vol-v').textContent = Math.round(EL.vol * 1000) + ' mL';
+  $('e-V-v').textContent = EL.Vs.toFixed(2) + ' V'; $('e-I-v').textContent = EL.Iset.toFixed(2) + ' A'; $('e-vel-v').textContent = fmtVel(EL.vel);
+  $('e-V-box').style.display = EL.modo === 'V' ? '' : 'none'; $('e-I-box').style.display = EL.modo === 'I' ? '' : 'none';
+  $('e-run').textContent = EL.run ? '⏸ Pausa' : '▶ Continuar';
+}
+function eToUI() {
+  $('e-sol').value = EL.sol; $('e-c').value = logInv(clamp(EL.c, 0.01, 2), 0.01, 2); $('e-d').value = EL.d; $('e-vol').value = EL.vol * 1000;
+  $('e-V').value = EL.Vs; $('e-I').value = EL.Iset; $('e-vel').value = logInv(EL.vel, 1, 5000); $('e-tstop').value = EL.tstop; setRadio('e-modo', EL.modo); eLabels();
+}
+function eReset() { EL.t = 0; EL.q = 0; EL.m = 0; EL.gasA = 0; EL.gasC = 0; EL.energy = 0; EL.hist = []; EL.bub = []; EL.cat = []; EL.ani = []; }
+function eInit() {
+  EL.ctx = setupCanvas($('cv-elec'), 1000, 630); EL.chx = setupCanvas($('ch-elec'), 700, 200);
+  $('e-sol').innerHTML = Object.entries(ELECTROLITOS).map(([k, s]) => `<option value="${k}">${s.nombre}</option>`).join('');
+  $('e-sol').onchange = e => { EL.sol = e.target.value; eReset(); };
+  $('e-c').oninput = e => { EL.c = logMap(+e.target.value, 0.01, 2); eLabels(); };
+  $('e-d').oninput = e => { EL.d = +e.target.value; eLabels(); };
+  $('e-vol').oninput = e => { EL.vol = +e.target.value / 1000; eLabels(); };
+  $('e-V').oninput = e => { EL.Vs = +e.target.value; eLabels(); };
+  $('e-I').oninput = e => { EL.Iset = +e.target.value; eLabels(); };
+  $('e-vel').oninput = e => { EL.vel = logMap(+e.target.value, 1, 5000); eLabels(); };
+  $('e-tstop').oninput = e => { EL.tstop = Math.max(0, +e.target.value || 0); };
+  document.querySelectorAll('input[name="e-modo"]').forEach(r => r.onchange = () => { EL.modo = radioVal('e-modo'); eLabels(); });
+  $('e-run').onclick = () => { if (!EL.run && EL.tstop > 0 && EL.t >= EL.tstop) EL.tstop = 0, $('e-tstop').value = 0; EL.run = !EL.run; eLabels(); };
+  $('e-reset').onclick = () => { eReset(); EL.c = 1; EL.run = true; eToUI(); };
+  makeLog('e', ['Electrolito', 'V (V)', 'I (A)', 't (s)', 'Q (C)', 'm (mg)', 'gas ánodo (mL)', 'gas cátodo (mL)'], () => {
+    const r = EL.last; return [EL.sol, r.V.toFixed(2), r.I.toFixed(3), EL.t.toFixed(1), EL.q.toFixed(1), (EL.m * 1000).toFixed(1), (EL.gasA * VM * 1000).toFixed(1), (EL.gasC * VM * 1000).toFixed(1)];
+  });
+  const set = o => { Object.assign(EL, { c: 1, d: 4, vol: 0.25, modo: 'V', Vs: 6, Iset: 1, vel: 50, tstop: 0, run: true }, o); eReset(); eToUI(); };
+  experiments('e-exp', [
+    { t: 'Ley de Faraday: 1 A durante 965 s', d: 'CuSO₄ con corriente fija de 1.00 A. La simulación se detiene sola en t = 965 s (Q = 965 C = 0.01 F).', q: 'Predice la masa de Cu: m = 965 × 63.55 / (2 × 96485). ¿Coincide con el simulador?', set: () => set({ sol: 'CuSO4', modo: 'I', Iset: 1, tstop: 965, vel: 50 }) },
+    { t: 'Voltaje mínimo de descomposición', d: 'CuCl₂ con voltaje fijo de 0.8 V. Sube poco a poco el voltaje.', q: '¿A partir de qué voltaje empieza a circular corriente? Compáralo con 1.36 − 0.34.', set: () => set({ sol: 'CuCl2', Vs: 0.8 }) },
+    { t: 'Plata vs cobre con la misma carga', d: 'Haz 2 corridas de 1 A × 600 s: una con AgNO₃ y otra con CuSO₄. Registra la masa.', q: '¿Por qué la plata deposita más del triple de masa que el cobre con la misma Q?', set: () => set({ sol: 'AgNO3', modo: 'I', Iset: 1, tstop: 600, vel: 50 }) },
+    { t: 'Refinado de cobre', d: 'Ánodo de cobre impuro: se disuelve mientras el cátodo crece.', q: '¿Por qué la concentración de Cu²⁺ no cambia y el voltaje necesario es tan bajo?', set: () => set({ sol: 'CuRef', Vs: 1.5, vel: 300 }) },
+    { t: 'Cloro-álcali (salmuera)', d: 'NaCl: se desprende Cl₂ en el ánodo y H₂ en el cátodo.', q: '¿Qué relación de volúmenes Cl₂ : H₂ esperas? ¿Por qué no se deposita sodio?', set: () => set({ sol: 'NaCl', modo: 'I', Iset: 2, vel: 100 }) },
+    { t: 'Concentración y separación', d: 'CuCl₂ a 6 V. Cambia la concentración (0.05 → 2 M) y la separación (2 → 10 cm).', q: '¿Cómo cambia la corriente? ¿Qué papel juega la resistencia de la disolución?', set: () => set({ sol: 'CuCl2', c: 0.05, Vs: 6 }) },
+  ]);
+  eToUI();
+}
+
+/* ======================================================================
+   3. CELDA DE COMBUSTIBLE
+   ====================================================================== */
+const FC = { h2: 60, o2: 30, P: 1, T: 60, R: 1, vel: 60, run: true, t: 0, water: 0, h2used: 0, energy: 0, mol: [], oh: [], h2o: [], eOff: 0, step: -1, stepT: 0, sweep: null, last: null, hist: [] };
+const fGeo = { x0: 200, x1: 800, y0: 190, y1: 460, aE: 340, cE: 660 };
+function fcModel(I, k) {
+  const b = Rg * k.T / (2 * 0.5 * F);
+  const act = b * Math.asinh((I + 0.003) / (2 * k.I0));
+  const ohm = I * 0.045;
+  const conc = I < k.IL ? -0.05 * Math.log(1 - I / k.IL) : 5;
+  return k.Erev - act - ohm - conc;
+}
+function fcCalc() {
+  const T = FC.T + 273.15;
+  const nH2 = FC.h2 / 60 / (VM * 1000), nO2 = FC.o2 / 60 / (VM * 1000);
+  const IL = Math.min(2 * F * nH2, 4 * F * nO2);
+  const Erev = 1.229 - 0.00085 * (T - 298.15) + Rg * T / (2 * F) * Math.log(FC.P * Math.sqrt(FC.P));
+  const k = { T, IL, Erev, I0: 0.002 * (1 + (FC.T - 25) / 30), nH2, nO2 };
+  if (IL <= 1e-6) return Object.assign(k, { I: 0, V: 0, P: 0, none: true });
+  let lo = 0, hi = IL * 0.99999;
+  if (fcModel(0, k) <= 0) return Object.assign(k, { I: 0, V: 0, P: 0 });
+  for (let i = 0; i < 60; i++) { const m = (lo + hi) / 2; (fcModel(m, k) - m * FC.R > 0) ? lo = m : hi = m; }
+  const I = lo, V = Math.max(0, fcModel(I, k));
+  return Object.assign(k, { I, V, P: I * V, OCV: fcModel(0, k), lim: nH2 * 2 * F <= nO2 * 4 * F ? 'H₂' : 'O₂' });
+}
+function fcStep(dt) {
+  const r = fcCalc(); FC.last = r;
+  if (FC.sweep) {
+    FC.sweep.tt += dt;
+    if (FC.sweep.tt > 0.25) {
+      FC.sweep.tt = 0; FC.log.add([FC.R.toFixed(3), r.I.toFixed(3), r.V.toFixed(3), r.P.toFixed(3), (r.V / 1.481 * 100).toFixed(1), FC.h2, FC.o2, FC.T, FC.P]);
+      FC.sweep.i++; if (FC.sweep.i > 18) { FC.sweep = null; } else { FC.R = logMap(1000 - FC.sweep.i * 1000 / 18, 0.02, 20); $('f-R').value = logInv(FC.R, 0.02, 20); fLabels(); }
+    }
+  }
+  if (!FC.run) return;
+  const dts = dt * FC.vel; FC.t += dts;
+  FC.water += r.I / (2 * F) * 18.015 * dts; FC.h2used += r.I / (2 * F) * dts; FC.energy += r.P * dts;
+  if (r.I > 0) { FC.stepT += dt; if (FC.stepT > 2.6) { FC.stepT = 0; FC.step = (FC.step + 1) % 4; } } else FC.step = -1;
+  FC.eOff += (r.I > 0 ? 30 + 120 * Math.sqrt(clamp(r.I / 5, 0, 1)) : 0) * dt;
+  // moléculas
+  const g = fGeo, util = r.IL > 0 ? r.I / r.IL : 0;
+  // probabilidad visual de captura (raíz para que se vea aun con bajo aprovechamiento)
+  const uH = r.nH2 > 0 ? Math.sqrt(r.I / (2 * F) / r.nH2) : 0, uO = r.nO2 > 0 ? Math.sqrt(r.I / (4 * F) / r.nO2) : 0;
+  if (Math.random() < FC.h2 * 0.08 * dt) FC.mol.push({ k: 'H2', x: lerp(225, 315, Math.random()), y: g.y0 + 10, cap: Math.random() < uH, ty: lerp(250, 430, Math.random()), a: Math.random() * 6 });
+  if (Math.random() < FC.o2 * 0.12 * dt) FC.mol.push({ k: 'O2', x: lerp(685, 775, Math.random()), y: g.y0 + 10, cap: Math.random() < uO, ty: lerp(250, 430, Math.random()), a: Math.random() * 6 });
+  for (let i = FC.mol.length - 1; i >= 0; i--) {
+    const m = FC.mol[i]; m.a += dt * 3;
+    m.y += 45 * dt;
+    if (m.cap && m.y >= m.ty) {
+      const tx = m.k === 'H2' ? g.aE - 6 : g.cE + 6; m.x += (tx - m.x) * dt * 4;
+      if (Math.abs(m.x - tx) < 3) {
+        FC.mol.splice(i, 1);
+        if (m.k === 'O2') for (let j = 0; j < 2; j++) FC.oh.push({ x: g.cE - 12, y: m.y + (j - 0.5) * 16, ph: Math.random() * 6 });
+        continue;
+      }
+    }
+    if (m.y > g.y1 + 20) FC.mol.splice(i, 1);
+  }
+  const vOH = 30 + 80 * Math.sqrt(clamp(util, 0, 1));
+  for (let i = FC.oh.length - 1; i >= 0; i--) {
+    const o = FC.oh[i]; o.ph += dt; o.x -= vOH * dt; o.y += Math.sin(o.ph * 3) * 10 * dt;
+    if (o.x < g.aE + 12) { FC.oh.splice(i, 1); FC.h2o.push({ x: g.aE - 20, y: o.y, ph: 0 }); }
+  }
+  for (let i = FC.h2o.length - 1; i >= 0; i--) { const w = FC.h2o[i]; w.ph += dt; w.x -= 10 * dt; w.y += 40 * dt; if (w.y > g.y1 + 30) FC.h2o.splice(i, 1); }
+  if (FC.mol.length > 120) FC.mol.splice(0, FC.mol.length - 120);
+}
+function fDraw() {
+  const ctx = FC.ctx, r = FC.last, g = fGeo; if (!r) return;
+  bg(ctx);
+  chip(ctx, 'ΔG < 0', 54, 22, '#14532d', '#bbf7d0', 12);
+  txt(ctx, `H₂ ${FC.h2} · O₂ ${FC.o2} mL/min · H₂O ${(FC.water).toFixed(2)} g`, 985, 22, { size: 14, color: '#5eead4', align: 'right', font: 'Georgia,serif', weight: 700 });
+  // cables y bombilla
+  const wL = [[g.aE, g.y0], [g.aE, 80], [480, 80]], wR = [[520, 80], [g.cE, 80], [g.cE, g.y0]];
+  strokePath(ctx, wL, '#0f172a', 9); strokePath(ctx, wL, '#2b3445', 5); strokePath(ctx, wR, '#0f172a', 9); strokePath(ctx, wR, '#dc2626', 5);
+  bulb(ctx, 500, 78, r.P / 2);
+  txt(ctx, `${r.V.toFixed(3)} V · ${fmtI(r.I)} · ${(r.P).toFixed(2)} W`, 500, 116, { size: 12, color: '#a3ff8f', font: 'ui-monospace,monospace' });
+  if (r.I > 0) { drawElectrons(ctx, makePath([[g.aE, g.y0 - 4], [g.aE, 80], [g.cE, 80], [g.cE, g.y0 - 4]]), FC.eOff, 26, p => Math.abs(p[0] - 500) < 22 && p[1] < 100); chip(ctx, 'e⁻ FLUJO →', 420, 58, '#1e3a8a', '#bfdbfe', 10); }
+  // carcasa
+  rr(ctx, g.x0, g.y0, g.x1 - g.x0, g.y1 - g.y0, 16); ctx.fillStyle = '#1e293b'; ctx.fill(); ctx.strokeStyle = '#475569'; ctx.lineWidth = 3; ctx.stroke();
+  // canales de gas
+  ctx.fillStyle = 'rgba(226,232,240,0.07)'; ctx.fillRect(g.x0 + 10, g.y0 + 10, g.aE - g.x0 - 18, g.y1 - g.y0 - 20); ctx.fillRect(g.cE + 8, g.y0 + 10, g.x1 - g.cE - 18, g.y1 - g.y0 - 20);
+  // electrolito
+  ctx.fillStyle = 'rgba(147,197,253,0.18)'; ctx.fillRect(g.aE + 8, g.y0 + 10, g.cE - g.aE - 16, g.y1 - g.y0 - 20);
+  txt(ctx, 'KOH(aq)', 500, g.y1 - 22, { size: 13, color: '#bfdbfe', weight: 800 });
+  // electrodos porosos
+  for (const x of [g.aE, g.cE]) { ctx.fillStyle = '#334155'; ctx.fillRect(x - 8, g.y0 + 6, 16, g.y1 - g.y0 - 12); ctx.fillStyle = '#64748b'; for (let y = g.y0 + 12; y < g.y1 - 10; y += 9) { ctx.beginPath(); ctx.arc(x + ((y / 9) % 2 ? -3 : 3), y, 2, 0, 7); ctx.fill(); } }
+  chip(ctx, 'ÁNODO −', g.aE, g.y0 - 14, '#e2e8f0', '#0f172a', 10); chip(ctx, 'CÁTODO +', g.cE, g.y0 - 14, '#e2e8f0', '#0f172a', 10);
+  // tuberías
+  ctx.fillStyle = '#475569'; ctx.fillRect(90, g.y0 + 20, g.x0 - 90, 18); ctx.fillRect(g.x1, g.y0 + 20, 110, 18); ctx.fillRect(90, g.y1 - 40, g.x0 - 90, 18); ctx.fillRect(g.x1, g.y1 - 40, 110, 18);
+  txt(ctx, 'H₂ entra →', 140, g.y0 + 8, { size: 12, color: '#e2e8f0', weight: 800 }); txt(ctx, '← O₂ entra', 860, g.y0 + 8, { size: 12, color: '#fca5a5', weight: 800 });
+  txt(ctx, '← H₂O + H₂ sobrante', 140, g.y1 - 2, { size: 11, color: '#93c5fd' }); txt(ctx, 'O₂ sobrante →', 860, g.y1 - 2, { size: 11, color: '#fca5a5' });
+  // válvulas (flujo)
+  const fl = (x, y, f, c) => { ctx.fillStyle = c; ctx.fillRect(x, y + 4, 60 * f, 10); };
+  fl(100, g.y0 + 20, FC.h2 / 120, '#e2e8f0'); fl(g.x1 + 40, g.y0 + 20, FC.o2 / 60, '#f87171');
+  // moléculas
+  for (const m of FC.mol) {
+    const rot = Math.sin(m.a) * 0.6;
+    ctx.save(); ctx.translate(m.x, m.y); ctx.rotate(rot);
+    if (m.k === 'H2') { ball(ctx, -5, 0, 5.5, '#f1f5f9'); ball(ctx, 5, 0, 5.5, '#f1f5f9'); }
+    else { ball(ctx, -6, 0, 7, '#e0313b'); ball(ctx, 6, 0, 7, '#e0313b'); }
+    ctx.restore();
+  }
+  for (const o of FC.oh) { ball(ctx, o.x, o.y, 7, '#e0313b', '', 1); ball(ctx, o.x + 8, o.y - 4, 4, '#f1f5f9'); txt(ctx, 'OH⁻', o.x, o.y - 13, { size: 9, color: '#c4b5fd', weight: 800 }); }
+  for (const w of FC.h2o) water(ctx, w.x, w.y, 0.8, 1, w.ph);
+  if (r.I > 0) chip(ctx, 'OH⁻ TRANSPORTA LA CARGA ←', 500, g.y0 + 28, '#0f172a', '#c4b5fd', 11);
+  txt(ctx, 'ánodo: H₂ + 2OH⁻ → 2H₂O + 2e⁻', 270, 500, { size: 12, color: '#cbd5e1', font: 'Georgia,serif' });
+  txt(ctx, 'cátodo: O₂ + 2H₂O + 4e⁻ → 4OH⁻', 730, 500, { size: 12, color: '#cbd5e1', font: 'Georgia,serif' });
+  txt(ctx, 'global: 2H₂ + O₂ → 2H₂O   ·   sin llama, solo agua', 500, 530, { size: 15, color: '#fde68a', font: 'Georgia,serif', weight: 700 });
+}
+function fPanel() {
+  const r = FC.last; if (!r) return;
+  const steps = [
+    ['El H₂ se oxida en el ánodo poroso', 'H₂ + 2OH⁻ → 2H₂O + 2e⁻'],
+    ['Los electrones encienden la bombilla', `V = ${r.V.toFixed(3)} V · I = ${fmtI(r.I)}`],
+    ['El O₂ se reduce en el cátodo', 'O₂ + 2H₂O + 4e⁻ → 4OH⁻'],
+    ['El OH⁻ cruza el KOH hacia el ánodo', 'el agua sale por el lado del ánodo'],
+  ];
+  const html = steps.map((s, i) => `<div class="step ${i === FC.step ? 'hl' : ''}"><span class="n">0${i + 1}</span>${s[0]}<i>${s[1]}</i></div>`).join('');
+  if ($('f-steps').dataset.h !== html) { $('f-steps').innerHTML = html; $('f-steps').dataset.h = html; }
+  out('f-out', [
+    ['E reversible (Nernst)', r.Erev.toFixed(3) + ' V'],
+    ['Voltaje en circuito abierto', (r.OCV || 0).toFixed(3) + ' V'],
+    ['Voltaje de trabajo', r.V.toFixed(3) + ' V'],
+    ['Corriente I', fmtI(r.I)],
+    ['Corriente límite (por gas)', r.IL.toFixed(2) + ' A' + (r.lim ? ` (limita ${r.lim})` : '')],
+    ['Potencia eléctrica', r.P.toFixed(3) + ' W'],
+    ['Eficiencia (V / 1.48 V)', (r.V / 1.481 * 100).toFixed(1) + ' %'],
+    ['Aprovechamiento de H₂', (r.nH2 > 0 ? r.I / (2 * F) / r.nH2 * 100 : 0).toFixed(1) + ' %'],
+    ['Agua producida', (r.I / (2 * F) * 18.015 * 3600).toFixed(2) + ' g/h'],
+    ['Tiempo', fmtT(FC.t)],
+    ['Agua acumulada', FC.water.toFixed(3) + ' g'],
+    ['Energía entregada', FC.energy < 3600 ? FC.energy.toFixed(0) + ' J' : (FC.energy / 3600).toFixed(3) + ' Wh'],
+  ]);
+  let msg = '';
+  if (r.none) msg = 'Sin hidrógeno u oxígeno no hay reacción: abre ambas válvulas.';
+  else if (r.IL > 0 && r.I / r.IL > 0.9) msg = `La celda está “hambrienta” de ${r.lim}: casi todo el gas se consume y el voltaje se desploma (pérdidas por concentración).`;
+  warn('f-warn', msg);
+  if (r.IL > 0) {
+    const pts = [], pw = [];
+    for (let i = 0; i <= 60; i++) { const I = r.IL * 0.999 * i / 60; const V = Math.max(0, fcModel(I, r)); pts.push([I, V]); pw.push([I, I * V]); }
+    const pmax = Math.max(...pw.map(p => p[1]), 0.1);
+    chart(FC.chx, { title: 'Curva de polarización', xlab: 'I (A)', xmin: 0, xmax: r.IL, ymin: 0, ymax: 1.3, y2: { ymin: 0, ymax: pmax * 1.15, color: '#f87171' },
+      series: [{ pts, color: '#5eead4', label: 'V (V)' }, { pts: pw, color: '#f87171', label: 'P (W)', axis: 2 }], point: [r.I, r.V] });
+  } else chart(FC.chx, { title: 'Curva de polarización', xlab: 'I (A)', xmin: 0, xmax: 1, ymin: 0, ymax: 1.3, series: [{ pts: [], color: '#5eead4', label: 'V (V)' }] });
+}
+function fLabels() {
+  $('f-h2-v').textContent = FC.h2 + ' mL/min'; $('f-o2-v').textContent = FC.o2 + ' mL/min'; $('f-P-v').textContent = FC.P.toFixed(1) + ' atm'; $('f-T-v').textContent = FC.T + ' °C';
+  $('f-R-v').textContent = (FC.R < 1 ? FC.R.toFixed(3) : FC.R.toFixed(2)) + ' Ω'; $('f-vel-v').textContent = fmtVel(FC.vel); $('f-run').textContent = FC.run ? '⏸ Pausa' : '▶ Continuar';
+}
+function fToUI() { $('f-h2').value = FC.h2; $('f-o2').value = FC.o2; $('f-P').value = FC.P; $('f-T').value = FC.T; $('f-R').value = logInv(FC.R, 0.02, 20); $('f-vel').value = logInv(FC.vel, 1, 3600); fLabels(); }
+function fInit() {
+  FC.ctx = setupCanvas($('cv-fuel'), 1000, 560); FC.chx = setupCanvas($('ch-fuel'), 700, 220);
+  $('f-h2').oninput = e => { FC.h2 = +e.target.value; fLabels(); };
+  $('f-o2').oninput = e => { FC.o2 = +e.target.value; fLabels(); };
+  $('f-P').oninput = e => { FC.P = +e.target.value; fLabels(); };
+  $('f-T').oninput = e => { FC.T = +e.target.value; fLabels(); };
+  $('f-R').oninput = e => { FC.R = logMap(+e.target.value, 0.02, 20); fLabels(); };
+  $('f-vel').oninput = e => { FC.vel = logMap(+e.target.value, 1, 3600); fLabels(); };
+  $('f-run').onclick = () => { FC.run = !FC.run; fLabels(); };
+  $('f-reset').onclick = () => { FC.t = 0; FC.water = 0; FC.h2used = 0; FC.energy = 0; FC.mol = []; FC.oh = []; FC.h2o = []; };
+  $('f-sweep').onclick = () => { FC.sweep = { i: 0, tt: 0 }; FC.R = 20; $('f-R').value = 1000; fLabels(); };
+  FC.log = makeLog('f', ['R (Ω)', 'I (A)', 'V (V)', 'P (W)', 'η (%)', 'H₂ mL/min', 'O₂ mL/min', 'T °C', 'P atm'], () => {
+    const r = FC.last; return [FC.R.toFixed(3), r.I.toFixed(3), r.V.toFixed(3), r.P.toFixed(3), (r.V / 1.481 * 100).toFixed(1), FC.h2, FC.o2, FC.T, FC.P];
+  });
+  const set = o => { Object.assign(FC, { h2: 60, o2: 30, P: 1, T: 60, R: 1, vel: 60, run: true }, o); fToUI(); };
+  experiments('f-exp', [
+    { t: 'Voltaje en circuito abierto', d: 'Pon la resistencia al máximo (20 Ω): casi no circula corriente.', q: '¿Por qué el voltaje medido es menor que 1.23 V aun sin corriente?', set: () => set({ R: 20 }) },
+    { t: 'Curva de polarización completa', d: 'Pulsa “📈 Barrido de R”: el simulador baja la resistencia y registra V, I y P en el cuaderno.', q: 'Identifica las 3 zonas: activación, óhmica y concentración. ¿En qué corriente hay potencia máxima?', set: () => { set({}); FC.sweep = { i: 0, tt: 0 }; FC.R = 20; $('f-R').value = 1000; fLabels(); } },
+    { t: 'Estequiometría 2 : 1', d: 'H₂ = 60 mL/min y O₂ = 15 mL/min (falta oxígeno). Luego O₂ = 30 y 45.', q: '¿Qué gas limita la corriente en cada caso? ¿Por qué la relación ideal es 2 : 1?', set: () => set({ o2: 15, R: 0.2 }) },
+    { t: 'Celda “hambrienta”', d: 'Resistencia muy baja (0.05 Ω) con poco H₂ (20 mL/min).', q: '¿Qué pasa con el voltaje cuando se consume casi el 100 % del combustible?', set: () => set({ h2: 20, R: 0.05 }) },
+    { t: 'Presión y temperatura', d: 'Compara 1 atm y 5 atm; luego 25 °C y 90 °C con R = 0.3 Ω.', q: '¿Cuál efecto es termodinámico (Nernst) y cuál cinético (catálisis)?', set: () => set({ R: 0.3 }) },
+    { t: '¿Cuánta agua bebe un astronauta?', d: 'Una celda a 1 A produce agua de forma continua. Pon velocidad 3600× y mira el agua acumulada en 1 h.', q: 'Calcula: 1 A × 3600 s / (2F) × 18 g/mol. ¿Coincide?', set: () => set({ R: 0.5, vel: 3600 }) },
+  ]);
+  fToUI();
+}
+
+/* ======================================================================
+   4. BATERÍA DE PLOMO
+   ====================================================================== */
+const PB = { soc: 1, soc0: 1, modo: 'desc', R: 4, Vch: 2.45, Imax: 1, cap: 2, cells: 1, vel: 300, run: true, t: 0, q: 0, hist: [], histT: 0, acid: [], bub: [], eOff: 0, step: -1, stepT: 0, last: null, spots: null };
+const pGeo = { x0: 220, x1: 760, y0: 190, y1: 470, liq: 222, pl: [300, 360], pr: [620, 680] };
+function pbCalc() {
+  const N = PB.cells, s = PB.soc;
+  const rho = 1.10 + 0.18 * s;
+  let ocv = rho + 0.84; if (s < 0.06) ocv -= (0.06 - s) * 10;
+  const r = 0.012 + 0.05 * (1 - s);
+  let I = 0, V = N * ocv, gas = false, eff = 1;
+  if (PB.modo === 'desc') { I = s > 0 ? Math.max(0, N * ocv / (PB.R + N * r)) : 0; V = I * PB.R; }
+  else if (PB.modo === 'carga') {
+    const back = ocv + 0.3 * Math.pow(s, 4), rc = 0.15;
+    I = clamp((PB.Vch - back) / rc, 0, PB.Imax);
+    V = N * (back + I * rc);
+    gas = back > 2.33 && I > 0;
+    eff = s < 0.85 ? 0.97 : clamp(0.97 - (s - 0.85) * 5.5, 0.05, 0.97);
+    if (s >= 1) eff = 0;
+  }
+  return { N, s, rho, ocv, r, I, V, gas, eff, P: I * V };
+}
+function pbStep(dt) {
+  const r = pbCalc(); PB.last = r;
+  if (!PB.run) return;
+  const dts = dt * PB.vel; PB.t += dts;
+  if (PB.modo === 'desc') { PB.soc = Math.max(0, PB.soc - r.I * dts / (PB.cap * 3600)); PB.q += r.I * dts; }
+  if (PB.modo === 'carga') { PB.soc = Math.min(1, PB.soc + r.I * r.eff * dts / (PB.cap * 3600)); PB.q -= r.I * r.eff * dts; }
+  PB.histT += dt;
+  if (PB.histT > 0.15) { PB.histT = 0; PB.hist.push([PB.t, PB.soc * 100, r.V / r.N]); if (PB.hist.length > 800) PB.hist = PB.hist.filter((_, i) => i % 2 === 0); }
+  if (r.I > 0) { PB.stepT += dt; if (PB.stepT > 2.6) { PB.stepT = 0; PB.step = (PB.step + 1) % 4; } } else PB.step = -1;
+  const dir = PB.modo === 'desc' ? 1 : -1;
+  PB.eOff += dir * (r.I > 0 ? 30 + 120 * Math.sqrt(clamp(r.I / 3, 0, 1)) : 0) * dt;
+  // ácido
+  const g = pGeo, target = Math.round((r.rho - 1.0) * 120);
+  while (PB.acid.length < target) PB.acid.push({ x: lerp(380, 600, Math.random()), y: lerp(g.liq + 15, g.y1 - 20, Math.random()), ph: Math.random() * 6, a: 0, die: 0 });
+  if (PB.acid.length > target) { const p = PB.acid.find(p => !p.die); if (p) p.die = 1; }
+  for (let i = PB.acid.length - 1; i >= 0; i--) {
+    const p = PB.acid[i]; p.ph += dt; p.a = Math.min(1, p.a + dt);
+    if (p.die) { const tx = p.x < 490 ? g.pl[1] + 6 : g.pr[0] - 6; p.x += (tx - p.x) * dt * 3; if (Math.abs(p.x - tx) < 4) PB.acid.splice(i, 1); }
+    else { p.x += Math.sin(p.ph * 1.3) * 12 * dt; p.y += Math.cos(p.ph * 1.7) * 12 * dt; p.x = clamp(p.x, 375, 605); p.y = clamp(p.y, g.liq + 10, g.y1 - 15); }
+  }
+  if (r.gas && Math.random() < dt * 14) PB.bub.push({ x: Math.random() < 0.5 ? lerp(g.pl[0], g.pl[1], Math.random()) : lerp(g.pr[0], g.pr[1], Math.random()), y: g.y1 - 30, r: 2 + Math.random() * 3 });
+  for (let i = PB.bub.length - 1; i >= 0; i--) { const b = PB.bub[i]; b.y -= (50 + b.r * 10) * dt; if (b.y < g.liq) PB.bub.splice(i, 1); }
+}
+function pDraw() {
+  const ctx = PB.ctx, r = PB.last, g = pGeo; if (!r) return;
+  bg(ctx);
+  if (!PB.spots) { PB.spots = [[], []]; for (let k = 0; k < 2; k++) for (let i = 0; i < 90; i++) PB.spots[k].push([Math.random(), Math.random(), 2 + Math.random() * 3.5]); }
+  const desc = PB.modo === 'desc', carga = PB.modo === 'carga';
+  txt(ctx, desc ? 'DESCARGA' : carga ? 'CARGA' : 'REPOSO', 30, 24, { size: 18, align: 'left', color: desc ? '#fde68a' : carga ? '#93c5fd' : '#94a3b8', font: 'Georgia,serif', weight: 700 });
+  txt(ctx, `ácido ${r.rho.toFixed(3)} g/mL`, 985, 24, { size: 15, align: 'right', color: '#fbbf24', font: 'Georgia,serif', weight: 700 });
+  if (r.I > 0) chip(ctx, desc ? 'ΔG < 0 · galvánica' : 'ΔG > 0 · electrolítica', 500, 24, desc ? '#14532d' : '#7f1d1d', desc ? '#bbf7d0' : '#fecaca', 11);
+  // cables
+  const xl = (g.pl[0] + g.pl[1]) / 2, xr = (g.pr[0] + g.pr[1]) / 2;
+  const wL = [[xl, g.y0 - 20], [xl, 86], [462, 86]], wR = [[538, 86], [xr, 86], [xr, g.y0 - 20]];
+  strokePath(ctx, wL, '#0f172a', 9); strokePath(ctx, wL, '#2b3445', 5); strokePath(ctx, wR, '#0f172a', 9); strokePath(ctx, wR, '#dc2626', 5);
+  if (desc) { bulb(ctx, 500, 84, r.P / 3); }
+  else if (carga) { rr(ctx, 450, 60, 100, 52, 8); ctx.fillStyle = '#1f2937'; ctx.fill(); ctx.strokeStyle = '#64748b'; ctx.lineWidth = 2; ctx.stroke(); txt(ctx, 'CARGADOR', 500, 76, { size: 10, weight: 900 }); txt(ctx, `${(PB.Vch * r.N).toFixed(2)} V DC`, 500, 96, { size: 11, color: '#a3ff8f', font: 'ui-monospace,monospace' }); }
+  else { strokePath(ctx, [[462, 86], [490, 70]], '#94a3b8', 4); txt(ctx, 'interruptor abierto', 500, 108, { size: 10, color: '#94a3b8' }); }
+  txt(ctx, `${r.V.toFixed(2)} V · ${fmtI(r.I)}`, 500, 132, { size: 12, color: '#a3ff8f', font: 'ui-monospace,monospace' });
+  if (r.I > 0) drawElectrons(ctx, makePath([[xl, g.y0 - 24], [xl, 86], [xr, 86], [xr, g.y0 - 24]]), PB.eOff, 26, p => Math.abs(p[0] - 500) < 52 && p[1] < 115);
+  if (r.I > 0) chip(ctx, desc ? 'e⁻ FLUJO →' : '← e⁻ FLUJO', desc ? 400 : 600, 66, '#1e3a8a', '#bfdbfe', 10);
+  // terminales
+  ctx.fillStyle = '#475569'; ctx.fillRect(xl - 10, g.y0 - 24, 20, 30); ctx.fillRect(xr - 10, g.y0 - 24, 20, 30);
+  txt(ctx, '−', xl - 26, g.y0 - 12, { size: 22, weight: 900, color: '#93c5fd' }); txt(ctx, '+', xr + 26, g.y0 - 12, { size: 22, weight: 900, color: '#fca5a5' });
+  // caja
+  rr(ctx, g.x0, g.y0, g.x1 - g.x0, g.y1 - g.y0, 12); ctx.fillStyle = 'rgba(30,41,59,0.9)'; ctx.fill();
+  ctx.fillStyle = `rgba(253,230,138,${0.06 + (r.rho - 1.1) * 0.9})`; ctx.fillRect(g.x0 + 6, g.liq, g.x1 - g.x0 - 12, g.y1 - g.liq - 6);
+  txt(ctx, 'H₂SO₄(aq)', 490, g.y1 - 16, { size: 12, color: '#fde68a', weight: 800 });
+  for (const p of PB.acid) ball(ctx, p.x, p.y, 4.5, '#facc15', '', p.a * (p.die ? 0.7 : 1));
+  // placas
+  const plate = (x0, x1, col, spots, lab, sub) => {
+    const gr = ctx.createLinearGradient(x0, 0, x1, 0); gr.addColorStop(0, shade(col, -0.3)); gr.addColorStop(0.5, col); gr.addColorStop(1, shade(col, -0.4));
+    ctx.fillStyle = gr; ctx.fillRect(x0, g.y0 + 6, x1 - x0, g.y1 - g.y0 - 30);
+    ctx.strokeStyle = 'rgba(0,0,0,0.25)'; for (let y = g.y0 + 20; y < g.y1 - 30; y += 14) { ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke(); }
+    const n = Math.round((1 - r.s) * spots.length);
+    for (let i = 0; i < n; i++) { const [u, v, rad] = spots[i]; ctx.fillStyle = 'rgba(241,245,249,0.92)'; ctx.beginPath(); ctx.arc(lerp(x0 + 3, x1 - 3, u), lerp(g.liq + 6, g.y1 - 30, v), rad, 0, 7); ctx.fill(); }
+    txt(ctx, lab, (x0 + x1) / 2, g.y1 + 14, { size: 13, weight: 800 }); txt(ctx, sub, (x0 + x1) / 2, g.y1 + 30, { size: 10, color: '#93a4c0' });
+  };
+  plate(g.pl[0], g.pl[1], '#8a929e', PB.spots[0], 'Pb', 'placa negativa');
+  plate(g.pr[0], g.pr[1], '#7c2d12', PB.spots[1], 'PbO₂', 'placa positiva');
+  for (const b of PB.bub) { ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 7); ctx.stroke(); }
+  if (r.gas) chip(ctx, 'GASIFICACIÓN: H₂ y O₂ (electrólisis del agua)', 490, g.liq + 20, '#7f1d1d', '#fecaca', 10);
+  chip(ctx, '● PbSO₄', 490, g.y0 + 50, 'rgba(241,245,249,0.9)', '#0f172a', 10);
+  // densímetro
+  const hx = 860, hy0 = 200, hy1 = 470;
+  rr(ctx, hx - 22, hy0, 44, hy1 - hy0, 18); ctx.fillStyle = 'rgba(253,230,138,0.12)'; ctx.fill(); ctx.strokeStyle = 'rgba(220,235,255,0.6)'; ctx.lineWidth = 2; ctx.stroke();
+  const fy = lerp(hy1 - 60, hy0 + 60, (r.rho - 1.10) / 0.18);
+  ctx.fillStyle = '#e2e8f0'; rr(ctx, hx - 7, fy - 50, 14, 70, 7); ctx.fill(); ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(hx, fy + 25, 12, 0, 7); ctx.fill();
+  txt(ctx, 'densímetro', hx, hy1 + 14, { size: 11, color: '#93a4c0' }); txt(ctx, r.rho.toFixed(3), hx, hy0 - 12, { size: 13, color: '#fbbf24', weight: 800 });
+  // barra SOC
+  rr(ctx, 40, 200, 26, 270, 8); ctx.fillStyle = '#0b1730'; ctx.fill(); ctx.strokeStyle = '#475569'; ctx.stroke();
+  const hh = 262 * r.s; ctx.fillStyle = r.s > 0.5 ? '#4ade80' : r.s > 0.2 ? '#facc15' : '#ef4444'; rr(ctx, 44, 466 - hh, 18, hh, 5); ctx.fill();
+  txt(ctx, (r.s * 100).toFixed(0) + '%', 53, 488, { size: 12, weight: 800 }); txt(ctx, 'carga', 53, 186, { size: 11, color: '#93a4c0' });
+  txt(ctx, desc ? 'DESCARGA = GALVÁNICA' : carga ? 'CARGA = ELECTROLÍTICA' : 'BATERÍA EN REPOSO', 490, 520, { size: 15, color: desc ? '#fde68a' : carga ? '#93c5fd' : '#94a3b8', weight: 800 });
+}
+function pPanel() {
+  const r = PB.last; if (!r) return;
+  const desc = PB.modo === 'desc', carga = PB.modo === 'carga';
+  $('p-eqdir').innerHTML = `Pb + PbO₂ + 2H₂SO₄ <span class="arr ${desc && r.I > 0 ? 'on' : 'off'}">⟶ descarga</span> / <span class="arr ${carga && r.I > 0 ? 'on' : 'off'}">carga ⟵</span> 2PbSO₄ + 2H₂O`;
+  const steps = desc ? [
+    ['En la placa negativa el Pb se oxida', 'Pb + SO₄²⁻ → PbSO₄ + 2e⁻'],
+    ['Los electrones encienden la bombilla', `I = ${fmtI(r.I)}`],
+    ['En la placa positiva el PbO₂ se reduce', 'PbO₂ + 4H⁺ + SO₄²⁻ + 2e⁻ → PbSO₄ + 2H₂O'],
+    ['Se consume ácido: la densidad baja', `ρ = ${r.rho.toFixed(3)} g/mL`],
+  ] : [
+    ['El cargador arranca electrones de la placa +', 'PbSO₄ + 2H₂O → PbO₂ + 4H⁺ + SO₄²⁻ + 2e⁻'],
+    ['…y los empuja hacia la placa −', `V cargador = ${(PB.Vch * r.N).toFixed(2)} V`],
+    ['En la placa negativa se regenera Pb', 'PbSO₄ + 2e⁻ → Pb + SO₄²⁻'],
+    ['Se regenera ácido: la densidad sube', r.gas ? '¡cerca del 100 % el agua se electroliza!' : `ρ = ${r.rho.toFixed(3)} g/mL`],
+  ];
+  const html = steps.map((s, i) => `<div class="step ${i === PB.step ? 'hl' : ''}"><span class="n">0${i + 1}</span>${s[0]}<i>${s[1]}</i></div>`).join('');
+  if ($('p-steps').dataset.h !== html) { $('p-steps').innerHTML = html; $('p-steps').dataset.h = html; }
+  const molE = Math.max(0, (1 - r.s) * PB.cap * 3600 / F);
+  out('p-out', [
+    ['Estado de carga', (r.s * 100).toFixed(1) + ' %'],
+    ['Densidad del ácido', r.rho.toFixed(3) + ' g/mL'],
+    ['Voltaje en reposo (por celda)', r.ocv.toFixed(3) + ' V'],
+    ['Voltaje en bornes (total)', r.V.toFixed(2) + ' V'],
+    ['Corriente', fmtI(r.I)],
+    ['Potencia', r.P.toFixed(2) + ' W'],
+    ['Eficiencia de carga', carga ? (r.eff * 100).toFixed(0) + ' %' : '—'],
+    ['Tiempo', fmtT(PB.t)],
+    ['Carga entregada neta', (PB.q / 3600).toFixed(3) + ' Ah'],
+    ['PbSO₄ en las placas (por celda)', (molE * 303.26).toFixed(2) + ' g'],
+    ['H₂SO₄ consumido (por celda)', (molE * 98.08).toFixed(2) + ' g'],
+    ['Autonomía restante', desc && r.I > 0 ? fmtT(r.s * PB.cap * 3600 / r.I) : '—'],
+  ]);
+  let msg = '';
+  if (desc && r.s <= 0.001) msg = 'Batería descargada: las placas están cubiertas de PbSO₄. Cambia a modo Carga.';
+  else if (carga && r.s >= 0.999) msg = 'Carga completa: toda la corriente adicional solo electroliza el agua (gasificación).';
+  else if (carga && PB.Vch < r.ocv) msg = 'El voltaje del cargador es menor que el de la batería: no puede cargarla.';
+  warn('p-warn', msg);
+  const h = PB.hist;
+  chart(PB.chx, { title: 'Estado de carga y voltaje por celda', xlab: 'tiempo simulado', xmin: h.length ? h[0][0] : 0, xmax: Math.max(1, h.length ? h[h.length - 1][0] : 1), ymin: 0, ymax: 100,
+    xfmt: v => fmtT(v).replace(/ \d+ s$/, ''), y2: { ymin: 1.6, ymax: 2.7, color: '#5eead4' },
+    series: [{ pts: h.map(p => [p[0], p[1]]), color: '#4ade80', label: 'carga (%)' }, { pts: h.map(p => [p[0], p[2]]), color: '#5eead4', label: 'V/celda', axis: 2 }] });
+}
+function pLabels() {
+  $('p-R-v').textContent = PB.R.toFixed(PB.R < 10 ? 2 : 1) + ' Ω'; $('p-Vch-v').textContent = PB.Vch.toFixed(2) + ' V (' + (PB.Vch * PB.cells).toFixed(1) + ' V total)';
+  $('p-Imax-v').textContent = PB.Imax.toFixed(1) + ' A'; $('p-cap-v').textContent = PB.cap + ' Ah'; $('p-soc-v').textContent = Math.round(PB.soc0 * 100) + ' %';
+  $('p-vel-v').textContent = fmtVel(PB.vel); $('p-run').textContent = PB.run ? '⏸ Pausa' : '▶ Continuar';
+}
+function pToUI() { setRadio('p-modo', PB.modo); setRadio('p-cells', String(PB.cells)); $('p-R').value = logInv(PB.R, 0.2, 100); $('p-Vch').value = PB.Vch; $('p-Imax').value = PB.Imax; $('p-cap').value = PB.cap; $('p-soc').value = PB.soc0 * 100; $('p-vel').value = logInv(PB.vel, 1, 5000); pLabels(); }
+function pReset() { PB.soc = PB.soc0; PB.t = 0; PB.q = 0; PB.hist = []; PB.bub = []; }
+function pInit() {
+  PB.ctx = setupCanvas($('cv-lead'), 1000, 540); PB.chx = setupCanvas($('ch-lead'), 700, 200);
+  document.querySelectorAll('input[name="p-modo"]').forEach(r => r.onchange = () => { PB.modo = radioVal('p-modo'); });
+  document.querySelectorAll('input[name="p-cells"]').forEach(r => r.onchange = () => { PB.cells = +radioVal('p-cells'); pLabels(); });
+  $('p-R').oninput = e => { PB.R = logMap(+e.target.value, 0.2, 100); pLabels(); };
+  $('p-Vch').oninput = e => { PB.Vch = +e.target.value; pLabels(); };
+  $('p-Imax').oninput = e => { PB.Imax = +e.target.value; pLabels(); };
+  $('p-cap').oninput = e => { PB.cap = +e.target.value; pLabels(); };
+  $('p-soc').oninput = e => { PB.soc0 = +e.target.value / 100; PB.soc = PB.soc0; pLabels(); };
+  $('p-vel').oninput = e => { PB.vel = logMap(+e.target.value, 1, 5000); pLabels(); };
+  $('p-run').onclick = () => { PB.run = !PB.run; pLabels(); };
+  $('p-reset').onclick = () => { pReset(); };
+  makeLog('p', ['Modo', 't (s)', 'Carga (%)', 'ρ (g/mL)', 'V (V)', 'I (A)', 'Ah netos'], () => {
+    const r = PB.last; return [PB.modo, PB.t.toFixed(0), (r.s * 100).toFixed(1), r.rho.toFixed(3), r.V.toFixed(3), r.I.toFixed(3), (PB.q / 3600).toFixed(3)];
+  });
+  const set = o => { Object.assign(PB, { modo: 'desc', R: 4, Vch: 2.45, Imax: 1, cap: 2, cells: 1, vel: 300, soc0: 1, run: true }, o); pReset(); pToUI(); };
+  experiments('p-exp', [
+    { t: 'Descarga completa', d: 'Batería de 2 Ah al 100 % con una carga de 4 Ω.', q: '¿Cómo evolucionan la densidad y el voltaje? ¿Por qué las dos placas se vuelven blancas?', set: () => set({}) },
+    { t: 'Carga y gasificación', d: 'Batería al 20 % en modo carga a 2.45 V/celda.', q: '¿Por qué la eficiencia cae al final? ¿Qué gases salen y de dónde?', set: () => set({ modo: 'carga', soc0: 0.2, vel: 600 }) },
+    { t: 'El densímetro como medidor de carga', d: 'Mueve el estado de carga inicial y registra ρ y el voltaje en reposo.', q: 'Verifica la regla V ≈ ρ + 0.84. ¿Qué densidad corresponde a una batería al 50 %?', set: () => set({ modo: 'rep', soc0: 0.5 }) },
+    { t: 'Batería de automóvil (12 V)', d: '6 celdas en serie, 45 Ah, carga de 1.2 Ω (≈ 120 W).', q: '¿Cuántas horas dura? Compara con Capacidad / I.', set: () => set({ cells: 6, cap: 45, R: 1.2, vel: 3000 }) },
+    { t: 'Cargador insuficiente', d: 'Modo carga con solo 2.05 V por celda en una batería al 50 %.', q: '¿Por qué no fluye corriente? ¿Qué condición debe cumplir el cargador?', set: () => set({ modo: 'carga', soc0: 0.5, Vch: 2.05 }) },
+  ]);
+  pToUI();
+}
+
+/* ======================================================================
+   EJERCICIOS
+   ====================================================================== */
+const X = { cur: null, ok: 0, tot: 0, streak: 0, done: false };
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const pair = (pool = Object.keys(METALES)) => { const a = pick(pool); let b; do b = pick(pool); while (b === a); return METALES[a].E < METALES[b].E ? [a, b] : [b, a]; };
+const D = s => `<span class="data">${s}</span>`;
+const TIPOS = {
+  e0: { n: 'E° de una pila', gen() {
+    const [a, c] = pair(); const A = METALES[a], C = METALES[c]; const E0 = C.E - A.E;
+    return { q: `Se construye una pila con un electrodo de ${A.nombre.toLowerCase()} en ${A.sal} ${D('1 M')} y otro de ${C.nombre.toLowerCase()} en ${C.sal} ${D('1 M')} a 25 °C. Calcula el <b>potencial estándar</b> de la celda (V).`,
+      ans: E0, tol: 0.011, abs: true, unit: 'V',
+      sol: `El metal con menor E° se oxida (ánodo): <b>${a}</b> (${A.E.toFixed(2)} V). El otro se reduce (cátodo): <b>${c}</b> (${C.E.toFixed(2)} V).<br>E° = E°<sub>cát</sub> − E°<sub>án</sub> = ${signed(C.E)} − ${signed(A.E)} = <b>${E0.toFixed(2)} V</b>`,
+      sim: () => { goTab('galv'); Object.assign(G, { L: a, R: c, cL: 1, cR: 1, T: 25, modo: 'volt', puente: true, run: true }); gReset(); gToUI(); } };
+  } },
+  nernst: { n: 'Ecuación de Nernst', gen() {
+    const [a, c] = pick([['Zn', 'Cu'], ['Zn', 'Cu'], ['Fe', 'Cu'], ['Ni', 'Ag'], ['Zn', 'Ni'], ['Mg', 'Cu'], ['Pb', 'Cu']]);
+    const A = METALES[a], C = METALES[c];
+    const cs = [0.001, 0.005, 0.01, 0.05, 0.1, 0.2, 0.5, 1, 1.5, 2];
+    const cA = pick(cs), cC = pick(cs);
+    const n = lcm(A.n, C.n), nuA = n / A.n, nuC = n / C.n, E0 = C.E - A.E;
+    const Q = Math.pow(cA, nuA) / Math.pow(cC, nuC); const E = E0 - 0.05916 / n * Math.log10(Q);
+    return { q: `Pila ${a} | ${A.ion} (${D(cA + ' M')}) ‖ ${C.ion} (${D(cC + ' M')}) | ${c} a 25 °C. Calcula el potencial E de la celda (V).`,
+      ans: E, tol: 0.006, abs: true, unit: 'V',
+      sol: `Reacción: ${nuA > 1 ? nuA : ''}${a} + ${nuC > 1 ? nuC : ''}${C.ion} → ${nuA > 1 ? nuA : ''}${A.ion} + ${nuC > 1 ? nuC : ''}${c} &nbsp; (n = ${n})<br>E° = ${signed(C.E)} − ${signed(A.E)} = ${E0.toFixed(2)} V<br>Q = [${A.ion}]${nuA > 1 ? '<sup>' + nuA + '</sup>' : ''}/[${C.ion}]${nuC > 1 ? '<sup>' + nuC + '</sup>' : ''} = ${fmtSig(Q, 3)}<br>E = ${E0.toFixed(2)} − (0.0592/${n})·log(${fmtSig(Q, 3)}) = <b>${E.toFixed(3)} V</b>`,
+      sim: () => { goTab('galv'); Object.assign(G, { L: a, R: c, cL: cA, cR: cC, T: 25, modo: 'volt', puente: true, run: true }); gReset(); gToUI(); } };
+  } },
+  dg: { n: 'ΔG° de una pila', gen() {
+    const [a, c] = pair(); const A = METALES[a], C = METALES[c]; const n = lcm(A.n, C.n), E0 = C.E - A.E, dG = -n * F * E0 / 1000;
+    return { q: `Para la pila ${a} | ${A.ion} ‖ ${C.ion} | ${c} en condiciones estándar, calcula ΔG° en <b>kJ</b> (por mol de reacción, con los menores coeficientes enteros).`,
+      ans: dG, tol: 0.02, unit: 'kJ',
+      sol: `E° = ${signed(C.E)} − ${signed(A.E)} = ${E0.toFixed(2)} V. Se intercambian n = mcm(${A.n}, ${C.n}) = ${n} e⁻.<br>ΔG° = −nFE° = −${n} × 96485 × ${E0.toFixed(2)} = <b>${dG.toFixed(1)} kJ</b> (negativo → espontánea)`,
+      sim: () => { goTab('galv'); Object.assign(G, { L: a, R: c, cL: 1, cR: 1, modo: 'volt', puente: true }); gReset(); gToUI(); } };
+  } },
+  logK: { n: 'Constante de equilibrio', gen() {
+    const [a, c] = pick([['Zn', 'Cu'], ['Fe', 'Cu'], ['Ni', 'Cu'], ['Cu', 'Ag'], ['Pb', 'Ag'], ['Zn', 'Ni']]); const A = METALES[a], C = METALES[c];
+    const n = lcm(A.n, C.n), E0 = C.E - A.E, lk = n * E0 / 0.05916;
+    return { q: `Calcula <b>log K</b> a 25 °C para la reacción de la pila ${a} | ${A.ion} ‖ ${C.ion} | ${c}.`, ans: lk, tol: 0.02, unit: '',
+      sol: `E° = ${E0.toFixed(2)} V, n = ${n}.<br>log K = nE°/0.0592 = ${n} × ${E0.toFixed(2)} / 0.0592 = <b>${lk.toFixed(1)}</b> → K ≈ 10<sup>${lk.toFixed(0)}</sup>. ¡La reacción es prácticamente completa!`,
+      sim: () => { goTab('galv'); Object.assign(G, { L: a, R: c, cL: 1, cR: 1, modo: 'volt' }); gReset(); gToUI(); } };
+  } },
+  faradayM: { n: 'Faraday: masa depositada', gen() {
+    const opts = [['Cu', 'CuSO4'], ['Ag', 'AgNO3'], ['Ni', 'NiSO4'], ['Cu', 'CuCl2']];
+    const [m, sol] = pick(opts); const M = METALES[m];
+    const I = pick([0.5, 0.8, 1, 1.5, 2, 2.5, 3]), tmin = pick([5, 10, 15, 20, 30]);
+    const mass = I * tmin * 60 * M.M / (M.n * F);
+    return { q: `Se electroliza una disolución de ${ELECTROLITOS[sol].nombre.split(' ')[0]} con una corriente de ${D(I + ' A')} durante ${D(tmin + ' min')}. ¿Qué masa de ${M.nombre.toLowerCase()} se deposita en el cátodo (g)?`,
+      ans: mass, tol: 0.02, unit: 'g',
+      sol: `Q = I·t = ${I} × ${tmin * 60} = ${(I * tmin * 60).toFixed(0)} C<br>mol e⁻ = Q/F = ${(I * tmin * 60 / F).toFixed(5)} mol<br>${M.ion} + ${eStr(M.n)} → ${m}: mol ${m} = ${(I * tmin * 60 / F / M.n).toFixed(5)} mol<br>m = ${(I * tmin * 60 / F / M.n).toFixed(5)} × ${M.M} = <b>${mass.toFixed(3)} g</b>`,
+      sim: () => { goTab('elec'); Object.assign(EL, { sol, c: 1, d: 4, modo: 'I', Iset: I, tstop: tmin * 60, vel: 50, run: true }); eReset(); eToUI(); } };
+  } },
+  faradayT: { n: 'Faraday: tiempo necesario', gen() {
+    const [m, sol] = pick([['Cu', 'CuSO4'], ['Ag', 'AgNO3'], ['Ni', 'NiSO4']]); const M = METALES[m];
+    const I = pick([0.5, 1, 2, 2.5, 4]), mass = pick([0.1, 0.2, 0.25, 0.5, 1]);
+    const t = mass / M.M * M.n * F / I / 60;
+    return { q: `¿Cuántos <b>minutos</b> se necesitan para depositar ${D(mass + ' g')} de ${M.nombre.toLowerCase()} a partir de ${ELECTROLITOS[sol].nombre.split(' ')[0]} con una corriente de ${D(I + ' A')}?`,
+      ans: t, tol: 0.02, unit: 'min',
+      sol: `mol ${m} = ${mass}/${M.M} = ${(mass / M.M).toFixed(5)} mol → mol e⁻ = × ${M.n} = ${(mass / M.M * M.n).toFixed(5)} mol<br>Q = mol e⁻ × F = ${(mass / M.M * M.n * F).toFixed(0)} C<br>t = Q/I = ${(t * 60).toFixed(0)} s = <b>${t.toFixed(1)} min</b>`,
+      sim: () => { goTab('elec'); Object.assign(EL, { sol, c: 1, d: 4, modo: 'I', Iset: I, tstop: Math.round(t * 60), vel: 100, run: true }); eReset(); eToUI(); } };
+  } },
+  gas: { n: 'Volumen de gas en electrólisis', gen() {
+    const I = pick([1, 2, 3, 5]), tmin = pick([5, 10, 20, 30]); const Q = I * tmin * 60; const V = Q / (2 * F) * VM * 1000;
+    return { q: `En la electrólisis de salmuera (NaCl) se hace pasar ${D(I + ' A')} durante ${D(tmin + ' min')}. ¿Qué volumen de Cl₂ (mL) se obtiene a 25 °C y 1 atm? (V<sub>m</sub> = 24.47 L/mol)`,
+      ans: V, tol: 0.025, unit: 'mL',
+      sol: `Q = ${I} × ${tmin * 60} = ${Q} C → mol e⁻ = ${(Q / F).toFixed(4)}<br>2Cl⁻ → Cl₂ + 2e⁻ → mol Cl₂ = ${(Q / F / 2).toFixed(4)} mol<br>V = ${(Q / F / 2).toFixed(4)} × 24.47 L = <b>${V.toFixed(0)} mL</b> (y el mismo volumen de H₂ en el cátodo)`,
+      sim: () => { goTab('elec'); Object.assign(EL, { sol: 'NaCl', c: 2, d: 4, modo: 'I', Iset: I, tstop: tmin * 60, vel: 100, run: true }); eReset(); eToUI(); } };
+  } },
+  fuel: { n: 'Celda de combustible: agua', gen() {
+    const I = pick([0.5, 1, 2, 3]), h = pick([1, 2, 5, 10]); const g = I * h * 3600 / (2 * F) * 18.015;
+    return { q: `Una celda de combustible H₂/O₂ entrega ${D(I + ' A')} de forma constante durante ${D(h + ' h')}. ¿Cuántos gramos de agua produce?`, ans: g, tol: 0.02, unit: 'g',
+      sol: `Q = ${I} × ${h * 3600} = ${I * h * 3600} C → mol e⁻ = ${(I * h * 3600 / F).toFixed(4)}<br>H₂ → 2e⁻ y cada H₂ da un H₂O → mol H₂O = mol e⁻ / 2 = ${(I * h * 3600 / F / 2).toFixed(4)}<br>m = × 18.015 = <b>${g.toFixed(2)} g</b>`,
+      sim: () => { goTab('fuel'); Object.assign(FC, { h2: 100, o2: 50, R: 0.5, run: true }); fToUI(); } };
+  } },
+  lead: { n: 'Batería de plomo: Pb consumido', gen() {
+    const Ah = pick([1, 2, 5, 10, 20, 45]); const g = Ah * 3600 / (2 * F) * 207.2;
+    return { q: `Una celda de plomo-ácido entrega ${D(Ah + ' Ah')} durante su descarga. ¿Cuántos gramos de Pb se transforman en PbSO₄ en la placa negativa?`, ans: g, tol: 0.02, unit: 'g',
+      sol: `Q = ${Ah} Ah × 3600 = ${Ah * 3600} C → mol e⁻ = ${(Ah * 3600 / F).toFixed(4)}<br>Pb + SO₄²⁻ → PbSO₄ + 2e⁻ → mol Pb = ${(Ah * 3600 / F / 2).toFixed(4)}<br>m = × 207.2 = <b>${g.toFixed(2)} g</b>`,
+      sim: () => { goTab('lead'); Object.assign(PB, { modo: 'desc', cap: Ah, soc0: 1, cells: 1, R: 1, vel: 2000, run: true }); pReset(); pToUI(); } };
+  } },
+  conc: { n: 'Conceptos (opción múltiple)', gen() {
+    const [a, c] = pair();
+    const bank = [
+      { q: `En la pila ${a} | ${METALES[a].ion} ‖ ${METALES[c].ion} | ${c}, ¿cuál electrodo es el <b>ánodo</b>?`, o: [a, c], k: 0, s: `${a} tiene el E° de reducción más bajo (${METALES[a].E.toFixed(2)} V), por lo que se oxida: es el ánodo.` },
+      { q: 'En el puente salino de una pila de Daniell, ¿hacia dónde migran los iones K⁺?', o: ['Hacia el vaso del cátodo (Cu)', 'Hacia el vaso del ánodo (Zn)', 'No se mueven'], k: 0, s: 'En el cátodo se consumen cationes Cu²⁺, el vaso se carga negativamente y atrae K⁺.' },
+      { q: '¿Qué signo tiene ΔG en una celda electrolítica?', o: ['Positivo: la reacción no es espontánea', 'Negativo: la reacción es espontánea', 'Cero'], k: 0, s: 'La fuente externa debe aportar energía para forzar una reacción con ΔG > 0.' },
+      { q: 'En la pila de Daniell, si se aumenta [Cu²⁺] manteniendo [Zn²⁺], el potencial E…', o: ['aumenta', 'disminuye', 'no cambia'], k: 0, s: 'Q = [Zn²⁺]/[Cu²⁺] disminuye, log Q es menor y E = E° − (0.0592/2)·log Q aumenta.' },
+      { q: 'En una celda electrolítica, el ánodo es…', o: ['positivo y allí ocurre la oxidación', 'negativo y allí ocurre la oxidación', 'positivo y allí ocurre la reducción'], k: 0, s: 'El ánodo siempre oxida. En la electrolítica está conectado al polo + de la fuente, que le arranca electrones.' },
+      { q: 'Al descargarse una batería de plomo, la densidad del electrolito…', o: ['disminuye porque se consume H₂SO₄ y se forma agua', 'aumenta porque se forma ácido', 'no cambia'], k: 0, s: 'Pb + PbO₂ + 2H₂SO₄ → 2PbSO₄ + 2H₂O: se gasta ácido y se produce agua.' },
+      { q: 'En una celda de combustible alcalina, ¿qué ion transporta la carga a través del electrolito?', o: ['OH⁻', 'H⁺', 'K⁺', 'O²⁻'], k: 0, s: 'El O₂ se reduce a OH⁻ en el cátodo y estos migran al ánodo, donde reaccionan con H₂.' },
+      { q: '¿Qué ocurre si se retira el puente salino de una pila galvánica?', o: ['La corriente se detiene', 'El voltaje se duplica', 'La reacción se acelera'], k: 0, s: 'Sin puente se acumula carga en cada vaso y el circuito queda abierto.' },
+      { q: 'Con la misma carga eléctrica, ¿qué se deposita en mayor masa?', o: ['Plata (Ag⁺, n = 1)', 'Cobre (Cu²⁺, n = 2)', 'Níquel (Ni²⁺, n = 2)'], k: 0, s: 'm = QM/(nF): la plata tiene M grande (107.9) y n = 1, así que M/n = 107.9 frente a 31.8 del Cu.' },
+      { q: 'Una pila de concentración Cu | Cu²⁺ (0.01 M) ‖ Cu²⁺ (1 M) | Cu tiene E igual a…', o: ['0.059 V', '0 V', '0.34 V', '1.10 V'], k: 0, s: 'E° = 0, Q = 0.01/1 → E = −(0.0592/2)·log(0.01) = 0.059 V.' },
+    ];
+    const it = pick(bank);
+    const idx = it.o.map((_, i) => i).sort(() => Math.random() - 0.5);
+    return { q: it.q, mc: idx.map(i => it.o[i]), key: idx.indexOf(it.k), sol: it.s, sim: () => { goTab('comp'); } };
+  } },
+};
+function xNew() {
+  let t = $('x-tipo').value; if (t === 'mix') t = pick(Object.keys(TIPOS));
+  X.cur = TIPOS[t].gen(); X.done = false;
+  $('x-q').innerHTML = `<div class="note">${TIPOS[t].n}</div>` + X.cur.q;
+  $('x-fb').className = 'fb'; $('x-sol').className = 'sol'; $('x-sol').innerHTML = X.cur.sol;
+  if (X.cur.mc) {
+    $('x-ans').innerHTML = '<div class="mc">' + X.cur.mc.map((o, i) => `<button class="btn" data-i="${i}">${String.fromCharCode(65 + i)}) ${o}</button>`).join('') + '</div>';
+    $('x-ans').querySelectorAll('button').forEach(b => b.onclick = () => xCheck(+b.dataset.i));
+  } else {
+    $('x-ans').innerHTML = `<input id="x-in" inputmode="decimal" placeholder="tu respuesta"> <span>${X.cur.unit}</span> <button class="btn pri" id="x-chk">Comprobar</button>`;
+    $('x-chk').onclick = () => xCheck(); $('x-in').onkeydown = e => { if (e.key === 'Enter') xCheck(); }; $('x-in').focus({ preventScroll: true });
+  }
+}
+function xCheck(choice) {
+  const c = X.cur; let ok;
+  if (c.mc) ok = choice === c.key;
+  else {
+    const v = parseFloat(($('x-in').value || '').replace(',', '.').replace(/\s/g, ''));
+    if (!isFinite(v)) { $('x-fb').className = 'fb bad'; $('x-fb').textContent = 'Escribe un número.'; return; }
+    ok = c.abs ? Math.abs(v - c.ans) <= c.tol : Math.abs(v - c.ans) <= Math.abs(c.ans) * c.tol;
+  }
+  if (!X.done) { X.tot++; if (ok) { X.ok++; X.streak++; } else X.streak = 0; X.done = ok; }
+  $('x-ok').textContent = X.ok; $('x-tot').textContent = X.tot; $('x-streak').textContent = X.streak;
+  const fb = $('x-fb');
+  if (ok) { fb.className = 'fb ok'; fb.innerHTML = '✔ ¡Correcto! ' + (c.mc ? '' : `Respuesta: ${fmtSig(c.ans, 4)} ${c.unit}`); $('x-sol').classList.add('on'); }
+  else { fb.className = 'fb bad'; fb.innerHTML = '✘ No es correcto. Revisa el planteamiento o pulsa “Ver solución”.'; }
+  if (c.mc) $('x-ans').querySelectorAll('button').forEach((b, i) => { if (i === c.key && ok) b.classList.add('pri'); });
+}
+function xInit() {
+  $('x-tipo').innerHTML = '<option value="mix">🎲 Aleatorio (todos)</option>' + Object.entries(TIPOS).map(([k, t]) => `<option value="${k}">${t.n}</option>`).join('');
+  $('x-tipo').onchange = xNew; $('x-new').onclick = xNew;
+  $('x-show').onclick = () => { $('x-sol').classList.add('on'); if (!X.cur.mc) $('x-fb').className = 'fb'; X.done = true; };
+  $('x-sim').onclick = () => X.cur && X.cur.sim && X.cur.sim();
+  $('x-pot').innerHTML = '<tr><th>Semirreacción</th><th>E° (V)</th></tr>' +
+    Object.entries(METALES).sort((a, b) => b[1].E - a[1].E).map(([k, m]) => `<tr><td>${m.ion} + ${eStr(m.n)} → ${k}</td><td>${m.E >= 0 ? '+' : ''}${m.E.toFixed(2)}</td></tr>`).join('') +
+    '<tr><td>Cl₂ + 2e⁻ → 2Cl⁻</td><td>+1.36</td></tr><tr><td>O₂ + 4H⁺ + 4e⁻ → 2H₂O</td><td>+1.23</td></tr><tr><td>2H₂O + 2e⁻ → H₂ + 2OH⁻</td><td>−0.83</td></tr>';
+  xNew();
+}
+
+/* ===================== pestañas y bucle ===================== */
+let active = 'galv';
+function goTab(t) {
+  active = t;
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  document.querySelectorAll('.tab').forEach(s => s.classList.toggle('on', s.id === 'tab-' + t));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => goTab(b.dataset.tab));
+gInit(); eInit(); fInit(); pInit(); xInit();
+const SIMS = { galv: [gStep, gDraw, gPanel], elec: [eStep, eDraw, ePanel], fuel: [fcStep, fDraw, fPanel], lead: [pbStep, pDraw, pPanel] };
+let last = performance.now(), panelT = 0;
+function loop(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  const s = SIMS[active];
+  if (s) {
+    s[0](dt); s[1]();
+    panelT += dt; if (panelT > 0.12) { panelT = 0; s[2](); }
+  }
+  requestAnimationFrame(loop);
+}
+for (const k in SIMS) { SIMS[k][0](0); SIMS[k][2](); }
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
