@@ -209,9 +209,13 @@ const SOL = {
   cuso4: { n: 'Sulfato de cobre', S: T => interp(CU_T, CU_S, T), cry: '#2563eb', edge: '#1e3a8a', tint: [29, 95, 220], dT: 0.05 },
 };
 const SOLIDS = {
-  sand: { n: 'Arena', k: 0.9, filt: 1, col: [185, 141, 85] },
-  clay: { n: 'Arcilla fina', k: 0.0035, filt: 0.7, col: [156, 116, 87] },
+  sand: { n: 'Arena', k: 0.9, filt: 1, col: [185, 141, 85], size: 0.4, rho: 2.6 },
+  clay: { n: 'Arcilla fina', k: 0.0035, filt: 0.7, col: [156, 116, 87], size: 0.002, rho: 2.6 },
+  iron: { n: 'Limaduras de hierro', k: 2.5, filt: 1, col: [64, 66, 74], size: 0.2, rho: 7.9, mag: true },
+  gravel: { n: 'Grava', k: 4, filt: 1, col: [150, 140, 128], size: 6, rho: 2.7 },
+  cork: { n: 'Corcho', k: 1.1, filt: 1, col: [205, 160, 105], size: 5, rho: 0.24, float: true },
 };
+const SIZE = s => SOLIDS[s] ? SOLIDS[s].size : 0.5; // mm (los cristales de sal ≈ 0.5 mm)
 const DYES = {
   dyeB: { n: 'Colorante azul', c: [37, 99, 235], rfW: 0.35, rfA: 0.85 },
   dyeR: { n: 'Colorante rojo', c: [225, 29, 72], rfW: 0.72, rfA: 0.45 },
@@ -234,6 +238,9 @@ const REAG = [
   { k: 'clay', n: 'Arcilla fina', f: 'Al₂Si₂O₅(OH)₄', a: 3, u: 'g', sw: 'rgb(156,116,87)', s: 1 },
   { k: 'salt', n: 'Cloruro de sodio', f: 'NaCl', a: 5, u: 'g', sw: '#f8fafc', s: 1 },
   { k: 'cuso4', n: 'Sulfato de cobre (II)', f: 'CuSO₄', a: 5, u: 'g', sw: '#2563eb', s: 1 },
+  { k: 'iron', n: 'Limaduras de hierro', f: 'Fe', a: 5, u: 'g', sw: 'rgb(64,66,74)', s: 1 },
+  { k: 'gravel', n: 'Grava', f: 'roca triturada', a: 10, u: 'g', sw: 'rgb(150,140,128)', s: 1 },
+  { k: 'cork', n: 'Corcho triturado', f: 'suberina · 0.24 g/cm³', a: 3, u: 'g', sw: 'rgb(205,160,105)', s: 1 },
   { k: 'dyeB', n: 'Colorante azul', f: 'azul de metileno', a: 0.5, u: 'g', sw: '#2563eb' },
   { k: 'dyeR', n: 'Colorante rojo', f: 'rojo alimentario', a: 0.5, u: 'g', sw: '#e11d48' },
   { k: 'dyeY', n: 'Colorante amarillo', f: 'tartrazina', a: 0.5, u: 'g', sw: '#eab308' },
@@ -247,9 +254,11 @@ const aqV = c => g0(c, 'water') + g0(c, 'ethanol');
 const liqV = c => aqV(c) + g0(c, 'oil');
 const dissolved = (c, s) => Math.min(g0(c, s), SOL[s].S(c.T) * g0(c, 'water') / 100);
 const undis = (c, s) => Math.max(0, g0(c, s) - dissolved(c, s));
-function settledVol(c) { let v = 0; for (const s in SOLIDS) v += (g0(c, s) - (c.sus[s] || 0)) * 0.4; for (const s in SOL) v += undis(c, s) * 0.4; return v; }
+const floats = c => liqV(c) > 0.5; // con líquido, los sólidos poco densos flotan
+function settledVol(c) { let v = 0; for (const s in SOLIDS) { if (SOLIDS[s].float && floats(c)) continue; v += (g0(c, s) - (c.sus[s] || 0)) * 0.4; } for (const s in SOL) v += undis(c, s) * 0.4; return v; }
+function floatVol(c) { if (!floats(c)) return 0; let v = 0; for (const s in SOLIDS) if (SOLIDS[s].float) v += (g0(c, s) - (c.sus[s] || 0)) * 1.2; return v; }
 function susVol(c) { let v = 0; for (const s in SOLIDS) v += (c.sus[s] || 0) * 0.4; return v; }
-const totV = c => liqV(c) + settledVol(c) + susVol(c);
+const totV = c => liqV(c) + settledVol(c) + susVol(c) + floatVol(c);
 function massOf(c) { let m = g0(c, 'water') + g0(c, 'ethanol') * 0.79 + g0(c, 'oil') * 0.92; for (const s in SOLIDS) m += g0(c, s); for (const s in SOL) m += g0(c, s); for (const d in DYES) m += g0(c, d); return m; }
 function mv(src, dst, k, a) { if (!(a > 0)) return; src.m[k] = g0(src, k) - a; if (src.m[k] < 1e-9) delete src.m[k]; dst.m[k] = (dst.m[k] || 0) + a; }
 function sub(c, k, a) { c.m[k] = g0(c, k) - a; if (c.m[k] < 1e-9) delete c.m[k]; }
@@ -267,15 +276,16 @@ function take(c, dV, mode) {
     const e = c.em * f; if (e > 0) { mv(c, out, 'oil', e); c.em -= e; out.em += e; }
     rem -= v;
   };
+  const phFloat = () => { const vol = floatVol(c); if (vol <= 1e-9) return; const v = Math.min(rem, vol), f = v / vol; for (const s in SOLIDS) if (SOLIDS[s].float) mv(c, out, s, (g0(c, s) - (c.sus[s] || 0)) * f); rem -= v; };
   const phSed = () => {
     const vol = settledVol(c); if (vol <= 1e-9) return;
-    const v = Math.min(rem, vol), f = v / vol;
-    for (const s in SOLIDS) mv(c, out, s, (g0(c, s) - (c.sus[s] || 0)) * f);
+    const v = Math.min(rem, vol), f = v / vol, fl = floats(c);
+    for (const s in SOLIDS) if (!(SOLIDS[s].float && fl)) mv(c, out, s, (g0(c, s) - (c.sus[s] || 0)) * f);
     for (const s in SOL) mv(c, out, s, undis(c, s) * f);
     rem -= v;
   };
-  if (mode === 'top') { phOil(); if (rem > 0) phAq(); if (rem > 0 && liqV(c) < 3) phSed(); }
-  else if (mode === 'bottom') { phSed(); if (rem > 0) phAq(); if (rem > 0) phOil(); }
+  if (mode === 'top') { phFloat(); if (rem > 0) phOil(); if (rem > 0) phAq(); if (rem > 0 && liqV(c) < 3) phSed(); }
+  else if (mode === 'bottom') { phSed(); if (rem > 0) phAq(); if (rem > 0) phOil(); if (rem > 0) phFloat(); }
   else { phAq(); if (rem > 0) phOil(); }
   return out;
 }
@@ -352,12 +362,16 @@ const GEO = {
   jar: { cap: 150, ib: -2, ih: 100, half: 26, mouth: [-26, 26, -118], botW: 28,
     line(c) { c.moveTo(-26, -118); c.lineTo(-26, -108); c.quadraticCurveTo(-34, -106, -34, -98); c.lineTo(-34, -6); c.quadraticCurveTo(-34, 0, -28, 0); c.lineTo(28, 0); c.quadraticCurveTo(34, 0, 34, -6); c.lineTo(34, -98); c.quadraticCurveTo(34, -106, 26, -108); c.lineTo(26, -118); },
     hl(c) { c.moveTo(-27, -95); c.lineTo(-27, -12); } },
+  tamiz: { cap: 120, ib: -3, ih: 36, half: 60, mouth: [-60, 60, -42], botW: 52, metal: true,
+    line(c) { c.moveTo(-62, -43); c.lineTo(-60, -41); c.lineTo(-60, 0); c.lineTo(60, 0); c.lineTo(60, -41); c.lineTo(62, -43); } },
+  petri: { cap: 40, ib: -1, ih: 14, half: 55, mouth: [-55, 55, -16], botW: 46,
+    line(c) { c.moveTo(-57, -17); c.lineTo(-55, -15); c.lineTo(-55, -3); c.quadraticCurveTo(-55, 0, -52, 0); c.lineTo(52, 0); c.quadraticCurveTo(55, 0, 55, -3); c.lineTo(55, -15); c.lineTo(57, -17); } },
   botella: { cap: 400, ib: -2, ih: 128, half: 11, mouth: [-11, 11, -170], botW: 28,
     line(c) { c.moveTo(-11, -170); c.lineTo(-11, -150); c.quadraticCurveTo(-34, -142, -34, -118); c.lineTo(-34, -6); c.quadraticCurveTo(-34, 0, -28, 0); c.lineTo(28, 0); c.quadraticCurveTo(34, 0, 34, -6); c.lineTo(34, -118); c.quadraticCurveTo(34, -142, 11, -150); c.lineTo(11, -170); },
     hl(c) { c.moveTo(-27, -112); c.lineTo(-27, -12); } },
 };
 GEO.bottleA = GEO.bottleW;
-const GLASS_MASS = { beaker: 55, erlen: 60, tube: 12, probeta: 80, aforado: 50, dish: 70, vidrio: 15, mortero: 180, funnel: 40, sep: 110, bureta: 70, pipeta: 5, balon: 90, bottleW: 40, bottleA: 40, jar: 90, botella: 120 };
+const GLASS_MASS = { tamiz: 150, petri: 25, beaker: 55, erlen: 60, tube: 12, probeta: 80, aforado: 50, dish: 70, vidrio: 15, mortero: 180, funnel: 40, sep: 110, bureta: 70, pipeta: 5, balon: 90, bottleW: 40, bottleA: 40, jar: 90, botella: 120 };
 const isC = o => !!GEO[o.type];
 const hOf = (g, v) => { const f = Math.min(Math.max(v, 0) / g.cap, 1.05); return g.ih * (g.shape === 'cone' ? Math.cbrt(f) : g.shape === 'bowl' ? Math.sqrt(f) : f); };
 const E = o => (o.sc || 1) * (o.parent ? E(o.parent) : 1); // escala (zoom) individual efectiva
@@ -419,7 +433,7 @@ function spill(x, part, fromY = -1e9) {
   let p = puddles.find(p => Math.abs(p.x - x) < 40 && Math.abs(p.y - y) < 2);
   if (!p) { p = { x, y, v: 0, col: liquidColor(part), seed: Math.random() * 100, oil: 0 }; puddles.push(p); }
   else p.x = lerp(p.x, x, v / (p.v + v));
-  p.v = Math.min(p.v + v, 600); p.col = liquidColor(part); p.oil = g0(part, 'oil') > aqV(part);
+  p.v = Math.min(p.v + v, 600); p.col = liquidColor(part); p.oil = g0(part, 'oil') > aqV(part) || liqV(part) < 0.01;
   toastOnce('spill', '¡Derrame! Coloca un recipiente debajo.', 'bad');
   return y;
 }
@@ -456,7 +470,7 @@ function drawContents(o, g) {
   let vc = 0, y = ib;
   const H = v => { const y0 = hOf(g, vc), y1 = hOf(g, vc + v); vc += v; return Math.max(0, y1 - y0); };
   let sedV = 0, sc = [0, 0, 0], sw = 0;
-  for (const s in SOLIDS) { const a = g0(o, s) - (o.sus[s] || 0); if (a > 1e-4) { sedV += a * 0.4; sc = sc.map((v, i) => v + SOLIDS[s].col[i] * a); sw += a; } }
+  for (const s in SOLIDS) { if (SOLIDS[s].float && floats(o)) continue; const a = g0(o, s) - (o.sus[s] || 0); if (a > 1e-4) { sedV += a * 0.4; sc = sc.map((v, i) => v + SOLIDS[s].col[i] * a); sw += a; } }
   if (sedV > 0.01) {
     const h = Math.max(1.5, H(sedV)), col = sc.map(v => Math.round(v / sw));
     ctx.fillStyle = `rgb(${col})`; ctx.fillRect(-200, y - h, 400, h + 30);
@@ -483,6 +497,13 @@ function drawContents(o, g) {
   }
   const oilF = Math.max(0, g0(o, 'oil') - o.em);
   if (oilF > 0.01) { const h = H(oilF); ctx.fillStyle = oilCol; ctx.fillRect(-200, y - h, 400, h + (aqT > 0.01 || sedV > 0.01 ? 0 : 30)); ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.fillRect(-200, y - h, 400, 1.2); y -= h; }
+  const flV = floatVol(o);
+  if (flV > 0.01) { // material flotante (corcho): trocitos sobre la superficie
+    const h = Math.max(3, H(flV)), n = Math.min(70, Math.round(flV * 3) + 3);
+    for (let i = 0; i < n; i++) { const px = lerp(-g.half - 4, g.half + 4, hash(i * 2.3 + o.id)), py = y - h * hash(i * 4.1 + 3) + Math.sin(t * 1.5 + i) * 1.2, r = 2.5 + 2.5 * hash(i + 9); ctx.fillStyle = `rgb(${SOLIDS.cork.col.map(v => v - 30 * hash(i))})`; ctx.beginPath(); ctx.ellipse(px, py, r * 1.3, r, hash(i) * 3, 0, 7); ctx.fill(); }
+  }
+  // sólidos flotantes sumergidos al agitar (suben poco a poco)
+  for (const s in SOLIDS) if (SOLIDS[s].float && (o.sus[s] || 0) > 0.01 && floats(o)) { const n = Math.min(40, Math.round(o.sus[s] * 6)); for (let i = 0; i < n; i++) { ctx.fillStyle = `rgb(${SOLIDS[s].col})`; ctx.beginPath(); ctx.arc(lerp(-g.half, g.half, hash(i * 7 + o.id)), lerp(ib - 4, y, hash(i * 3.3 + 1)), 2.5, 0, 7); ctx.fill(); } }
   for (const k of o.cry) {
     const S = SOL[k.s], sz = 4 + 20 * Math.cbrt(k.mass), cx = k.x * g.botW * 0.9, cy = ib - sz * 0.35 - (k.r * 4);
     ctx.save(); ctx.translate(cx, cy); ctx.rotate(k.a);
@@ -529,6 +550,15 @@ function drawCont(o) {
     text(o.label || '', 0, y0 + 12, 8.5, '#0f172a', 'center', 800); text(o.formula || '', 0, y0 + 24, 8, '#64748b', 'center', 600);
     ctx.fillStyle = '#334155'; if (o.type === 'jar') { ctx.beginPath(); rr(ctx, -28, -126, 56, 9, 3); ctx.fill(); } else { ctx.beginPath(); rr(ctx, -13, -180, 26, 11, 3); ctx.fill(); }
   }
+  if (o.type === 'tamiz') {
+    ctx.strokeStyle = 'rgba(71,85,105,.75)'; ctx.lineWidth = o.mesh < 1 ? 0.5 : 1;
+    const st = o.mesh < 1 ? 3 : 7; for (let x = -58; x <= 58; x += st) { ctx.beginPath(); ctx.moveTo(x, -6); ctx.lineTo(x + 3, 0); ctx.stroke(); }
+    ctx.beginPath(); ctx.moveTo(-60, -3); ctx.lineTo(60, -3); ctx.stroke();
+    const mg = ctx.createLinearGradient(0, -43, 0, -30); mg.addColorStop(0, '#e5e7eb'); mg.addColorStop(1, '#9ca3af');
+    ctx.fillStyle = mg; ctx.fillRect(-62, -43, 124, 9); ctx.fillRect(-62, -8, 124, 8);
+    ctx.strokeStyle = '#6b7280'; ctx.lineWidth = 1.5; ctx.strokeRect(-62, -43, 124, 9); ctx.strokeRect(-62, -8, 124, 8);
+    text(`malla ${o.mesh < 1 ? '0.1' : '2'} mm`, 0, -38.5, 7.5, '#374151', 'center', 700);
+  }
   if (o.type === 'aforado') { ctx.strokeStyle = 'rgba(30,41,59,.85)'; ctx.lineWidth = 1.3; ctx.beginPath(); ctx.moveTo(-6, -140); ctx.lineTo(6, -140); ctx.stroke(); ctx.fillStyle = '#334155'; ctx.beginPath(); rr(ctx, -8, -188, 16, 10, 3); ctx.fill(); }
   if (o.type === 'pipeta') { ctx.fillStyle = '#ef4444'; ctx.beginPath(); rr(ctx, -8, -168, 16, 46, 8); ctx.fill(); ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.fillRect(-5, -162, 3, 30); }
   if (o.type === 'mortero') { ctx.save(); ctx.translate(14, -26); ctx.rotate(-0.55); ctx.beginPath(); rr(ctx, -6, -86, 12, 92, 6); const pg = ctx.createLinearGradient(-6, 0, 6, 0); pg.addColorStop(0, '#d1d5db'); pg.addColorStop(0.5, '#fff'); pg.addColorStop(1, '#cbd5e1'); ctx.fillStyle = pg; ctx.fill(); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore(); }
@@ -546,7 +576,7 @@ function drawCont(o) {
   ctx.restore();
 }
 
-const SHORT = { water: 'Agua', ethanol: 'Alcohol', oil: 'Aceite', sand: 'Arena', clay: 'Arcilla', salt: 'Sal', cuso4: 'CuSO₄' };
+const SHORT = { water: 'Agua', ethanol: 'Alcohol', oil: 'Aceite', sand: 'Arena', clay: 'Arcilla', iron: 'Hierro', gravel: 'Grava', cork: 'Corcho', salt: 'Sal', cuso4: 'CuSO₄' };
 const fq = x => x < 10 ? x.toFixed(1) : x.toFixed(0);
 function compName(c) {
   const it = [];
@@ -575,9 +605,9 @@ function drawTag(o, g) {
 
 /* ============================== tipos de objetos ============================== */
 const CONT_HITS = { beaker: [-48, -120, 48, 0], erlen: [-50, -139, 50, 0], tube: [-13, -123, 13, 0], dish: [-64, -37, 64, 4], vidrio: [-42, -16, 42, 2], mortero: [-52, -112, 64, 0], funnel: [-54, -102, 54, 0], balon: [-50, -168, 50, -40], bottleW: [-34, -182, 48, 0], probeta: [-26, -204, 26, 0], aforado: [-38, -190, 38, 0], jar: [-36, -128, 36, 0], botella: [-36, -182, 36, 0], pipeta: [-9, -170, 9, 0] };
-CONT_HITS.bottleA = CONT_HITS.bottleW;
-const CLAB = { beaker: 'Vaso de precipitados', erlen: 'Matraz Erlenmeyer', tube: 'Tubo de ensayo', dish: 'Cápsula de porcelana', vidrio: 'Vidrio de reloj', mortero: 'Mortero y pistilo', funnel: 'Embudo con papel de filtro', balon: 'Balón de destilación', bottleW: 'Frasco lavador (agua)', bottleA: 'Frasco de alcohol', probeta: 'Probeta', aforado: 'Matraz aforado', jar: 'Frasco de reactivo', botella: 'Botella de reactivo', pipeta: 'Pipeta' };
-const ROD_SOCK = ['beaker', 'erlen', 'dish', 'probeta', 'mortero', 'jar', 'vidrio'];
+CONT_HITS.bottleA = CONT_HITS.bottleW; CONT_HITS.tamiz = [-64, -46, 64, 2]; CONT_HITS.petri = [-58, -20, 58, 2];
+const CLAB = { tamiz: 'Tamiz', petri: 'Placa de Petri', beaker: 'Vaso de precipitados', erlen: 'Matraz Erlenmeyer', tube: 'Tubo de ensayo', dish: 'Cápsula de porcelana', vidrio: 'Vidrio de reloj', mortero: 'Mortero y pistilo', funnel: 'Embudo con papel de filtro', balon: 'Balón de destilación', bottleW: 'Frasco lavador (agua)', bottleA: 'Frasco de alcohol', probeta: 'Probeta', aforado: 'Matraz aforado', jar: 'Frasco de reactivo', botella: 'Botella de reactivo', pipeta: 'Pipeta' };
+const ROD_SOCK = ['beaker', 'erlen', 'dish', 'probeta', 'mortero', 'jar', 'vidrio', 'petri'];
 for (const t in CONT_HITS) TYPES[t] = {
   lab: CLAB[t], draw: drawCont, hits: () => [{ r: CONT_HITS[t] }],
   sockets: ROD_SOCK.includes(t) ? o => { const g = GEO[o.type]; return [{ name: 'rod', x: o.x + (g.half > 20 ? g.half * 0.42 : 0), y: o.y + g.ib - 3, acc: ['termometro', 'varilla'], dy: 0 }]; } : undefined
@@ -590,7 +620,7 @@ function standType(ring) {
   return {
     lab: ring ? 'Soporte universal con aro' : 'Soporte universal con pinza',
     init(o) { if (o.armY === undefined) o.armY = -235; },
-    sockets: o => [{ name: 'arm', x: o.x + 25, y: o.y + o.armY, acc: ring ? ['funnel', 'sep'] : ['paper', 'bureta'] }],
+    sockets: o => [{ name: 'arm', x: o.x + 25, y: o.y + o.armY, acc: ring ? ['funnel', 'sep', 'tamiz'] : ['paper', 'bureta'] }],
     hits: o => [{ c: [-55, o.armY, 12], part: 'arm' }, { r: [-74, -14, 74, 0] }, { r: [-61, -392, -49, 0] }, { r: [-55, o.armY - 7, ring ? 64 : 48, o.armY + 7] }],
     draw(o) {
       ctx.save(); ctx.translate(o.x, o.y);
@@ -816,6 +846,36 @@ TYPES.espatula = {
     ctx.restore();
   }
 };
+TYPES.iman = {
+  lab: 'Imán de herradura',
+  init(o) { o.load = o.load || {}; },
+  hits: () => [{ r: [-42, -96, 42, 10] }],
+  draw(o) {
+    ctx.save(); ctx.translate(o.x, o.y);
+    ctx.lineCap = 'butt'; ctx.strokeStyle = '#991b1b'; ctx.lineWidth = 22; ctx.beginPath(); ctx.moveTo(-28, -14); ctx.lineTo(-28, -55); ctx.arc(0, -55, 28, Math.PI, 0); ctx.lineTo(28, -14); ctx.stroke();
+    ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 17; ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-33, -16); ctx.lineTo(-33, -55); ctx.arc(0, -55, 33, Math.PI, Math.PI * 1.4); ctx.stroke();
+    for (const [x, l] of [[-28, 'N'], [28, 'S']]) { ctx.fillStyle = '#9ca3af'; ctx.fillRect(x - 11, -16, 22, 16); ctx.strokeStyle = '#4b5563'; ctx.lineWidth = 1; ctx.strokeRect(x - 11, -16, 22, 16); text(l, x, -8, 9, '#111827', 'center', 800); }
+    const n = Math.min(160, Math.round((o.load.iron || 0) * 9));
+    ctx.strokeStyle = '#374151'; ctx.lineWidth = 1.2;
+    for (let i = 0; i < n; i++) { const px = (i % 2 ? 28 : -28) + (hash(i) - 0.5) * 24, py = 1 + hash(i * 3.7) * 9, a = (hash(i * 5.1) - 0.5) * 1.4; ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + Math.sin(a) * 4, py + Math.cos(a) * 4); ctx.stroke(); }
+    ctx.restore();
+  }
+};
+TYPES.espumadera = {
+  lab: 'Espumadera',
+  init(o) { o.load = o.load || {}; },
+  hits: () => [{ r: [-26, -178, 46, 8] }],
+  draw(o) {
+    ctx.save(); ctx.translate(o.x, o.y);
+    metal(10, -8, 40, -172, 5, '#d1d5db');
+    ctx.fillStyle = '#d1d5db'; ctx.strokeStyle = '#6b7280'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.ellipse(0, -4, 24, 8, 0, 0, 7); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#6b7280'; for (let i = -2; i <= 2; i++) for (let j = -1; j <= 1; j++) { ctx.beginPath(); ctx.arc(i * 8, -4 + j * 3, 1.2, 0, 7); ctx.fill(); }
+    const n = Math.min(40, Math.round((o.load.cork || 0) * 6));
+    for (let i = 0; i < n; i++) { ctx.fillStyle = `rgb(${SOLIDS.cork.col.map(v => v - 30 * hash(i))})`; ctx.beginPath(); ctx.ellipse((hash(i) - 0.5) * 36, -8 - hash(i * 3) * 8, 3.5, 2.6, hash(i), 0, 7); ctx.fill(); }
+    ctx.restore();
+  }
+};
 TYPES.balanza = {
   lab: 'Balanza',
   init(o) { o.tare = o.tare || 0; },
@@ -897,7 +957,7 @@ function heatOpen(o, P, amb, dt) {
     }
   }
   if (aqV(o) <= 0.05) T = Math.min(T, 250);
-  o.T = T; o.boil = boiling;
+  o.T = T; o.boil = boiling; o.heatP = P;
 }
 function crystUpdate(o, dt) {
   const cool = Math.max(0, (o.Tp - o.T) / Math.max(dt, 1e-3)); o.Tp = o.T;
@@ -906,7 +966,7 @@ function crystUpdate(o, dt) {
     let list = o.cry.filter(k => k.s === s);
     if (u < 1e-4) { if (list.length) o.cry = o.cry.filter(k => k.s !== s); continue; }
     if (du > 1e-6) {
-      const nu = 0.03 + 0.35 * cool * cool + (o.boil ? 2 : 0);
+      const nu = 0.03 + 0.35 * cool * cool + (o.boil ? 4 * Math.pow(o.heatP || 0.5, 2) : 0);
       let n = list.length === 0 ? 1 : 0; if (Math.random() < nu * dt) n += 1 + (nu * dt > 1 ? Math.floor(nu * dt) : 0);
       for (let i = 0; i < n && o.cry.length < 70; i++) { const k = { s, mass: 0, x: Math.random() * 2 - 1, a: Math.random() * Math.PI, r: Math.random() }; o.cry.push(k); list.push(k); }
       let ws = 0; for (const k of list) ws += Math.pow(k.mass + 0.003, 0.667);
@@ -935,6 +995,14 @@ function contUpdate(o, dt) {
     const part = take(o, Math.min(liqV(o) + susVol(o), rate * dt), 'liquid');
     for (const s in SOLIDS) { const sp = part.sus[s] || 0, back = sp * SOLIDS[s].filt; if (back > 0) { part.m[s] -= back; part.sus[s] -= back; o.m[s] = (o.m[s] || 0) + back; } }
     deliver(o.x, o.y, part, o, 'fromFilter');
+  }
+  if (o.type === 'tamiz' && totV(o) > 0.001) { // pasa lo que es más pequeño que la malla
+    const mesh = o.mesh || 2, shaking = o.shakeT && performance.now() - o.shakeT < 2500, part = newC(); part.T = o.T;
+    if (liqV(o) > 0.01) { add(part, take(o, Math.min(liqV(o) + susVol(o), 30 * dt), 'liquid')); for (const k in SOLIDS) if (SIZE(k) >= mesh && g0(part, k) > 0) { const a = g0(part, k); mv(part, o, k, a); part.sus[k] = 0; } }
+    const rate = (shaking ? 14 : 0.25) * dt;
+    for (const k in SOLIDS) if (SIZE(k) < mesh) { const a = Math.min(g0(o, k), rate); if (a > 0) { const f = a / g0(o, k); o.sus[k] = (o.sus[k] || 0) * (1 - f); mv(o, part, k, a); } }
+    for (const k in SOL) if (SIZE(k) < mesh) { const a = Math.min(undis(o, k), rate); if (a > 0) mv(o, part, k, a); }
+    if (totV(part) > 1e-4) deliver(o.x, o.y, part, o, 'fromSieve');
   }
   if ((o.type === 'sep' || o.type === 'bureta') && o.open && totV(o) > 0.01) {
     const part = take(o, Math.min(totV(o), (o.type === 'sep' ? 7 : 2.5) * dt), 'bottom');
@@ -1051,10 +1119,30 @@ function heldPour(dt) {
     streams.push({ x1: lx, y1: ly, x2: lx + o.tdir * 6, y2: gy, col: liquidColor(part) });
   }
 }
+function toolPick(dt) {
+  if (held && held.noPick) { const c = objs.find(c => c.id === held.noPick); if (!c || held.x < mouthOf(c).x0 - 10 || held.x > mouthOf(c).x1 + 10) held.noPick = null; } // el imán atrae hierro y la espumadera recoge lo que flota
+  const o = held; if (!o || (o.type !== 'iman' && o.type !== 'espumadera')) return;
+  const mag = o.type === 'iman', key = mag ? 'iron' : 'cork', e = E(o);
+  for (const c of objs) {
+    if (!isC(c) || c === o || c.id === o.noPick) continue;
+    const m = mouthOf(c); if (o.x < m.x0 + 4 || o.x > m.x1 - 4 || o.y > c.y) continue;
+    const sy = surfaceY(c), have = g0(c, key); if (have <= 1e-4) continue;
+    if (mag) { const d = sy - o.y; if (d > 70 * e || d < -200) continue; const a = Math.min(have, (8 + 30 * clamp(1 - d / (70 * e), 0, 1)) * dt); const f = a / have; c.sus[key] = (c.sus[key] || 0) * (1 - f); mv(c, { m: o.load }, key, a); toastOnce('mag', '¡El imán atrae las limaduras de hierro!', 'ok'); }
+    else { if (Math.abs(o.y - sy) > 14 * e || !floats(c)) continue; const fl = have - (c.sus[key] || 0); if (fl <= 1e-4) continue; mv(c, { m: o.load }, key, Math.min(fl, 6 * dt)); }
+    return;
+  }
+}
+function releaseTool(o) {
+  const load = o.load || {}; let tot = 0; for (const k in load) tot += load[k]; if (tot < 0.01) { toast(o.type === 'iman' ? 'El imán no lleva limaduras.' : 'La espumadera está vacía.'); return; }
+  const part = newC(); part.m = { ...load }; o.load = {};
+  const c = containerUnder(o.x, o.y, o);
+  if (c) { add(c, part); c.fromTool = true; o.noPick = c.id; toast(`Depositaste ${fq(tot)} g de ${o.type === 'iman' ? 'hierro' : 'corcho'} en ${(c.tag || c.name || TYPES[c.type].lab).toLowerCase()}.`, 'ok'); }
+  else { spill(o.x, part, o.y); toast('Lo soltaste sobre la mesa.'); }
+}
 function update(dt) {
   layoutAll();
   streams = []; drops = [];
-  heldPour(dt);
+  heldPour(dt); toolPick(dt);
   for (const o of [...objs]) {
     if (isC(o)) contUpdate(o, dt);
     if (o.type === 'destilador') destUpdate(o, dt);
@@ -1187,7 +1275,7 @@ cv.addEventListener('pointerdown', e => {
     let o = h.o; if (o.fixed) o = root(o);
     if (o.parent) { if (o.parent.type === 'centrifuge' && o.parent.run) return; o.parent = null; o.sock = null; }
     bringFront(o); sel = o;
-    drag = { mode: 'obj', o, dx: w.x - o.x, dy: w.y - o.y, moved: false }; held = o; poured = 0; o.vy = 0; cv.className = 'grab';
+    drag = { mode: 'obj', o, dx: w.x - o.x, dy: w.y - o.y, moved: false }; held = o; poured = 0; if (o.noPick) { const c = objs.find(c => c.id === o.noPick); if (!c || Math.abs(c.x - o.x) > 80) o.noPick = null; } o.vy = 0; cv.className = 'grab';
     $('trash').classList.add('show');
   } else { drag = { mode: 'pan', sx: e.clientX, sy: e.clientY, cx: cam.x, cy: cam.y }; sel = null; }
 });
@@ -1230,6 +1318,7 @@ function endDrag(e) {
       if (h.part === 'burner') { h.o.on = !h.o.on; labRender(); return; }
       if (h.part === 'btn') { startCent(h.o); labRender(); return; }
       if (h.part === 'tara') { h.o.tare = h.o.read || 0; toast('Balanza tarada a 0.00 g.'); return; }
+      if (d.o.type === 'iman' || d.o.type === 'espumadera') { releaseTool(d.o); return; }
     }
     if (removeZone(e.clientX, e.clientY)) { removeObj(d.o); toast('Material retirado del escenario.'); return; }
     dropObj(d.o);
@@ -1239,7 +1328,7 @@ cv.addEventListener('pointerup', endDrag); cv.addEventListener('pointercancel', 
 cv.addEventListener('pointerleave', () => { $('tip').style.display = 'none'; });
 cv.addEventListener('dblclick', e => {
   const w = S2W(e.clientX, e.clientY), h = hitTest(w.x, w.y);
-  if (h && isC(h.o) && !h.o.fixed) { stir(h.o); if (h.o.type === 'sep') flags.sepShake = true; toast(`Agitaste: ${h.o.name || TYPES[h.o.type].lab}`); }
+  if (h && isC(h.o) && !h.o.fixed) { stir(h.o); h.o.shakeT = performance.now(); if (h.o.type === 'sep') flags.sepShake = true; toast(`Agitaste: ${h.o.name || TYPES[h.o.type].lab}`); }
 });
 function zoomAt(sx, sy, f) { const w0 = S2W(sx, sy); cam.z = clamp(cam.z * f, 0.2, 4); const w1 = S2W(sx, sy); cam.x += w0.x - w1.x; cam.y += w0.y - w1.y; $('z-lvl').textContent = Math.round(cam.z * 100) + '%'; }
 cv.addEventListener('wheel', e => {
@@ -1273,6 +1362,8 @@ function showTip(h, x, y) {
   else if (o.type === 'paper') html = `<b>${INKS[o.ink].n}</b><br>${o.bled ? 'La mancha se disolvió en el disolvente.' : o.wet ? `Frente del disolvente: ${((o.front - 30) / 20).toFixed(1)} cm` : 'Seco: baja la pinza hasta tocar el disolvente.'}`;
   else if (o.type === 'destilador') html = `<b>Equipo de destilación</b><br>${describe(o.balon)}<br><span class="s">Termómetro: ${o.headT.toFixed(1)} °C · ${o.src === 'manta' ? 'manta calefactora' : 'mechero'}</span>`;
   else if (o.type === 'termometro') html = `<b>Termómetro</b><br>${(o.read ?? 20).toFixed(1)} °C<br><span class="s">Suéltalo dentro de un recipiente para medir</span>`;
+  else if (o.type === 'iman') html = `<b>Imán</b><br>Lleva ${fq(o.load.iron || 0)} g de hierro<br><span class="s">Acércalo a la mezcla para atraer el hierro · clic para soltarlo</span>`;
+  else if (o.type === 'espumadera') html = `<b>Espumadera</b><br>Lleva ${fq(o.load.cork || 0)} g de corcho<br><span class="s">Pásala por la superficie para recoger lo que flota · clic para soltarlo</span>`;
   else if (o.type === 'varilla') html = '<b>Varilla de vidrio</b><br><span class="s">Muévela dentro de un líquido para agitarlo</span>';
   else if (o.type === 'balanza') html = `<b>Balanza</b><br>${((o.read || 0) - o.tare).toFixed(2)} g<br><span class="s">Coloca un recipiente en el plato · T = tara</span>`;
   else html = `<b>${TYPES[o.type].lab}</b>`;
@@ -1285,7 +1376,7 @@ function describe(c) {
   if (g0(c, 'water') > 0.05) L.push(`Agua: ${f1(g0(c, 'water'))} mL`);
   if (g0(c, 'ethanol') > 0.05) L.push(`Alcohol: ${f1(g0(c, 'ethanol'))} mL`);
   if (g0(c, 'oil') > 0.05) L.push(`Aceite: ${f1(g0(c, 'oil'))} mL${c.em > 0.5 ? ` (${Math.round(c.em / g0(c, 'oil') * 100)} % emulsionado)` : ''}`);
-  for (const s in SOLIDS) if (g0(c, s) > 0.01) { const p = (c.sus[s] || 0) / g0(c, s); L.push(`${SOLIDS[s].n}: ${g0(c, s).toFixed(2)} g · ${p > 0.03 ? Math.round(p * 100) + ' % en suspensión' : 'sedimentada'}`); }
+  for (const s in SOLIDS) if (g0(c, s) > 0.01) { const p = (c.sus[s] || 0) / g0(c, s), fl = SOLIDS[s].float && floats(c); L.push(`${SOLIDS[s].n}: ${g0(c, s).toFixed(2)} g · ${fl ? (p > 0.03 ? Math.round(p * 100) + ' % sumergido' : 'flotando') : liqV(c) < 0.5 ? 'seco' : p > 0.03 ? Math.round(p * 100) + ' % en suspensión' : 'sedimentada'} <span class="s">(${SOLIDS[s].rho} g/cm³)</span>`); }
   for (const s in SOL) if (g0(c, s) > 0.01) { const d = dissolved(c, s), u = undis(c, s); L.push(`${SOL[s].n}: ${d > 0.01 ? d.toFixed(2) + ' g disuelta' : ''}${d > 0.01 && u > 0.01 ? ' + ' : ''}${u > 0.01 ? u.toFixed(2) + ' g sólida' : ''}`); }
   let dy = 0; for (const d in DYES) dy += g0(c, d); if (dy > 0.001) L.push('Colorantes disueltos');
   if (!L.length) return '<span class="s">Vacío</span>';
@@ -1338,6 +1429,22 @@ const TECH = [null,
     desc: 'Separa <b>sólidos muy finos</b> de un líquido girando a gran velocidad. La fuerza centrífuga los lleva al fondo del tubo. Los tubos deben ir <b>equilibrados</b>.',
     ej: 'Ej.: análisis de sangre, lavadoras (centrifugado), leche.',
     steps: ['Arrastra los tubos a los huecos del rotor.', 'Equilibra: coloca tubos de igual masa enfrentados (usa la balanza).', 'Pulsa ▶ en la centrífuga o en el panel.', 'Vierte el sobrenadante limpio a un vaso.'] },
+  { n: 'Separación magnética', col: '#b91c1c', prop: 'Magnetismo',
+    desc: 'Separa un componente <b>magnético</b> (hierro, níquel, cobalto) de otros que no lo son. El imán atrae las limaduras y deja la arena.',
+    ej: 'Ej.: reciclaje de chatarra, separar hierro de minerales.',
+    steps: ['Arrastra el imán y acércalo a la mezcla de hierro y arena.', 'Las limaduras saltan al imán (pasa el ratón para ver cuánto lleva).', 'Llévalo a la placa vacía y haz <b>clic</b> en el imán para soltarlas.', 'Prueba el imán con la sal y la arena: ¿atrae algo?'] },
+  { n: 'Tamizado', col: '#92400e', prop: 'Tamaño de partícula',
+    desc: 'Separa <b>sólidos de distinto tamaño</b>. Las partículas más pequeñas que los agujeros de la malla pasan; las grandes quedan retenidas.',
+    ej: 'Ej.: separar grava y arena en la construcción, cernir harina.',
+    steps: ['Vierte la grava con arena en el tamiz (sobre el aro).', 'Agítalo: doble clic, 🥄 en la barra, o sacúdelo con el ratón.', 'La arena cae al vaso; la grava se queda en la malla.', 'Cambia a la malla fina (0.1 mm): ¿qué pasa ahora con la arena?'] },
+  { n: 'Evaporación', col: '#ea580c', prop: 'Volatilidad del disolvente',
+    desc: 'Elimina el <b>disolvente</b> calentando hasta que se evapora y deja el <b>sólido disuelto</b>. A diferencia de la destilación, el agua se pierde.',
+    ej: 'Ej.: salinas (sal del agua de mar), concentrar jugos.',
+    steps: ['Enciende el mechero bajo la cápsula con agua de mar.', 'El agua hierve y se evapora; la sal se va concentrando.', 'Cuando se seque, apaga el mechero: queda la sal.', 'Repite a fuego lento y compara el tamaño de los cristales.'] },
+  { n: 'Flotación', col: '#0f766e', prop: 'Densidad',
+    desc: 'Los sólidos <b>menos densos</b> que el líquido flotan y los más densos se hunden. El corcho (0.24 g/cm³) flota en el agua (1 g/cm³); la arena (2.6 g/cm³) se hunde.',
+    ej: 'Ej.: separar minerales en la minería, limpiar semillas, reciclaje de plásticos.',
+    steps: ['Observa: tras agitar, el corcho sube y la arena baja.', 'Pasa la espumadera por la superficie para recoger el corcho.', 'Haz clic en la espumadera sobre la placa para soltarlo.', 'Decanta el agua para quedarte con la arena.'] },
 ];
 const anyC = f => objs.some(o => isC(o) && f(o));
 const MIS = {
@@ -1365,6 +1472,18 @@ const MIS = {
   8: [{ t: 'Centrifuga con el rotor equilibrado', f: () => flags.balancedRun },
     { t: 'Obtén un sobrenadante transparente (< 5 % en suspensión)', f: () => objs.some(o => o.type === 'tube' && g0(o, 'clay') > 0.2 && (o.sus.clay || 0) / g0(o, 'clay') < 0.05) },
     { t: 'Vierte el sobrenadante de un tubo a un vaso sin arrastrar arcilla', f: () => anyC(o => o.fromTube && o.type !== 'tube' && g0(o, 'water') >= 5 && g0(o, 'clay') < 0.05) }],
+  9: [{ t: 'Atrae las limaduras con el imán', f: () => objs.some(o => o.type === 'iman' && (o.load.iron || 0) >= 1) || anyC(o => o.fromTool && g0(o, 'iron') >= 1) },
+    { t: 'Deposita ≥ 9 g de hierro en otra placa sin arena', f: () => anyC(o => o.fromTool && g0(o, 'iron') >= 9 && g0(o, 'sand') < 0.2) },
+    { t: 'Deja la arena limpia: < 0.1 g de hierro', f: () => anyC(o => g0(o, 'sand') >= 10 && g0(o, 'salt') < 0.1 && g0(o, 'iron') < 0.1 && o.name === 'Hierro + arena') }],
+  10: [{ t: 'Separa ≥ 15 g de arena que pase por el tamiz', f: () => anyC(o => o.fromSieve && g0(o, 'sand') >= 15 && g0(o, 'gravel') < 0.1) },
+    { t: 'Retén ≥ 15 g de grava limpia en la malla', f: () => objs.some(o => o.type === 'tamiz' && g0(o, 'gravel') >= 15 && g0(o, 'sand') < 0.5) },
+    { t: 'Con la malla fina, ¿pasa la arena?', f: () => objs.some(o => o.type === 'tamiz' && o.mesh < 1 && g0(o, 'sand') >= 5 && o.shakeT && performance.now() - o.shakeT < 3000), ok: 'Con malla de 0.1 mm la arena (≈0.4 mm) ya no pasa: el tamizado depende del tamaño de los agujeros.' }],
+  11: [{ t: 'Lleva el agua de mar a ebullición', f: () => anyC(o => o.boil && g0(o, 'salt') > 0) },
+    { t: 'Evapora todo el agua y obtén ≥ 5 g de sal', f: () => anyC(o => g0(o, 'water') < 0.05 && undis(o, 'salt') >= 5) },
+    { t: 'A fuego lento (≤ 35 %), obtén la sal en ≤ 15 cristales', f: () => anyC(o => g0(o, 'water') < 0.05 && undis(o, 'salt') >= 5 && o.cry.filter(c => c.s === 'salt').length <= 15) }],
+  12: [{ t: 'Observa: el corcho flota y la arena se hunde', f: () => anyC(o => g0(o, 'cork') > 1 && g0(o, 'sand') > 1 && floats(o) && (o.sus.cork || 0) / g0(o, 'cork') < 0.05 && (o.sus.sand || 0) / g0(o, 'sand') < 0.1) },
+    { t: 'Recoge ≥ 4 g de corcho con la espumadera y deposítalo', f: () => anyC(o => o.fromTool && g0(o, 'cork') >= 4 && g0(o, 'sand') < 0.2) },
+    { t: 'Decanta el agua y deja la arena sin corcho', f: () => anyC(o => g0(o, 'sand') >= 10 && g0(o, 'cork') < 0.1 && g0(o, 'water') < 20) }]
 };
 
 function build(t) {
@@ -1419,7 +1538,29 @@ function build(t) {
       a = mk('beaker', 580, 0, { name: 'Agua turbia (arcilla)' }); fill(a, { water: 150, clay: 6 }, true);
       mk('beaker', 720, 0); mk('balanza', 860, 0);
       break;
+    case 9:
+      a = mk('petri', 160, 0, { name: 'Hierro + arena' }); fill(a, { iron: 10, sand: 15 });
+      mk('petri', 380, 0, { name: 'Placa para el hierro' });
+      mk('iman', 560, 0);
+      a = mk('petri', 740, 0, { name: 'Sal + arena' }); fill(a, { salt: 8, sand: 10 });
+      break;
+    case 10:
+      s = mk('standRing', 300, 0, { armY: -150 }); attach(mk('tamiz', 0, 0, { mesh: 2 }), s, 'arm');
+      mk('beaker', 325, 0, { name: 'Vaso colector' });
+      a = mk('beaker', 110, 0, { name: 'Grava + arena' }); fill(a, { gravel: 20, sand: 20 });
+      mk('beaker', 560, 0); mk('balanza', 720, 0);
+      break;
+    case 11:
+      s = mk('tripod', 320, 0, { on: false, P: 0.6 }); a = mk('dish', 0, 0, { name: 'Agua de mar' }); attach(a, s, 'top'); fill(a, { water: 40, salt: 6 });
+      a = mk('beaker', 120, 0, { name: 'Agua de mar' }); fill(a, { water: 80, salt: 12 });
+      mk('dish', 560, 0); mk('vidrio', 720, 0);
+      break;
+    case 12:
+      a = mk('beaker', 160, 0, { name: 'Agua + arena + corcho' }); fill(a, { water: 150, sand: 12, cork: 5 }, true);
+      mk('espumadera', 360, 0); mk('petri', 520, 0, { name: 'Placa para el corcho' }); mk('beaker', 690, 0);
+      break;
   }
+  for (const o of objs) if (o.type === 'iman' || o.type === 'espumadera') o.load = {};
   layoutAll();
   missionDone = (MIS[t] || []).map(() => false);
 }
@@ -1432,6 +1573,9 @@ function techRender() {
 }
 function ctrlHTML(t) {
   switch (t) {
+    case 9: case 12: return `<div class="row"><button class="btn pri" data-act="drop">⤓ Soltar lo que lleva ${t === 9 ? 'el imán' : 'la espumadera'}</button></div><div class="row"><button class="btn" data-act="stir">🥄 Agitar recipiente</button></div><dl class="ro" id="ro"></dl>`;
+    case 10: return `<div class="chips" id="mesh"><button data-m="2">Malla 2 mm</button><button data-m="0.1">Malla fina 0.1 mm</button></div><div class="row"><button class="btn pri" data-act="sieve">↔ Sacudir el tamiz</button></div><dl class="ro" id="ro"></dl>`;
+    case 11: return `<label class="sl"><span>Llama del mechero <b id="v-flame">60 %</b></span><input type="range" id="i-flame" min="5" max="100" value="60"></label><div class="row"><button class="btn pri" data-act="burner" id="b-burn">🔥 Encender</button></div><dl class="ro" id="ro"></dl>`;
     case 1: case 2: return `<div class="row"><button class="btn" data-act="stir">🥄 Agitar recipiente</button></div><dl class="ro" id="ro"></dl>`;
     case 3: return `<div class="row"><button class="btn pri" data-act="tap" id="b-tap">Abrir llave</button><button class="btn" data-act="shake">↻ Agitar</button></div><dl class="ro" id="ro"></dl>`;
     case 4: case 5: return `<div class="chips" id="src"><button data-src="manta">Manta calefactora</button><button data-src="mechero">Mechero Bunsen</button></div><label class="sl"><span>Fuente de calor <b id="v-heat">0 %</b></span><input type="range" id="i-heat" min="0" max="100" value="0"></label><label class="tg"><input type="checkbox" id="i-cool" checked> Agua fría en el refrigerante</label><dl class="ro" id="ro"></dl>`;
@@ -1463,6 +1607,7 @@ function labRender() {
   if ($('i-flame') && tp) { $('i-flame').value = tp.P * 100; $('i-flame').oninput = e => { tp.P = e.target.value / 100; }; }
   const ce = objs.find(o => o.type === 'centrifuge');
   if ($('i-rpm') && ce) { $('i-rpm').value = ce.rpm; $('i-time').value = ce.time; $('i-rpm').oninput = e => { ce.rpm = +e.target.value; }; $('i-time').oninput = e => { ce.time = +e.target.value; }; }
+  if ($('mesh')) { const t = objs.find(o => o.type === 'tamiz'); $('mesh').querySelectorAll('button').forEach(b => { b.classList.toggle('on', t && +b.dataset.m === (t.mesh || 2)); b.onclick = () => { objs.filter(o => o.type === 'tamiz').forEach(o => o.mesh = +b.dataset.m); labRender(); }; }); }
   if ($('inks')) { const p = objs.find(o => o.type === 'paper'); if (p) inkSel = p.ink; $('inks').querySelectorAll('button').forEach(b => { b.classList.toggle('on', b.dataset.ink === inkSel); b.onclick = () => { inkSel = b.dataset.ink; $('inks').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); }; }); }
   misRender(); labUpdate();
 }
@@ -1473,6 +1618,8 @@ function act(a) {
   if (a === 'shake') { const s = objs.find(o => o.type === 'sep'); if (s) { stir(s); flags.sepShake = true; toast('Embudo agitado: se forma una emulsión que luego se separa.'); } }
   if (a === 'burner') { const tp = objs.find(o => o.type === 'tripod'); if (tp) tp.on = !tp.on; }
   if (a === 'cent') { const c = objs.find(o => o.type === 'centrifuge'); if (c) startCent(c); }
+  if (a === 'drop') { const t = objs.find(o => o.type === (tech === 9 ? 'iman' : 'espumadera')); if (t) releaseTool(t); }
+  if (a === 'sieve') { const t = objs.find(o => o.type === 'tamiz'); if (t) { t.shakeT = performance.now(); toast('Sacudiendo el tamiz…'); } }
   if (a === 'newpaper') {
     const old = objs.find(o => o.type === 'paper'); const st = objs.find(o => o.type === 'standClamp');
     if (old) removeObj(old);
@@ -1534,6 +1681,23 @@ function labUpdate() {
       ro(items);
     }
   }
+  if (tech === 9 || tech === 12) {
+    const t = objs.find(o => o.type === (tech === 9 ? 'iman' : 'espumadera')), k = tech === 9 ? 'iron' : 'cork', src = objs.find(o => o.name === (tech === 9 ? 'Hierro + arena' : 'Agua + arena + corcho'));
+    const items = [[tech === 9 ? 'Hierro en el imán' : 'Corcho en la espumadera', t ? fq(t.load[k] || 0) + ' g' : '—']];
+    if (src) items.push([`${SHORT[k]} en la mezcla`, fq(g0(src, k)) + ' g'], ['Arena en la mezcla', fq(g0(src, 'sand')) + ' g']);
+    const dst = objs.find(o => isC(o) && o.fromTool); if (dst) items.push([`${SHORT[k]} depositado`, fq(g0(dst, k)) + ' g']);
+    if (tech === 12) items.push(['Densidades', 'corcho 0.24 · agua 1.0 · arena 2.6 g/cm³']);
+    ro(items);
+  }
+  if (tech === 10) {
+    const t = objs.find(o => o.type === 'tamiz'), c = objs.find(o => o.fromSieve);
+    if (t) ro([['Malla', (t.mesh || 2) < 1 ? '0.1 mm' : '2 mm'], ['Estado', t.shakeT && performance.now() - t.shakeT < 2500 ? 'sacudiendo…' : 'en reposo'], ['Grava en el tamiz', fq(g0(t, 'gravel')) + ' g'], ['Arena en el tamiz', fq(g0(t, 'sand')) + ' g'], ['Arena que pasó', c ? fq(g0(c, 'sand')) + ' g' : '0 g'], ['Tamaños', 'grava ≈ 6 mm · arena ≈ 0.4 mm']]);
+  }
+  if (tech === 11) {
+    const tp = objs.find(o => o.type === 'tripod'); if (tp && $('b-burn')) { $('v-flame').textContent = Math.round(tp.P * 100) + ' %'; $('b-burn').textContent = tp.on ? '⏻ Apagar mechero' : '🔥 Encender mechero'; $('b-burn').className = 'btn ' + (tp.on ? 'red' : 'pri'); }
+    const c = selC() && g0(sel, 'salt') > 0 ? sel : objs.find(o => o.type === 'dish' && o.parent) || objs.find(o => isC(o) && g0(o, 'salt') > 0);
+    if (c) { const w = g0(c, 'water'), k = c.cry.filter(x => x.s === 'salt'); ro([['Recipiente', c.tag || c.name || TYPES[c.type].lab], ['Temperatura', c.T.toFixed(0) + ' °C' + (c.boil ? ' · hirviendo' : '')], ['Agua que queda', fq(w) + ' mL'], ['Sal disuelta', fq(dissolved(c, 'salt')) + ' g'], ['Sal sólida', fq(undis(c, 'salt')) + ' g'], ['Cristales de sal', k.length || '—']]); }
+  }
   if (tech === 8) {
     const c = objs.find(o => o.type === 'centrifuge');
     if (c) {
@@ -1560,9 +1724,9 @@ function solChart(c, s) {
 /* ============================== materiales y reactivos (con imagen) ============================== */
 const MATS = [
   ['Recipientes', [['beaker', 'Vaso de precipitados'], ['erlen', 'Matraz Erlenmeyer'], ['probeta', 'Probeta'], ['aforado', 'Matraz aforado'], ['tube', 'Tubo de ensayo'], ['bottleW', 'Frasco lavador'], ['dish', 'Cápsula de porcelana'], ['vidrio', 'Vidrio de reloj'], ['mortero', 'Mortero y pistilo']]],
-  ['Medida y transferencia', [['pipeta', 'Pipeta'], ['bureta', 'Bureta'], ['funnel', 'Embudo'], ['sep', 'Embudo de decantación'], ['termometro', 'Termómetro'], ['balanza', 'Balanza'], ['varilla', 'Varilla de vidrio'], ['espatula', 'Espátula'], ['gradilla', 'Gradilla']]],
+  ['Medida y transferencia', [['pipeta', 'Pipeta'], ['bureta', 'Bureta'], ['funnel', 'Embudo'], ['sep', 'Embudo de decantación'], ['termometro', 'Termómetro'], ['balanza', 'Balanza'], ['varilla', 'Varilla de vidrio'], ['espatula', 'Espátula'], ['gradilla', 'Gradilla'], ['iman', 'Imán'], ['espumadera', 'Espumadera'], ['tamiz', 'Tamiz'], ['petri', 'Placa de Petri']]],
   ['Equipos', [['standRing', 'Soporte con aro'], ['standClamp', 'Soporte con pinza'], ['tripod', 'Trípode y mechero'], ['iceBath', 'Baño de hielo'], ['column', 'Columna'], ['paper', 'Papel de cromatografía'], ['destilador', 'Equipo de destilación'], ['centrifuge', 'Centrífuga'], ['campana', 'Campana de extracción']]],
-  ['Mezclas preparadas', [['beaker', 'Arena + agua', { water: 120, sand: 12 }, 1], ['beaker', 'Sal + agua', { water: 100, salt: 8 }], ['beaker', 'Aceite + agua', { water: 90, oil: 60 }], ['beaker', 'Alcohol + agua', { water: 80, ethanol: 80 }], ['beaker', 'Sulfato de cobre', { water: 60, cuso4: 12 }], ['beaker', 'Agua turbia', { water: 150, clay: 6 }, 1], ['beaker', 'Arena + sal + agua', { water: 120, sand: 10, salt: 8 }, 1], ['beaker', 'Agua con colorante', { water: 120, dyeB: 1 }], ['bottleA', 'Alcohol', { ethanol: 450 }]]],
+  ['Mezclas preparadas', [['petri', 'Hierro + arena', { iron: 10, sand: 15 }], ['beaker', 'Grava + arena', { gravel: 20, sand: 20 }], ['beaker', 'Agua de mar', { water: 100, salt: 3.5 }], ['beaker', 'Agua + arena + corcho', { water: 150, sand: 12, cork: 5 }, 1], ['beaker', 'Arena + agua', { water: 120, sand: 12 }, 1], ['beaker', 'Sal + agua', { water: 100, salt: 8 }], ['beaker', 'Aceite + agua', { water: 90, oil: 60 }], ['beaker', 'Alcohol + agua', { water: 80, ethanol: 80 }], ['beaker', 'Sulfato de cobre', { water: 60, cuso4: 12 }], ['beaker', 'Agua turbia', { water: 150, clay: 6 }, 1], ['beaker', 'Arena + sal + agua', { water: 120, sand: 10, salt: 8 }, 1], ['beaker', 'Agua con colorante', { water: 120, dyeB: 1 }], ['bottleA', 'Alcohol', { ethanol: 450 }]]],
 ];
 function iconObj(type, comp, stirred) {
   const o = { icon: true, id: 900000 + Math.floor(Math.random() * 1e5), type, x: 0, y: 0, parent: null, tilt: 0, tdir: 1, ...newC(), armY: -235, P: 0.6, on: true, heat: 0, cool: true, headT: 20, front: 0, buf: {}, src: 'manta', ink: 'negra', wet: false, bled: false, e: 0, rpm: 3000, time: 20, run: false, tLeft: 0, open: false, tare: 0, spin: 0, read: 20, label: '', formula: '' };
@@ -1706,6 +1870,7 @@ function tbRender() {
   const c = isC(o) && !o.fixed;
   tb.innerHTML = `<button data-a="zout" title="Reducir este elemento">−</button><button class="sz" data-a="z1" title="Tamaño original">${Math.round((o.sc || 1) * 100)}%</button><button data-a="zin" title="Ampliar este elemento">+</button>`
     + (c ? `<i></i><button data-a="tag" class="${o.tagOn === false || !showTags ? 'off' : ''}" title="Mostrar/ocultar etiqueta">🏷</button><button data-a="name" title="Escribir el nombre de la etiqueta">✎</button><button data-a="stir" title="Agitar">🥄</button>` : '')
+    + (o.type === 'iman' || o.type === 'espumadera' ? `<i></i><button data-a="drop" title="Soltar lo que lleva">⤓ soltar</button>` : '')
     + `<i></i><button data-a="del" title="Quitar del escenario">✕</button>`;
   tb.querySelectorAll('button').forEach(b => b.onclick = ev => { ev.stopPropagation(); tbAct(b.dataset.a); });
 }
@@ -1716,6 +1881,7 @@ function tbAct(a) {
   if (a === 'z1') { o.sc = 1; layoutAll(); }
   if (a === 'tag') { if (!showTags) { showTags = true; $('b-tag').classList.add('on'); o.tagOn = true; } else o.tagOn = o.tagOn === false; }
   if (a === 'stir') { stir(o); o.shakeT = performance.now(); if (o.type === 'sep') flags.sepShake = true; toast(`Agitaste: ${(o.name || TYPES[o.type].lab).toLowerCase()}`); }
+  if (a === 'drop') releaseTool(o);
   if (a === 'del') { removeObj(o); sel = null; toast('Material retirado del escenario.'); }
   if (a === 'name') {
     editing = true; const tb = $('seltb');
@@ -1743,6 +1909,14 @@ function tbPlace() {
   const z = tb.querySelector('.sz'); if (z && !editing) z.textContent = Math.round((sel.sc || 1) * 100) + '%';
 }
 
+// la columna de Materiales/Reactivos se coloca justo debajo del panel de técnicas
+function dockPlace() {
+  const t = $('p-tech'), d = $('dock'); if (!d) return;
+  const r = t.getBoundingClientRect(), vis = getComputedStyle(t).display !== 'none' && r.left < 60;
+  const top = vis ? Math.round(r.bottom + 10) : 82;
+  if (d.dataset.top != top) { d.dataset.top = top; d.style.top = top + 'px'; d.style.maxHeight = `calc(100vh - ${top + 70}px)`; }
+}
+
 /* ============================== bucle ============================== */
 let last = performance.now(), acc = 0, accM = 0;
 function loop(now) {
@@ -1750,12 +1924,12 @@ function loop(now) {
   const sdt = dt * SPEED, n = Math.ceil(SPEED);
   for (let i = 0; i < n; i++) update(sdt / n);
   draw(); tbPlace();
-  acc += dt; if (acc > 0.25) { acc = 0; labUpdate(); }
+  acc += dt; if (acc > 0.25) { acc = 0; labUpdate(); dockPlace(); }
   accM += dt; if (accM > 0.4) { accM = 0; checkMissions(); }
   requestAnimationFrame(loop);
 }
 setBG(store.get('hted-bg') || BGS[0]);
-techRender(); matRender(); reaRender(); qtyRender(); setTech(1);
+techRender(); matRender(); reaRender(); qtyRender(); setTech(1); dockPlace();
 if (!store.get('hted-sep-help')) { $('help').classList.add('on'); store.set('hted-sep-help', '1'); }
 requestAnimationFrame(loop);
 </script>
